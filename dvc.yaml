@@ -1,0 +1,39 @@
+stages:
+  train-baseline:
+    cmd: python -m solarnet.main train
+    params:
+      - config/config.yaml:
+        - data
+        - trainer
+        - name
+        - seed
+        - tracking
+        - gpus
+    deps:
+      - solarnet/main.py
+      - config/config.yaml
+      - data/sdo-benchmark
+    outs:
+      - models/baseline/model.ckpt
+
+  test-baseline:
+    cmd: python -m solarnet.main test
+    params:
+      - config/config.yaml:
+        - data
+        - trainer
+        - seed
+        - gpus
+    deps:
+      - solarnet/main.py
+      - config/config.yaml
+      - data/sdo-benchmark
+      - models/baseline/model.ckpt
+    metrics:
+      - models/baseline/metrics.yaml:
+          cache: false
+    outs:
+      - models/baseline/test_samples.png:
+          cache: false
+      - models/baseline/confusion_matrix.png:
+          cache: false

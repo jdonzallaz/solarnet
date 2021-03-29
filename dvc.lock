@@ -1,0 +1,73 @@
+schema: '2.0'
+stages:
+  train-baseline:
+    cmd: python -m solarnet.main train
+    deps:
+    - path: config/config.yaml
+      md5: 6847f43b9ab870f9b032233cb23c7451
+      size: 210
+    - path: data/sdo-benchmark
+      md5: df0207baf2b8d30978dd713c078d8359.dir
+      size: 2949323515
+      nfiles: 364913
+    - path: solarnet/main.py
+      md5: 3d55024b877842fedda76c3a30b4422c
+      size: 1124
+    params:
+      config/config.yaml:
+        data:
+          validation_size: 0.1
+          channel: '171'
+          size: 256
+        gpus: 1
+        name: Baseline binary classification model
+        seed: 42
+        tracking: true
+        trainer:
+          epochs: 25
+          batch_size: 64
+          learning_rate: 0.005
+          patience: 8
+    outs:
+    - path: models/baseline/model.ckpt
+      md5: a20c7d63809d47c356bfe53d0731e68e
+      size: 50458575
+  test-baseline:
+    cmd: python -m solarnet.main test
+    deps:
+    - path: config/config.yaml
+      md5: 6847f43b9ab870f9b032233cb23c7451
+      size: 210
+    - path: data/sdo-benchmark
+      md5: df0207baf2b8d30978dd713c078d8359.dir
+      size: 2949323515
+      nfiles: 364913
+    - path: models/baseline/model.ckpt
+      md5: a20c7d63809d47c356bfe53d0731e68e
+      size: 50458575
+    - path: solarnet/main.py
+      md5: 3d55024b877842fedda76c3a30b4422c
+      size: 1124
+    params:
+      config/config.yaml:
+        data:
+          validation_size: 0.1
+          channel: '171'
+          size: 256
+        gpus: 1
+        seed: 42
+        trainer:
+          epochs: 25
+          batch_size: 64
+          learning_rate: 0.005
+          patience: 8
+    outs:
+    - path: models/baseline/confusion_matrix.png
+      md5: d6dce80fc5b6dbfaa2e96fe3aab7ea83
+      size: 22093
+    - path: models/baseline/metrics.yaml
+      md5: 57449ecc54fd6b11c7594799d8a3df41
+      size: 54
+    - path: models/baseline/test_samples.png
+      md5: 79ee8b34a9f82b5ffa60a72e8fa129d0
+      size: 993998
