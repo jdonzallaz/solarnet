@@ -9,11 +9,12 @@ from torchmetrics.functional import accuracy, f1
 def conv_block(input_size, output_size, *args, **kwargs):
     return nn.Sequential(
         nn.Conv2d(input_size, output_size, *args, **kwargs),
-        nn.ReLU(),
-        # nn.Dropout2d(0.1),
+        nn.BatchNorm2d(output_size),
         # nn.Conv2d(input_size, output_size, (3, 3)),
         # nn.ReLU(),
         nn.MaxPool2d((2, 2)),
+        nn.ReLU(),
+        nn.Dropout2d(0.1),
     )
 
 
@@ -26,13 +27,14 @@ class CNN(pl.LightningModule):
 
         # Architecture
         self.conv_blocks = nn.Sequential(
-            conv_block(channels, 16, kernel_size=3, padding=1),
-            # conv_block(8, 16, kernel_size=3, padding=1),
-            conv_block(16, 64, kernel_size=3, padding=1),
+            conv_block(channels, 16, kernel_size=3, padding=1,stride=3),
+            conv_block(16, 32, kernel_size=3, padding=1,stride=3),
+            conv_block(32, 64, kernel_size=3, padding=1,stride=3),
             nn.Flatten(),
         )
         self.linear_block = nn.Sequential(
-            nn.Linear(int(64 * height * width / (4 ** 2)), 16),
+            nn.Linear(64, 16),
+            # nn.Linear(int(64 * height * width / (4 ** 3)), 16),
             nn.ReLU(),
             nn.Dropout2d(0.2),
         )
@@ -56,6 +58,7 @@ class CNN(pl.LightningModule):
     @auto_move_data
     def forward(self, image):
         image = self.conv_blocks(image)
+        # print(image.shape)
         image = self.linear_block(image)
 
         return self.out(image)

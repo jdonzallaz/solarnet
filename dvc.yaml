@@ -1,18 +1,28 @@
 stages:
+  download-dataset:
+    cmd: python -m solarnet.main download sdo-benchmark-zip
+    deps:
+      - solarnet/main.py
+      - config/minio.yaml
+    outs:
+      - data/sdo-benchmark.placeholder:
+          cache: false
+
   train-baseline:
     cmd: python -m solarnet.main train
     params:
       - config/config.yaml:
-        - data
-        - trainer
-        - name
-        - seed
-        - tracking
-        - gpus
+          - data
+          - trainer
+          - name
+          - seed
+          - tracking
+          - gpus
     deps:
       - solarnet/main.py
+      - solarnet/models/baseline.py
       - config/config.yaml
-      - data/sdo-benchmark
+      - data/sdo-benchmark.placeholder
     outs:
       - models/baseline/model.ckpt
 
@@ -20,14 +30,15 @@ stages:
     cmd: python -m solarnet.main test
     params:
       - config/config.yaml:
-        - data
-        - trainer
-        - seed
-        - gpus
+          - data
+          - trainer
+          - seed
+          - gpus
     deps:
       - solarnet/main.py
+      - solarnet/models/baseline.py
       - config/config.yaml
-      - data/sdo-benchmark
+      - data/sdo-benchmark.placeholder
       - models/baseline/model.ckpt
     metrics:
       - models/baseline/metrics.yaml:
