@@ -19,5 +19,6 @@ torchvision>=0.9.0+cu111
 torch_optimizer==0.1.0
 tqdm==4.60.0
 typer==0.3.2
+git+https://github.com/jacobgil/pytorch-grad-cam
 
 --find-links https://download.pytorch.org/whl/torch_stable.html
