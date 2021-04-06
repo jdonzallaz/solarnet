@@ -3,6 +3,7 @@ from pathlib import Path
 
 import typer
 
+from solarnet.tasks.download_dataset import download_dataset
 from solarnet.utils.log import init_log, set_log_level
 init_log()
 
@@ -37,6 +38,16 @@ def test_command(
     logger.info(f"Params: {params}")
 
     test(params)
+
+
+@app.command('download')
+def train_command(
+    dataset: str = typer.Argument("sdo-benchmark"),
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+):
+    if verbose: set_log_level(logging.INFO)
+
+    download_dataset(dataset)
 
 
 # Command to add options before the command (-v train ...)

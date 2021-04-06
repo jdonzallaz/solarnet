@@ -3,6 +3,7 @@
 .vscode
 
 # Remove config with sensible data
+config/minio.yaml
 config/neptune.yaml
 
 # Remove models data
