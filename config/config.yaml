@@ -3,11 +3,14 @@ data:
   channel: '171'
   size: 256
 
+model:
+  activation: relu
+
 trainer:
   epochs: 25
   batch_size: 64
   learning_rate: 5e-3
-  patience: 8
+  patience: 12
 
 name: Baseline binary classification model
 seed: 42

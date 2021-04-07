@@ -1,4 +1,5 @@
 import logging
+import os
 import shutil
 from pathlib import Path
 
@@ -28,6 +29,7 @@ def train(parameters: dict):
         channel=parameters['data']['channel'],
         resize=parameters['data']['size'],
         seed=parameters['seed'],
+        num_workers=0 if os.name == 'nt' else 4  # Windows supports only 1, Linux supports more
     )
     datamodule.setup()
     logger.info(f"Data format: {datamodule.size()}")
@@ -36,7 +38,8 @@ def train(parameters: dict):
     total_steps = parameters['trainer']['epochs'] * steps_per_epoch
 
     model = CNN(*datamodule.size(), n_class=2, learning_rate=parameters['trainer']['learning_rate'],
-                class_weight=datamodule.class_weight, total_steps=total_steps)
+                class_weight=datamodule.class_weight, total_steps=total_steps,
+                activation=parameters['model']['activation'])
     logger.info(f"Model: {model}")
 
     early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=parameters['trainer']['patience'],
@@ -68,6 +71,7 @@ def train(parameters: dict):
                          # limit_val_batches=1,
                          # limit_test_batches=10,
                          log_every_n_steps=10, flush_logs_every_n_steps=10,
+                         accelerator=None if parameters['gpus'] is None or parameters['gpus'] == 0 else 'ddp',
                          )
 
     trainer.fit(model, datamodule=datamodule)

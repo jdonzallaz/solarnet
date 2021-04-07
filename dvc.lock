@@ -4,17 +4,17 @@ stages:
     cmd: python -m solarnet.main train
     deps:
     - path: config/config.yaml
-      md5: 6847f43b9ab870f9b032233cb23c7451
-      size: 210
+      md5: bd8bc5fbd8939b730426333d1d8083aa
+      size: 238
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: solarnet/main.py
-      md5: 50b63f6154cda212c065a92bc74683e9
-      size: 1421
+      md5: 4d266c087916e2df354b3d09a52f16e5
+      size: 1483
     - path: solarnet/models/baseline.py
-      md5: ff9accbaafd8da878f6517ec5dac2b9e
-      size: 5136
+      md5: fa5c9030961178ca83aa07d3ddf8ba90
+      size: 5637
     params:
       config/config.yaml:
         data:
@@ -22,6 +22,8 @@ stages:
           channel: '171'
           size: 256
         gpus: 1
+        model:
+          activation: relu
         name: Baseline binary classification model
         seed: 42
         tracking: true
@@ -29,29 +31,29 @@ stages:
           epochs: 25
           batch_size: 64
           learning_rate: 0.005
-          patience: 8
+          patience: 12
     outs:
     - path: models/baseline/model.ckpt
-      md5: 18e40cd220097425edddfad93fa9955e
-      size: 321175
+      md5: bbf95a8fc51449e8f713449a0405866a
+      size: 321428
   test-baseline:
     cmd: python -m solarnet.main test
     deps:
     - path: config/config.yaml
-      md5: 6847f43b9ab870f9b032233cb23c7451
-      size: 210
+      md5: bd8bc5fbd8939b730426333d1d8083aa
+      size: 238
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline/model.ckpt
-      md5: 18e40cd220097425edddfad93fa9955e
-      size: 321175
+      md5: bbf95a8fc51449e8f713449a0405866a
+      size: 321428
     - path: solarnet/main.py
-      md5: 50b63f6154cda212c065a92bc74683e9
-      size: 1421
+      md5: 4d266c087916e2df354b3d09a52f16e5
+      size: 1483
     - path: solarnet/models/baseline.py
-      md5: ff9accbaafd8da878f6517ec5dac2b9e
-      size: 5136
+      md5: fa5c9030961178ca83aa07d3ddf8ba90
+      size: 5637
     params:
       config/config.yaml:
         data:
@@ -59,22 +61,24 @@ stages:
           channel: '171'
           size: 256
         gpus: 1
+        model:
+          activation: relu
         seed: 42
         trainer:
           epochs: 25
           batch_size: 64
           learning_rate: 0.005
-          patience: 8
+          patience: 12
     outs:
     - path: models/baseline/confusion_matrix.png
-      md5: 4188e58993462cc4f8edf507c114d1b0
-      size: 21743
+      md5: c2ecb1d79b965a92b0057aa56c0fa5fd
+      size: 21656
     - path: models/baseline/metrics.yaml
-      md5: ea01701baae0c6d350cb5c197822d178
-      size: 53
+      md5: 71e77a27dff2dcf35a2e3fe62feed179
+      size: 51
     - path: models/baseline/test_samples.png
-      md5: b485068946415f7bb371b65e2aaffef1
-      size: 993998
+      md5: bbf6be8b9313c4bd269810c7018b81de
+      size: 993010
   download-dataset:
     cmd: python -m solarnet.main download sdo-benchmark-zip
     deps:
@@ -82,8 +86,8 @@ stages:
       md5: 2cf2c6bc04bcddb76df1d97aae80ba0a
       size: 117
     - path: solarnet/main.py
-      md5: 50b63f6154cda212c065a92bc74683e9
-      size: 1421
+      md5: 4d266c087916e2df354b3d09a52f16e5
+      size: 1483
     outs:
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337

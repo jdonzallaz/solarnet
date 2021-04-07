@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 import typer
@@ -14,6 +15,7 @@ from solarnet.utils.yaml import load_yaml
 set_log_level(logging.WARNING)
 logger = logging.getLogger()
 app = typer.Typer(context_settings={"help_option_names": ["-h", "--help"]})
+os.environ["PL_TORCH_DISTRIBUTED_BACKEND"] = "gloo"
 
 
 @app.command('train')

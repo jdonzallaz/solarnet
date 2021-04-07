@@ -6,30 +6,43 @@ from torch import nn, optim
 from torchmetrics.functional import accuracy, f1
 
 
-def conv_block(input_size, output_size, *args, **kwargs):
+def conv_block(input_size, output_size, activation: str, *args, **kwargs):
+    if activation == "leakyrelu":
+        activation_fn = nn.LeakyReLU()
+    elif activation == "selu":
+        activation_fn = nn.SELU()
+    elif activation == "tanh":
+        activation_fn = nn.Tanh()
+    elif activation == "prelu":
+        activation_fn = nn.PReLU()
+    elif activation == "relu6":
+        activation_fn = nn.ReLU6()
+    else:
+        activation_fn = nn.ReLU()
+
     return nn.Sequential(
         nn.Conv2d(input_size, output_size, *args, **kwargs),
         nn.BatchNorm2d(output_size),
         # nn.Conv2d(input_size, output_size, (3, 3)),
         # nn.ReLU(),
         nn.MaxPool2d((2, 2)),
-        nn.ReLU(),
+        activation_fn,
         nn.Dropout2d(0.1),
     )
 
 
 class CNN(pl.LightningModule):
     def __init__(self, channels: int, height: int, width: int, n_class: int, learning_rate: float = 1e-4,
-                 class_weight: torch.FloatTensor = None, total_steps: int = 0):
+                 class_weight: torch.FloatTensor = None, total_steps: int = 0, activation: str = 'relu'):
         super().__init__()
 
         self.save_hyperparameters()
 
         # Architecture
         self.conv_blocks = nn.Sequential(
-            conv_block(channels, 16, kernel_size=3, padding=1,stride=3),
-            conv_block(16, 32, kernel_size=3, padding=1,stride=3),
-            conv_block(32, 64, kernel_size=3, padding=1,stride=3),
+            conv_block(channels, 16, kernel_size=3, padding=0, stride=3, activation=activation),
+            conv_block(16, 32, kernel_size=3, padding=0, stride=3, activation=activation),
+            conv_block(32, 64, kernel_size=3, padding=0, stride=3, activation=activation),
             nn.Flatten(),
         )
         self.linear_block = nn.Sequential(

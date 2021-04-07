@@ -6,6 +6,7 @@ stages:
       - config/minio.yaml
     outs:
       - data/sdo-benchmark.placeholder:
+          persist: true
           cache: false
 
   train-baseline:
@@ -13,6 +14,7 @@ stages:
     params:
       - config/config.yaml:
           - data
+          - model
           - trainer
           - name
           - seed
@@ -31,6 +33,7 @@ stages:
     params:
       - config/config.yaml:
           - data
+          - model
           - trainer
           - seed
           - gpus

@@ -18,6 +18,9 @@ def download_dataset(dataset: str):
     is_zip = dataset.split("-")[-1] == "zip"
     if is_zip:
         dataset = "-".join(dataset.split("-")[:-1])
+    
+    if (Path('data') / f"{dataset}.placeholder").exists():
+        return
 
     # Check MinIO config
     minio_config_file = Path('config') / 'minio.yaml'
@@ -41,7 +44,7 @@ def download_dataset(dataset: str):
         zip_file.unlink()  # Delete archive
 
     # Add dataset placeholder file (mostly to indicate to DVC that the data is present)
-    with open(Path('data') / "sdo-benchmark.placeholder", "w+") as f:
-        f.write("SDO-Benchmark dataset version 1.0\n")
+    with open(Path('data') / f"{dataset}.placeholder", "w+") as f:
+        f.write(f"{dataset} dataset version 1.0\n")
         f.write("This file is only a placeholder file. It is created when the dataset is downloaded and indicates that "
                 "the dataset is present.\n")
