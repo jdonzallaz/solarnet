@@ -1,14 +1,11 @@
+import datetime as dt
 import os
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Callable, Optional
 
-import numpy as np
 import pandas as pd
-import torch
 from PIL import Image
-from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset
-import datetime as dt
 
 
 class SDOBenchmarkDataset(Dataset):
@@ -16,10 +13,9 @@ class SDOBenchmarkDataset(Dataset):
         self,
         csv_file: Path,
         root_folder: Path,
-        channel="continuum",
+        channel="171",
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
-        # scaler=None,
     ):
         metadata = pd.read_csv(csv_file, parse_dates=["start", "end"])
 
@@ -50,45 +46,18 @@ class SDOBenchmarkDataset(Dataset):
             if image_path.exists():
                 ls.append([os.path.join(sample_active_region, sample_date, image_name), target])
 
-        self.ls = ls # np.array(ls)
+        self.ls = ls
 
     def get_y(self):
         return [self.target_transform(y[1]) for y in self.ls]
-
-        # if scaler is not None:
-        #     self.scaler = scaler
-        # else:
-        #     self.scaler = StandardScaler()
-        #     self.scaler.fit(self.ls[:, 1].reshape(-1, 1))
-        #
-        # y_scaled = self.scaler.transform(self.ls[:, 1].reshape(-1, 1))
-        # y_scaled = torch.from_numpy(y_scaled)
-        # self.ls[:, 1] = y_scaled.flatten()
 
     def __len__(self) -> int:
         return len(self.ls)
 
     def __getitem__(self, index):
-        # metadata = self.metadata.iloc[index]
         metadata = self.ls[index]
-        # target = metadata["peak_flux"]
-        # target = float(metadata[1])
         target = metadata[1]
-
-        # sample_active_region, sample_date = metadata["id"].split("_", maxsplit=1)
-        #
-        # image_folder = self.root_folder / sample_active_region / sample_date
-        # image_date = metadata["start"] + dt.timedelta(minutes=self.time_steps[3])
-        # image_date_str = dt.datetime.strftime(
-        #     image_date,
-        #     "%Y-%m-%dT%H%M%S",
-        # )
-        # image_path = image_folder / f"{image_date_str}__{self.channel}.jpg"
-        # try:
         image = Image.open(self.root_folder / metadata[0])
-        # except FileNotFoundError:
-        #     image_path = self.find_image(image_folder, image_date)
-        #     image = Image.open(image_path)
 
         if self.transform:
             image = self.transform(image)

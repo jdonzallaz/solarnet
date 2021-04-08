@@ -1,21 +1,21 @@
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 import numpy as np
 import pytorch_lightning as pl
 import torch
 from sklearn.utils import class_weight
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
 from solarnet.utils.data import train_test_split
-from solarnet.utils.physics import flux_to_class, flux_to_id, flux_to_binary_class
 
 
 class SDOBenchmarkDataModule(pl.LightningDataModule):
     def __init__(self, dataset_dir: Path, channel: str = '171', batch_size: int = 32, num_workers: int = 0,
-                 validation_size: float = 0.1, resize: int = 64, seed: int = 42):
+                 validation_size: float = 0.1, resize: int = 64, seed: int = 42,
+                 target_transform: Callable[[float], any] = None):
         super().__init__()
         self.dataset_dir = dataset_dir
         self.channel = channel
@@ -31,8 +31,7 @@ class SDOBenchmarkDataModule(pl.LightningDataModule):
 
         self.class_weight = None
 
-        # self.target_transform = flux_to_id
-        self.target_transform = flux_to_binary_class
+        self.target_transform = target_transform
 
     def prepare_data(self):
         pass

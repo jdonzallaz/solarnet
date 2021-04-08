@@ -3,9 +3,6 @@ stages:
   train-baseline:
     cmd: python -m solarnet.main train
     deps:
-    - path: config/config.yaml
-      md5: bd8bc5fbd8939b730426333d1d8083aa
-      size: 238
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -16,14 +13,18 @@ stages:
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6250
     - path: solarnet/tasks/train.py
-      md5: 249a03e9c1f3ceec6d2e1f0e9efa6402
-      size: 3346
+      md5: 365884d39b5acc6b9c104c56f8cab3df
+      size: 3611
     params:
       config/config.yaml:
         data:
           validation_size: 0.1
           channel: '171'
           size: 256
+          targets:
+            classes:
+            - Quiet: < 1e-6
+            - '>=C': '>= 1e-6'
         gpus: 1
         model:
           activation: relu
@@ -37,19 +38,16 @@ stages:
           patience: 12
     outs:
     - path: models/baseline/model.ckpt
-      md5: 941e14737ce7b539dfebc4609111d5ba
+      md5: 8ecbc012ba43418d476d6bfb410d7b9f
       size: 321620
   test-baseline:
     cmd: python -m solarnet.main test
     deps:
-    - path: config/config.yaml
-      md5: bd8bc5fbd8939b730426333d1d8083aa
-      size: 238
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline/model.ckpt
-      md5: 941e14737ce7b539dfebc4609111d5ba
+      md5: 8ecbc012ba43418d476d6bfb410d7b9f
       size: 321620
     - path: solarnet/main.py
       md5: 4d266c087916e2df354b3d09a52f16e5
@@ -58,14 +56,18 @@ stages:
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6250
     - path: solarnet/tasks/test.py
-      md5: 812c41eed5a57a17ad68b19d1b1eff42
-      size: 4889
+      md5: 8d9902b4952b3bb0d092b10d68b933dd
+      size: 5197
     params:
       config/config.yaml:
         data:
           validation_size: 0.1
           channel: '171'
           size: 256
+          targets:
+            classes:
+            - Quiet: < 1e-6
+            - '>=C': '>= 1e-6'
         gpus: 1
         model:
           activation: relu
@@ -77,11 +79,11 @@ stages:
           patience: 12
     outs:
     - path: models/baseline/confusion_matrix.png
-      md5: da1241be0302b37c66a3a1fa290ab716
-      size: 20886
+      md5: 4cde5a80e0ce8dfd39b6cc3137224673
+      size: 20378
     - path: models/baseline/metrics.yaml
-      md5: 58a701a2a6cfb30af7a218879e9875a2
-      size: 175
+      md5: 56548a0d5401c8126177f55e28ed5759
+      size: 172
     - path: models/baseline/test_samples.png
       md5: bbf6be8b9313c4bd269810c7018b81de
       size: 993010

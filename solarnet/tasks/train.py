@@ -9,6 +9,7 @@ from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, Mode
 
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.models.baseline import CNN
+from solarnet.utils.target import flux_to_class_builder
 from solarnet.utils.tracking import NeptuneTracking, Tracking
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,8 @@ def train(parameters: dict):
         channel=parameters['data']['channel'],
         resize=parameters['data']['size'],
         seed=parameters['seed'],
-        num_workers=0 if os.name == 'nt' else 4  # Windows supports only 1, Linux supports more
+        num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
+        target_transform=flux_to_class_builder(parameters['data']['targets']['classes'])
     )
     datamodule.setup()
     logger.info(f"Data format: {datamodule.size()}")
@@ -37,8 +39,11 @@ def train(parameters: dict):
     steps_per_epoch = len(datamodule.train_dataloader())
     total_steps = parameters['trainer']['epochs'] * steps_per_epoch
 
-    model = CNN(*datamodule.size(), n_class=2, learning_rate=parameters['trainer']['learning_rate'],
-                class_weight=datamodule.class_weight, total_steps=total_steps,
+    model = CNN(*datamodule.size(),
+                n_class=len(parameters['data']['targets']['classes']),
+                learning_rate=parameters['trainer']['learning_rate'],
+                class_weight=datamodule.class_weight,
+                total_steps=total_steps,
                 activation=parameters['model']['activation'])
     logger.info(f"Model: {model}")
 
@@ -71,7 +76,7 @@ def train(parameters: dict):
                          # limit_val_batches=1,
                          # limit_test_batches=10,
                          log_every_n_steps=10, flush_logs_every_n_steps=10,
-                         accelerator=None if parameters['gpus'] is None or parameters['gpus'] == 0 else 'ddp',
+                         accelerator=None if parameters['gpus'] is None or parameters['gpus'] == 0 or parameters['gpus'] == 1 else 'ddp',
                          )
 
     trainer.fit(model, datamodule=datamodule)
