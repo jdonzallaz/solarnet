@@ -3,7 +3,7 @@ import torch
 import torch_optimizer
 from pytorch_lightning.core.decorators import auto_move_data
 from torch import nn, optim
-from torchmetrics.functional import accuracy, f1
+from torchmetrics import Accuracy, F1, MetricCollection, Recall, StatScores
 
 
 def conv_block(input_size, output_size, activation: str, *args, **kwargs):
@@ -68,6 +68,13 @@ class CNN(pl.LightningModule):
         # self.test_metrics = {}
         # self.mae = pl.metrics.MeanAbsoluteError()
 
+        self.test_metrics = MetricCollection([
+            Accuracy(),
+            F1(num_classes=self.hparams.n_class, average="macro"),
+            Recall(num_classes=self.hparams.n_class, average='macro'),
+            StatScores(num_classes=self.hparams.n_class, reduce="micro"),
+        ])
+
     @auto_move_data
     def forward(self, image):
         image = self.conv_blocks(image)
@@ -100,10 +107,8 @@ class CNN(pl.LightningModule):
         image, y = batch
         logits = self(image)
         y_pred = torch.argmax(logits, dim=1)
-        acc = accuracy(y_pred, y)
-        self.log('test_accuracy', acc)
-        f1_score = f1(y_pred, y, self.hparams.n_class, average='macro')
-        self.log('test_f1', f1_score)
+
+        self.test_metrics(y_pred, y)
 
     def step(self, batch, step_type: str):
         image, y = batch
@@ -120,6 +125,18 @@ class CNN(pl.LightningModule):
         self.log(f"{step_type}_loss", loss, prog_bar=True, sync_dist=False)
 
         return loss
+
+    def test_epoch_end(self, outs):
+        test_metrics = self.test_metrics.compute()
+        self.log('test_accuracy', test_metrics["Accuracy"])
+        self.log('test_recall', test_metrics["Recall"])
+        self.log('test_f1', test_metrics["F1"])
+
+        tp, fp, tn, fn, _ = test_metrics["StatScores"]
+        self.log('test_tp', tp)
+        self.log('test_fp', fp)
+        self.log('test_tn', tn)
+        self.log('test_fn', fn)
 
     # def validation_epoch_end(self, outputs):
     #     avg_val_loss = torch.stack([x["val_loss"] for x in outputs]).mean()

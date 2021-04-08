@@ -26,6 +26,7 @@ def test(parameters: dict):
     ds_path = Path("data/sdo-benchmark")
     model_path = Path("models/baseline/")
     labels = ['Quiet', '>=C']
+    parameters["gpus"] = min(1, parameters["gpus"])
 
     datamodule = SDOBenchmarkDataModule(
         ds_path,
@@ -49,10 +50,32 @@ def test(parameters: dict):
     # Evaluate model
     raw_metrics = trainer.test(model, datamodule=datamodule, verbose=True)
 
+    tp = raw_metrics[0]["test_tp"]  # hits
+    fp = raw_metrics[0]["test_fp"]  # false alarm
+    tn = raw_metrics[0]["test_tn"]  # correct negative
+    fn = raw_metrics[0]["test_fn"]  # miss
+    sensitivity = tp / (tp + fn)
+    specificity = tn / (tn + fp)
+
     # Write metrics
+    # Metric computation is inspired by hydrogo/rainymotion.
     metrics = {
+        # Accuracy
         "accuracy": raw_metrics[0]["test_accuracy"],
+        # Balanced accuracy is the recall using average=macro
+        "balanced_accuracy": raw_metrics[0]["test_recall"],
+        # F1-score macro
         "f1": raw_metrics[0]["test_f1"],
+        # False Alarm Rate - computation inspired by hydrogo/rainymotion
+        "far": fp / (tp + fp),
+        # Heidke Skill Score - computation inspired by hydrogo/rainymotion
+        "hss": (2 * (tp * tn - fn * fp)) / (fn ** 2 + fp ** 2 + 2 * tp * tn + (fn + fp) * (tp + tn)),
+        # Probability Of Detection - computation inspired by hydrogo/rainymotion
+        "pod": sensitivity,
+        # Critical Success Index - computation inspired by hydrogo/rainymotion
+        "csi": tp / (tp + fn + fp),
+        # True Skill Statistic
+        "tss": sensitivity + specificity - 1,
     }
     write_yaml(model_path / "metrics.yaml", metrics)
 

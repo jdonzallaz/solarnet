@@ -22,6 +22,7 @@ stages:
           - gpus
     deps:
       - solarnet/main.py
+      - solarnet/tasks/train.py
       - solarnet/models/baseline.py
       - config/config.yaml
       - data/sdo-benchmark.placeholder
@@ -39,6 +40,7 @@ stages:
           - gpus
     deps:
       - solarnet/main.py
+      - solarnet/tasks/test.py
       - solarnet/models/baseline.py
       - config/config.yaml
       - data/sdo-benchmark.placeholder

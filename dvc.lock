@@ -13,8 +13,11 @@ stages:
       md5: 4d266c087916e2df354b3d09a52f16e5
       size: 1483
     - path: solarnet/models/baseline.py
-      md5: fa5c9030961178ca83aa07d3ddf8ba90
-      size: 5637
+      md5: 4d5632d2f513677fb49937a3fc44c602
+      size: 6250
+    - path: solarnet/tasks/train.py
+      md5: 249a03e9c1f3ceec6d2e1f0e9efa6402
+      size: 3346
     params:
       config/config.yaml:
         data:
@@ -34,8 +37,8 @@ stages:
           patience: 12
     outs:
     - path: models/baseline/model.ckpt
-      md5: bbf95a8fc51449e8f713449a0405866a
-      size: 321428
+      md5: 941e14737ce7b539dfebc4609111d5ba
+      size: 321620
   test-baseline:
     cmd: python -m solarnet.main test
     deps:
@@ -46,14 +49,17 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline/model.ckpt
-      md5: bbf95a8fc51449e8f713449a0405866a
-      size: 321428
+      md5: 941e14737ce7b539dfebc4609111d5ba
+      size: 321620
     - path: solarnet/main.py
       md5: 4d266c087916e2df354b3d09a52f16e5
       size: 1483
     - path: solarnet/models/baseline.py
-      md5: fa5c9030961178ca83aa07d3ddf8ba90
-      size: 5637
+      md5: 4d5632d2f513677fb49937a3fc44c602
+      size: 6250
+    - path: solarnet/tasks/test.py
+      md5: 812c41eed5a57a17ad68b19d1b1eff42
+      size: 4889
     params:
       config/config.yaml:
         data:
@@ -71,11 +77,11 @@ stages:
           patience: 12
     outs:
     - path: models/baseline/confusion_matrix.png
-      md5: c2ecb1d79b965a92b0057aa56c0fa5fd
-      size: 21656
+      md5: da1241be0302b37c66a3a1fa290ab716
+      size: 20886
     - path: models/baseline/metrics.yaml
-      md5: 71e77a27dff2dcf35a2e3fe62feed179
-      size: 51
+      md5: 58a701a2a6cfb30af7a218879e9875a2
+      size: 175
     - path: models/baseline/test_samples.png
       md5: bbf6be8b9313c4bd269810c7018b81de
       size: 993010
