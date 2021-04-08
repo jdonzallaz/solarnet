@@ -47,7 +47,6 @@ def test(parameters: dict):
 
     trainer = pl.Trainer(
         gpus=parameters["gpus"],
-        limit_test_batches=10,
     )
 
     # Evaluate model

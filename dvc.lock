@@ -56,8 +56,8 @@ stages:
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6250
     - path: solarnet/tasks/test.py
-      md5: 8d9902b4952b3bb0d092b10d68b933dd
-      size: 5197
+      md5: 094b8f3501b341502132aefd0b73e021
+      size: 5166
     params:
       config/config.yaml:
         data:
@@ -82,8 +82,8 @@ stages:
       md5: 4cde5a80e0ce8dfd39b6cc3137224673
       size: 20378
     - path: models/baseline/metrics.yaml
-      md5: 56548a0d5401c8126177f55e28ed5759
-      size: 172
+      md5: ecfc008ca85c8a855f478be5f53e6e15
+      size: 209
     - path: models/baseline/test_samples.png
       md5: bbf6be8b9313c4bd269810c7018b81de
       size: 993010
