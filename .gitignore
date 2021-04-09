@@ -9,6 +9,8 @@ config/neptune.yaml
 # Remove models data
 *.ckpt
 lightning_logs
+tracking.yaml
+.neptune
 
 
 ### PyCharm ###

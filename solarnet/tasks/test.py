@@ -14,7 +14,8 @@ from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
 from solarnet.models.baseline import CNN
 from solarnet.utils.plots import image_grid, plot_confusion_matrix
 from solarnet.utils.target import flux_to_class_builder
-from solarnet.utils.yaml import write_yaml
+from solarnet.utils.tracking import NeptuneNewTracking, Tracking
+from solarnet.utils.yaml import load_yaml, write_yaml
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,14 @@ def test(parameters: dict):
     model_path = Path("models/baseline/")
     labels = [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
     parameters["gpus"] = min(1, parameters["gpus"])
+
+    # Tracking
+    tracking_path = model_path / "tracking.yaml"
+    tracking: Optional[Tracking] = None
+    if tracking_path.exists():
+        tracking_data = load_yaml(tracking_path)
+        run_id = tracking_data["run_id"]
+        tracking = NeptuneNewTracking.resume(run_id)
 
     datamodule = SDOBenchmarkDataModule(
         ds_path,
@@ -81,6 +90,8 @@ def test(parameters: dict):
         "tss": sensitivity + specificity - 1,
     }
     write_yaml(model_path / "metrics.yaml", metrics)
+    if tracking:
+        tracking.log_metrics(metrics, "metrics/test")
 
     # Prepare a set of test samples
     model.freeze()
@@ -97,7 +108,11 @@ def test(parameters: dict):
 
     # Confusion matrix
     y_pred, y = predict(model, datamodule.test_dataloader())
-    plot_confusion_matrix(y, y_pred, labels, path=Path(model_path / "confusion_matrix.png"))
+    confusion_matrix_path = Path(model_path / "confusion_matrix.png")
+    plot_confusion_matrix(y, y_pred, labels, path=confusion_matrix_path)
+    if tracking:
+        tracking.log_artifact(confusion_matrix_path, "metrics/test/confusion_matrix")
+        tracking.end()
 
 
 def get_random_test_samples_dataloader(

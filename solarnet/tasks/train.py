@@ -10,7 +10,8 @@ from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, Mode
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.models.baseline import CNN
 from solarnet.utils.target import flux_to_class_builder
-from solarnet.utils.tracking import NeptuneTracking, Tracking
+from solarnet.utils.tracking import NeptuneNewTracking, Tracking
+from solarnet.utils.yaml import write_yaml
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +60,8 @@ def train(parameters: dict):
     )
     callbacks = [early_stop_callback, checkpoint_callback]
 
-    tracking: Tracking = NeptuneTracking(parameters=parameters, tags=[], disabled=not parameters['tracking'])
-    pl_logger = tracking.get_pl_logger()
+    tracking: Tracking = NeptuneNewTracking(parameters=parameters, tags=[], disabled=not parameters['tracking'])
+    pl_logger = tracking.get_callback('pytorch-lightning')
 
     if pl_logger is not None:
         callbacks.append(LearningRateMonitor(logging_interval='step'))
@@ -89,5 +90,10 @@ def train(parameters: dict):
     path = Path(checkpoint_callback.best_model_path)
     if str(path) != ".":
         shutil.copy2(path, Path(path.parent, "model.ckpt"))
+
+    # Output tracking run id to continue logging in test step
+    run_id = tracking.get_id()
+    if run_id is not None:
+        write_yaml(model_path / "tracking.yaml", {"run_id": run_id})
 
     tracking.end()
