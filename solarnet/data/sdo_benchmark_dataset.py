@@ -1,9 +1,9 @@
 import datetime as dt
-import os
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional, Union
 
 import pandas as pd
+import torch
 from PIL import Image
 from torch.utils.data import Dataset
 
@@ -16,6 +16,7 @@ class SDOBenchmarkDataset(Dataset):
         channel="171",
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
+        time_steps: Union[int, List[int]] = 0
     ):
         metadata = pd.read_csv(csv_file, parse_dates=["start", "end"])
 
@@ -24,7 +25,8 @@ class SDOBenchmarkDataset(Dataset):
         self.transform = transform
         self.target_transform = target_transform
 
-        self.time_steps = [0, 7 * 60, 10 * 60 + 30, 11 * 60 + 50]
+        self.time_steps_values = [0, 7 * 60, 10 * 60 + 30, 11 * 60 + 50]
+        self.time_steps = time_steps if isinstance(time_steps, list) else [time_steps]
 
         self.setup(metadata)
 
@@ -33,18 +35,23 @@ class SDOBenchmarkDataset(Dataset):
         for i in range(len(metadata)):
             sample_metadata = metadata.iloc[i]
             target = sample_metadata["peak_flux"]
+            if self.target_transform is not None and self.target_transform(target) < 0:
+                # Ignore sample if it is not part of a class
+                continue
 
             sample_active_region, sample_date = sample_metadata["id"].split("_", maxsplit=1)
 
-            image_date = sample_metadata["start"] + dt.timedelta(minutes=self.time_steps[3])
-            image_date_str = dt.datetime.strftime(
-                image_date,
-                "%Y-%m-%dT%H%M%S",
-            )
-            image_name = f"{image_date_str}__{self.channel}.jpg"
-            image_path = self.root_folder / sample_active_region / sample_date / image_name
-            if image_path.exists():
-                ls.append([os.path.join(sample_active_region, sample_date, image_name), target])
+            paths: List[Path] = []
+            for time_step in self.time_steps:
+                image_date = sample_metadata["start"] + dt.timedelta(minutes=self.time_steps_values[time_step])
+                image_date_str = dt.datetime.strftime(image_date, "%Y-%m-%dT%H%M%S")
+                image_name = f"{image_date_str}__{self.channel}.jpg"
+                paths.append(Path(sample_active_region) / sample_date / image_name)
+
+            if not all((self.root_folder / path).exists() for path in paths):
+                continue
+
+            ls.append((paths, target))
 
         self.ls = ls
 
@@ -57,31 +64,17 @@ class SDOBenchmarkDataset(Dataset):
     def __getitem__(self, index):
         metadata = self.ls[index]
         target = metadata[1]
-        image = Image.open(self.root_folder / metadata[0])
+        images = [Image.open(self.root_folder / path) for path in metadata[0]]
 
         if self.transform:
-            image = self.transform(image)
+            images = [self.transform(image) for image in images]
         if self.target_transform:
             target = self.target_transform(target)
 
+        if not torch.is_tensor(images[0]):
+            return images[0], target
+
+        # Put images of different time steps as one image of multiple channels (time steps ~ rgb)
+        image = torch.cat(images, 0)
+
         return image, target
-
-    def find_image(self, path: Path, expected_date: dt.datetime) -> Path:
-        time_space = -1
-        image_name = None
-
-        for img in [name for name in os.listdir(path) if name.endswith('.jpg')]:
-            img_datetime_raw, img_wavelength = os.path.splitext(img)[0].split("__")
-            if img_wavelength != self.channel:
-                continue
-            img_datetime = dt.datetime.strptime(img_datetime_raw, "%Y-%m-%dT%H%M%S")
-
-            current_time_space = abs((expected_date - img_datetime).total_seconds())
-            if time_space == -1 or current_time_space < time_space:
-                time_space = current_time_space
-                image_name = img
-
-        if image_name is None:
-            raise ValueError("Error in dataset, cannot find image.")
-
-        return path / image_name

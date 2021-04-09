@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional, Union
 
 import numpy as np
 import pytorch_lightning as pl
@@ -13,9 +13,17 @@ from solarnet.utils.data import train_test_split
 
 
 class SDOBenchmarkDataModule(pl.LightningDataModule):
-    def __init__(self, dataset_dir: Path, channel: str = '171', batch_size: int = 32, num_workers: int = 0,
-                 validation_size: float = 0.1, resize: int = 64, seed: int = 42,
-                 target_transform: Callable[[float], any] = None):
+    def __init__(
+        self, dataset_dir: Path,
+        channel: str = '171',
+        batch_size: int = 32,
+        num_workers: int = 0,
+        validation_size: float = 0.1,
+        resize: int = 64,
+        seed: int = 42,
+        target_transform: Callable[[float], any] = None,
+        time_steps: Union[int, List[int]] = 0,
+    ):
         super().__init__()
         self.dataset_dir = dataset_dir
         self.channel = channel
@@ -32,6 +40,7 @@ class SDOBenchmarkDataModule(pl.LightningDataModule):
         self.class_weight = None
 
         self.target_transform = target_transform
+        self.time_steps = time_steps
 
     def prepare_data(self):
         pass
@@ -40,7 +49,8 @@ class SDOBenchmarkDataModule(pl.LightningDataModule):
         if stage == 'fit' or stage is None:
             dataset_train_val = SDOBenchmarkDataset(self.dataset_dir / 'training' / 'meta_data.csv',
                                                     self.dataset_dir / 'training', transform=self.transform,
-                                                    target_transform=self.target_transform, channel=self.channel)
+                                                    target_transform=self.target_transform, channel=self.channel,
+                                                    time_steps=self.time_steps)
             self.dataset_train, self.dataset_val = train_test_split(dataset_train_val, self.validation_size, self.seed)
             self.dims = tuple(self.dataset_val[0][0].shape)
 
@@ -50,7 +60,8 @@ class SDOBenchmarkDataModule(pl.LightningDataModule):
         if stage == 'test' or stage is None:
             self.dataset_test = SDOBenchmarkDataset(self.dataset_dir / 'test' / 'meta_data.csv',
                                                     self.dataset_dir / 'test', transform=self.transform,
-                                                    target_transform=self.target_transform, channel=self.channel)
+                                                    target_transform=self.target_transform, channel=self.channel,
+                                                    time_steps=self.time_steps)
             self.dims = tuple(self.dataset_test[0][0].shape)
 
     def train_dataloader(self):

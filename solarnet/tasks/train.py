@@ -31,7 +31,8 @@ def train(parameters: dict):
         resize=parameters['data']['size'],
         seed=parameters['seed'],
         num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
-        target_transform=flux_to_class_builder(parameters['data']['targets']['classes'])
+        target_transform=flux_to_class_builder(parameters['data']['targets']['classes']),
+        time_steps=parameters['data']['time_steps'],
     )
     datamodule.setup()
     logger.info(f"Data format: {datamodule.size()}")
@@ -76,7 +77,7 @@ def train(parameters: dict):
                          # limit_val_batches=1,
                          # limit_test_batches=10,
                          log_every_n_steps=10, flush_logs_every_n_steps=10,
-                         accelerator=None if parameters['gpus'] is None or parameters['gpus'] == 0 or parameters['gpus'] == 1 else 'ddp',
+                         accelerator=None if parameters['gpus'] in [None, 0, 1] else 'ddp',
                          )
 
     trainer.fit(model, datamodule=datamodule)

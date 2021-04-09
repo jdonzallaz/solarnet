@@ -68,6 +68,6 @@ def flux_to_class_builder(class_list: List[dict]) -> Callable[[float], int]:
         for i, c in enumerate(classes_definitions):
             if c['comparator'](flux, c['flux']):
                 return i
-        return 0
+        return -1
 
     return flux_to_class

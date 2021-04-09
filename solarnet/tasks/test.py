@@ -2,7 +2,7 @@ import logging
 import os
 import random
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional, Union
 
 import pytorch_lightning as pl
 import torch
@@ -37,9 +37,10 @@ def test(parameters: dict):
         resize=parameters["data"]["size"],
         seed=parameters["seed"],
         num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
-        target_transform=flux_to_class_builder(parameters['data']['targets']['classes'])
+        target_transform=flux_to_class_builder(parameters['data']['targets']['classes']),
+        time_steps=parameters['data']['time_steps'],
     )
-    datamodule.setup()
+    datamodule.setup('test')
     logger.info(f"Data format: {datamodule.size()}")
 
     model = CNN.load_from_checkpoint(str(model_path / "model.ckpt"))
@@ -87,7 +88,9 @@ def test(parameters: dict):
         ds_path,
         transforms=datamodule.transform,
         target_transform=flux_to_class_builder(parameters['data']['targets']['classes']),
-        channel=parameters["data"]["channel"])
+        channel=parameters["data"]["channel"],
+        time_steps=parameters['data']['time_steps'],
+    )
     y_pred, _ = predict(model, dataloader)
     images, y = map(list, zip(*dataset_image))
     image_grid(images, y, y_pred, labels=labels, path=Path(model_path / "test_samples.png"))
@@ -97,16 +100,31 @@ def test(parameters: dict):
     plot_confusion_matrix(y, y_pred, labels, path=Path(model_path / "confusion_matrix.png"))
 
 
-def get_random_test_samples_dataloader(ds_path: Path, nb_sample: int = 10, channel: str = '171',
-                                       transforms: Optional[Callable] = None,
-                                       target_transform: Optional[Callable] = None
-                                       ) -> (Dataset, DataLoader):
+def get_random_test_samples_dataloader(
+    ds_path: Path,
+    nb_sample: int = 10,
+    channel: str = '171',
+    transforms: Optional[Callable] = None,
+    target_transform: Optional[Callable] = None,
+    time_steps: Union[int, List[int]] = 0,
+) -> (Dataset, DataLoader):
     """ Return a random set of test samples """
 
-    dataset_test_image = SDOBenchmarkDataset(ds_path / 'test' / 'meta_data.csv', ds_path / 'test', transform=None,
-                                             target_transform=target_transform, channel=channel)
-    dataset_test_tensors = SDOBenchmarkDataset(ds_path / 'test' / 'meta_data.csv', ds_path / 'test',
-                                               transform=transforms, target_transform=target_transform, channel=channel)
+    dataset_test_image = SDOBenchmarkDataset(
+        ds_path / 'test' / 'meta_data.csv',
+        ds_path / 'test',
+        transform=None,
+        target_transform=target_transform,
+        channel=channel
+    )
+    dataset_test_tensors = SDOBenchmarkDataset(
+        ds_path / 'test' / 'meta_data.csv',
+        ds_path / 'test',
+        transform=transforms,
+        target_transform=target_transform,
+        channel=channel,
+        time_steps=time_steps
+    )
 
     subset_indices = [random.randrange(len(dataset_test_image)) for _ in range(nb_sample)]
     subset_images = Subset(dataset_test_image, subset_indices)
