@@ -20,7 +20,7 @@ from solarnet.utils.yaml import load_yaml, write_yaml
 logger = logging.getLogger(__name__)
 
 
-def test(parameters: dict):
+def test(parameters: dict, verbose: bool = False):
     logger.info("Testing...")
 
     seed_everything(parameters["seed"])
@@ -33,7 +33,7 @@ def test(parameters: dict):
     # Tracking
     tracking_path = model_path / "tracking.yaml"
     tracking: Optional[Tracking] = None
-    if tracking_path.exists():
+    if parameters["tracking"] and tracking_path.exists():
         tracking_data = load_yaml(tracking_path)
         run_id = tracking_data["run_id"]
         tracking = NeptuneNewTracking.resume(run_id)
@@ -60,7 +60,7 @@ def test(parameters: dict):
     )
 
     # Evaluate model
-    raw_metrics = trainer.test(model, datamodule=datamodule, verbose=True)
+    raw_metrics = trainer.test(model, datamodule=datamodule, verbose=verbose)
 
     tp = raw_metrics[0]["test_tp"]  # hits
     fp = raw_metrics[0]["test_fp"]  # false alarm

@@ -39,7 +39,7 @@ def test_command(
     params = load_yaml(Path('config') / 'config.yaml')
     logger.info(f"Params: {params}")
 
-    test(params)
+    test(params, verbose)
 
 
 @app.command('download')

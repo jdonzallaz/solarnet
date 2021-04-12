@@ -38,4 +38,8 @@ dependencies:
      - opencv-python
      - torch_optimizer==0.1.0
      - "--editable=git+https://github.com/jacobgil/pytorch-grad-cam#egg=grad-cam"
+     - "--editable=git+https://github.com/dulwich/dulwich@master#egg=dulwich"  # Fix perf issue in dvc
+     - optuna==2.7.0
+     - plotly==4.14.3  # Needed for optuna
+     - kaleido==0.2.1  # Needed for plotly
 prefix: /home/jonathan.donzallaz/anaconda3/envs/solarnet-conda-env

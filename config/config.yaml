@@ -1,6 +1,6 @@
 data:
   validation_size: 0.1
-  channel: '171'
+  channel: 211
   size: 256
   targets:
     classes:
@@ -9,11 +9,11 @@ data:
   time_steps: [3]
 
 model:
-  activation: relu
+  activation: relu6
 
 trainer:
-  epochs: 25
-  batch_size: 64
+  epochs: 20
+  batch_size: 128
   learning_rate: 5e-3
   patience: 12
 
