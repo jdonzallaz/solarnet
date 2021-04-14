@@ -27,6 +27,10 @@ stages:
       - data/sdo-benchmark.placeholder
     outs:
       - models/baseline/model.ckpt
+      - models/baseline/history.png:
+          cache: false
+      - models/baseline/model_summary.txt:
+          cache: false
 
   test-baseline:
     cmd: python -m solarnet.main test

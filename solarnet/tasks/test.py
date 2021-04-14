@@ -12,9 +12,9 @@ from torch.utils.data import DataLoader, Dataset, Subset
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
 from solarnet.models.baseline import CNN
-from solarnet.utils.plots import image_grid, plot_confusion_matrix
+from solarnet.utils.plots import plot_image_grid, plot_confusion_matrix
 from solarnet.utils.target import flux_to_class_builder
-from solarnet.utils.tracking import NeptuneNewTracking, Tracking
+from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.utils.yaml import load_yaml, write_yaml
 
 logger = logging.getLogger(__name__)
@@ -57,6 +57,7 @@ def test(parameters: dict, verbose: bool = False):
 
     trainer = pl.Trainer(
         gpus=parameters["gpus"],
+        logger=None,
     )
 
     # Evaluate model
@@ -104,7 +105,7 @@ def test(parameters: dict, verbose: bool = False):
     )
     y_pred, _ = predict(model, dataloader)
     images, y = map(list, zip(*dataset_image))
-    image_grid(images, y, y_pred, labels=labels, path=Path(model_path / "test_samples.png"))
+    plot_image_grid(images, y, y_pred, labels=labels, path=Path(model_path / "test_samples.png"))
 
     # Confusion matrix
     y_pred, y = predict(model, datamodule.test_dataloader())
