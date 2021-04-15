@@ -13,24 +13,21 @@ stages:
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6250
     - path: solarnet/tasks/train.py
-      md5: 3d83c4eeab7d256b8a9ef14f1d917040
-      size: 3876
+      md5: b327442b626f2571fb5c7d8224a76954
+      size: 4110
     params:
       config/config.yaml:
         data:
           validation_size: 0.1
           channel: 211
           size: 256
-          targets:
-            classes:
-            - Quiet: < 1e-6
-            - '>=C': '>= 1e-6'
+          targets: regression
           time_steps:
           - 3
         gpus: 1
         model:
           activation: relu6
-        name: Baseline binary classification model
+        name: Baseline regression model
         seed: 42
         tracking: true
         trainer:
@@ -40,8 +37,8 @@ stages:
           patience: 12
     outs:
     - path: models/baseline/model.ckpt
-      md5: 19549d5a5a02b3ab1cd38292d6f06f67
-      size: 321620
+      md5: 4b089ccc3b3d5d127a96d5f2731382ff
+      size: 322059
   test-baseline:
     cmd: python -m solarnet.main test
     deps:
@@ -49,8 +46,8 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline/model.ckpt
-      md5: 19549d5a5a02b3ab1cd38292d6f06f67
-      size: 321620
+      md5: fcf5f0c97b457d193f0bcc95a7d137cd
+      size: 322004
     - path: solarnet/main.py
       md5: feec11e98fd1abb809708172ec7cbf3a
       size: 1492
@@ -69,7 +66,9 @@ stages:
           targets:
             classes:
             - Quiet: < 1e-6
-            - '>=C': '>= 1e-6'
+            - C: < 1e-5
+            - M: < 1e-4
+            - X: '>= 1e-4'
           time_steps:
           - 3
         gpus: 1
@@ -83,14 +82,14 @@ stages:
           patience: 12
     outs:
     - path: models/baseline/confusion_matrix.png
-      md5: a2c894c2cbeb0e3fe6f97ce831cb2de6
-      size: 21366
+      md5: 03906a26fef60b673ae8793856bde879
+      size: 43116
     - path: models/baseline/metrics.yaml
-      md5: 58324e9924ffafae5dbef35a20d1a2c4
-      size: 211
+      md5: da8e5f52f36494f3c9fa0fc3768978f3
+      size: 209
     - path: models/baseline/test_samples.png
-      md5: fe209658ea12ec9c5b3dfeba3a27e001
-      size: 755993
+      md5: d63502656d84bbd657cc1a65f6a838a7
+      size: 758511
   download-dataset:
     cmd: python -m solarnet.main download sdo-benchmark-zip
     deps:

@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader, Dataset, Subset
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
 from solarnet.models.baseline import CNN
+from solarnet.models.baseline_regression import CNNRegression
 from solarnet.utils.plots import image_grid, plot_confusion_matrix
 from solarnet.utils.target import flux_to_class_builder
 from solarnet.utils.tracking import NeptuneNewTracking, Tracking
@@ -27,7 +28,8 @@ def test(parameters: dict, verbose: bool = False):
 
     ds_path = Path("data/sdo-benchmark")
     model_path = Path("models/baseline/")
-    labels = [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
+    regression = parameters['data']['targets'] == "regression"
+    labels = ["Peak flux"] if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
     parameters["gpus"] = min(1, parameters["gpus"])
 
     # Tracking
@@ -46,13 +48,14 @@ def test(parameters: dict, verbose: bool = False):
         resize=parameters["data"]["size"],
         seed=parameters["seed"],
         num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
-        target_transform=flux_to_class_builder(parameters['data']['targets']['classes']),
+        target_transform=None if regression else flux_to_class_builder(parameters['data']['targets']['classes']),
         time_steps=parameters['data']['time_steps'],
     )
     datamodule.setup('test')
     logger.info(f"Data format: {datamodule.size()}")
 
-    model = CNN.load_from_checkpoint(str(model_path / "model.ckpt"))
+    model_class = CNNRegression if regression else CNN
+    model = model_class.load_from_checkpoint(str(model_path / "model.ckpt"))
     logger.info(f"Model: {model}")
 
     trainer = pl.Trainer(
@@ -61,6 +64,15 @@ def test(parameters: dict, verbose: bool = False):
 
     # Evaluate model
     raw_metrics = trainer.test(model, datamodule=datamodule, verbose=verbose)
+
+    if regression:
+        print(raw_metrics)
+        if tracking:
+            tracking.log_metrics({
+                'mae': raw_metrics[0]["test_mae"],
+                'mse': raw_metrics[0]["test_mse"],
+            }, "metrics/test")
+        return
 
     tp = raw_metrics[0]["test_tp"]  # hits
     fp = raw_metrics[0]["test_fp"]  # false alarm

@@ -56,7 +56,10 @@ class SDOBenchmarkDataset(Dataset):
         self.ls = ls
 
     def get_y(self):
-        return [self.target_transform(y[1]) for y in self.ls]
+        if self.target_transform is not None:
+            return [self.target_transform(y[1]) for y in self.ls]
+        
+        return [y[1] for y in self.ls]
 
     def __len__(self) -> int:
         return len(self.ls)
