@@ -2,13 +2,11 @@ data:
   validation_size: 0.1
   channel: 211
   size: 256
-  targets: regression
-    # classes:
-      # - Quiet: "< 1e-6"
-      # - "C": "< 1e-5"
-      # - "M": "< 1e-4"
-      # - "X": ">= 1e-4"
-  time_steps: [3]
+  targets:
+    classes:
+      - Quiet: "< 1e-6"
+      - ">=C": ">= 1e-6"
+  time_steps: [ 3 ]
 
 model:
   activation: relu6
@@ -19,7 +17,8 @@ trainer:
   learning_rate: 5e-3
   patience: 12
 
-name: Baseline regression model
+name: Baseline binary classification model
+path: models/binary
 seed: 42
 tracking: true
 gpus: 1

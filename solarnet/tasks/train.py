@@ -1,6 +1,5 @@
 import logging
 import os
-import shutil
 from pathlib import Path
 
 import pytorch_lightning as pl
@@ -8,10 +7,13 @@ from pytorch_lightning import seed_everything
 from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
 
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
+from solarnet.logging import InMemoryLogger
+from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.models.baseline import CNN
 from solarnet.models.baseline_regression import CNNRegression
+from solarnet.utils.plots import plot_loss_curve
+from solarnet.utils.pytorch import pytorch_model_summary
 from solarnet.utils.target import flux_to_class_builder
-from solarnet.utils.tracking import NeptuneNewTracking, Tracking
 from solarnet.utils.yaml import write_yaml
 
 logger = logging.getLogger(__name__)
@@ -23,7 +25,7 @@ def train(parameters: dict):
     seed_everything(parameters['seed'])
 
     ds_path = Path('data/sdo-benchmark')
-    model_path = Path('models/baseline/')
+    model_path = Path(parameters["path"])
 
     regression = parameters['data']['targets'] == "regression"
 
@@ -59,15 +61,19 @@ def train(parameters: dict):
         monitor="val_loss",
         mode="min",
         dirpath=str(model_path),
-        filename="model-{epoch:02d}",
-        save_top_k=2,
+        filename="model",
     )
     callbacks = [early_stop_callback, checkpoint_callback]
 
     tracking: Tracking = NeptuneNewTracking(parameters=parameters, tags=[], disabled=not parameters['tracking'])
-    pl_logger = tracking.get_callback('pytorch-lightning')
+    tracking_logger = tracking.get_callback('pytorch-lightning')
+    im_logger = InMemoryLogger()
+    if tracking_logger is None:
+        pl_logger = im_logger
+    else:
+        pl_logger = [im_logger, tracking_logger]
 
-    if pl_logger is not None:
+    if tracking_logger is not None:
         callbacks.append(LearningRateMonitor(logging_interval='step'))
 
     trainer = pl.Trainer(gpus=parameters['gpus'],
@@ -89,11 +95,14 @@ def train(parameters: dict):
     # trainer.tuner.scale_batch_size(model, init_val=32, mode='binsearch', datamodule=datamodule)
     # return
 
-    # Copy and rename best checkpoint
-    # TODO: move to utils
-    path = Path(checkpoint_callback.best_model_path)
-    if str(path) != ".":
-        shutil.copy2(path, Path(path.parent, "model.ckpt"))
+    # Log actual config used for training
+    write_yaml(model_path / "config.yaml", parameters)
+
+    # Log model summary
+    pytorch_model_summary(model, model_path)
+
+    # Save plot of history
+    plot_loss_curve(im_logger.metrics, save_path=model_path)
 
     # Output tracking run id to continue logging in test step
     run_id = tracking.get_id()

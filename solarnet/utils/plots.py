@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -70,9 +70,9 @@ colors = {
 }
 
 
-def image_grid(images: list, y: List[int], y_pred: Optional[List[int]] = None, labels: List[str] = None,
-               columns: int = 5, width: int = 20, height: int = 6, max_images: int = 10, label_font_size: int = 14,
-               path: Optional[Path] = None):
+def plot_image_grid(images: list, y: List[int], y_pred: Optional[List[int]] = None, labels: List[str] = None,
+                    columns: int = 5, width: int = 20, height: int = 6, max_images: int = 10, label_font_size: int = 14,
+                    path: Optional[Path] = None):
     """
     Display a grid of images with labels. Compares true labels and predictions if predictions are given
 
@@ -122,3 +122,80 @@ def image_grid(images: list, y: List[int], y_pred: Optional[List[int]] = None, l
         plt.show()
     else:
         plt.savefig(path, bbox_inches='tight')
+
+
+def plot_loss_curve(
+    metrics: Dict[str, List[Dict[str, Union[float, int]]]],
+    save_path: Path = None,
+    y_lim=None,
+    step_name: str = "Steps",
+    smooth_factor=0.0
+):
+    """
+    Plot the loss curve of training and validation.
+    The metrics dict should have keys "train_loss" and "val_loss", each with a list as value. Lists should have "value"
+     and step key. The step could be an arbitrary step, a batch number or an epoch and is used to align training
+     and validation curves.
+
+    :param metrics: A dict of train/val metrics, with list of values per step.
+    :param save_path: optional path where the figure will be saved.
+    :param y_lim: An optional array (2 entries) to specify y-axis limits. Default to [0, 1].
+    :param step_name: The name to give to the step axis on the plot. Default to "Steps".
+    :param smooth_factor: A factor for smoothing the plot in [0, 1]. Default to 0 (no smoothing).
+    """
+
+    if y_lim is None:
+        y_lim = [0, 1]
+
+    train_loss = metrics["train_loss"]
+    train_loss = {k: [dic[k] for dic in train_loss] for k in train_loss[0]}
+    train_loss_steps = train_loss["step"]
+    train_loss_values = smooth_curve(train_loss["value"], smooth_factor)
+
+    val_loss = metrics["val_loss"]
+    val_loss = {k: [dic[k] for dic in val_loss] for k in val_loss[0]}
+    val_loss_steps = val_loss["step"]
+    val_loss_values = smooth_curve(val_loss["value"], smooth_factor)
+
+    plt.ioff()
+
+    fig = plt.figure(figsize=(8, 6))
+
+    plt.plot(train_loss_steps, train_loss_values, 'dodgerblue', label='Training loss')
+    plt.plot(val_loss_steps, val_loss_values, 'g', label='Validation loss')  # g is for "solid green line"
+
+    plt.title('Training and validation loss')
+    plt.xlabel(step_name)
+    plt.ylabel('Loss')
+    plt.gca().set_ylim(y_lim)
+    plt.grid(alpha=0.75)
+    plt.legend()
+
+    if save_path is None:
+        plt.show()
+    else:
+        save_path.mkdir(parents=True, exist_ok=True)
+        plt.savefig(save_path / 'history.png')
+
+    plt.close(fig)
+
+
+def smooth_curve(points, factor=0.0):
+    """
+    Smooth an list of points by a given factor.
+    A factor of 0 does not smooth the curve. A factor of 1 gives a straight line.
+
+    :param points: An iterable of numbers
+    :param factor: A factor in [0,1]
+    :return: A smoothed list of numbers
+    """
+
+    smoothed_points = []
+    for point in points:
+        if smoothed_points:
+            previous = smoothed_points[-1]
+            smoothed_points.append(previous * factor + point * (1 - factor))
+        else:
+            smoothed_points.append(point)
+
+    return smoothed_points
