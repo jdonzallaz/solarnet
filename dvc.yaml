@@ -55,3 +55,39 @@ stages:
           cache: false
       - models/baseline/confusion_matrix.png:
           cache: false
+
+  generate-report:
+    vars:
+      - report: "models/baseline/report.md"
+    # TODO: add model size (x kB)
+    # TODO: add diff with naive method
+    # TODO: add number of train/test samples
+    cmd: >-
+      echo # Model report > ${report} &&
+      echo ## Training >> ${report} &&
+      echo ### Parameters >> ${report} &&
+      echo ```>> ${report} &&
+      cat config/config.yaml >> ${report} &&
+      echo ```>> ${report} &&
+      echo ### Model architecture >> ${report} &&
+      echo ```>> ${report} &&
+      cat models/baseline/model_summary.txt >> ${report} &&
+      echo ```>> ${report} &&
+      echo ### Loss curve >> ${report} &&
+      printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${report} &&
+      echo ## Test >> ${report} &&
+      echo ### Metrics >> ${report} &&
+      dvc metrics show --show-md >> ${report} &&
+      echo ### Confusion matrix >> ${report} &&
+      printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> ${report} &&
+      echo ### Test samples >> ${report} &&
+      printf "![Test samples](test_samples.png 'Test samples')\n\n" >> ${report}
+    deps:
+      - models/baseline/history.png
+      - models/baseline/model_summary.txt
+      - models/baseline/metrics.yaml
+      - models/baseline/test_samples.png
+      - models/baseline/confusion_matrix.png
+    outs:
+      - ${report}:
+          cache: false

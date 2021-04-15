@@ -110,3 +110,37 @@ stages:
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
+  generate-report:
+    cmd: "echo # Model report > models/baseline/report.md && echo ## Training >> models/baseline/report.md\
+      \ && echo ### Parameters >> models/baseline/report.md && echo ```>> models/baseline/report.md\
+      \ && cat config/config.yaml >> models/baseline/report.md && echo ```>> models/baseline/report.md\
+      \ && echo ### Model architecture >> models/baseline/report.md && echo ```>>\
+      \ models/baseline/report.md && cat models/baseline/model_summary.txt >> models/baseline/report.md\
+      \ && echo ```>> models/baseline/report.md && echo ### Loss curve >> models/baseline/report.md\
+      \ && printf \"![Loss curve](history.png 'Loss curve')\\n\\n\" >> models/baseline/report.md\
+      \ && echo ## Test >> models/baseline/report.md && echo ### Metrics >> models/baseline/report.md\
+      \ && dvc metrics show --show-md >> models/baseline/report.md && echo ### Confusion\
+      \ matrix >> models/baseline/report.md && printf \"![Confusion matrix](confusion_matrix.png\
+      \ 'Confusion matrix')\\n\\n\" >> models/baseline/report.md && echo ### Test\
+      \ samples >> models/baseline/report.md && printf \"![Test samples](test_samples.png\
+      \ 'Test samples')\\n\\n\" >> models/baseline/report.md"
+    deps:
+    - path: models/baseline/confusion_matrix.png
+      md5: 81369aedb3791a62b3a932aa06fad6f4
+      size: 22654
+    - path: models/baseline/history.png
+      md5: 2368dedd3535ad242140a1d4a08f6bf8
+      size: 48620
+    - path: models/baseline/metrics.yaml
+      md5: dc3e910fd1a8660429a6944f7e8df1eb
+      size: 217
+    - path: models/baseline/model_summary.txt
+      md5: ea4d0736a2ad363d42b9d70caf6f186d
+      size: 1643
+    - path: models/baseline/test_samples.png
+      md5: 0bbc632b1638ea51a66987b89b258b3c
+      size: 756230
+    outs:
+    - path: models/baseline/report.md
+      md5: ce5b54a884a3163b93f95bbe65568a90
+      size: 2703
