@@ -9,85 +9,112 @@ stages:
           persist: true
           cache: false
 
-  train-baseline:
-    cmd: python -m solarnet.main train
-    params:
-      - config/config.yaml:
-          - data
-          - model
-          - trainer
-          - name
-          - seed
-          - tracking
-          - gpus
-    deps:
-      - solarnet/main.py
-      - solarnet/tasks/train.py
-      - solarnet/models/baseline.py
-      - data/sdo-benchmark.placeholder
-    outs:
-      - models/baseline/model.ckpt
-      - models/baseline/history.png:
-          cache: false
-      - models/baseline/model_summary.txt:
-          cache: false
+  train:
+    foreach:
+      binary:
+        experiment: binary_classification
+        path: binary
+      multiclass:
+        experiment: multiclass_classification
+        path: multiclass
+    do:
+      cmd: python -m solarnet.main train +experiment=${item.experiment}
+      params:
+        - config/config.yaml:
+            - data
+            - model
+            - trainer
+            - name
+            - seed
+            - tracking
+            - gpus
+      deps:
+        - solarnet/main.py
+        - solarnet/tasks/train.py
+        - solarnet/models/baseline.py
+        - data/sdo-benchmark.placeholder
+        - config/experiment/${item.experiment}.yaml
+      outs:
+        - models/${item.path}/model.ckpt
+        - models/${item.path}/history.png:
+            cache: false
+        - models/${item.path}/model_summary.txt:
+            cache: false
 
-  test-baseline:
-    cmd: python -m solarnet.main test
-    params:
-      - config/config.yaml:
-          - data
-          - model
-          - trainer
-          - seed
-          - gpus
-    deps:
-      - solarnet/main.py
-      - solarnet/tasks/test.py
-      - solarnet/models/baseline.py
-      - data/sdo-benchmark.placeholder
-      - models/baseline/model.ckpt
-    metrics:
-      - models/baseline/metrics.yaml:
-          cache: false
-    outs:
-      - models/baseline/test_samples.png:
-          cache: false
-      - models/baseline/confusion_matrix.png:
-          cache: false
+  test:
+    foreach:
+      binary:
+        experiment: binary_classification
+        path: binary
+      multiclass:
+        experiment: multiclass_classification
+        path: multiclass
+    do:
+      cmd: python -m solarnet.main test +experiment=${item.experiment}
+      params:
+        - config/config.yaml:
+            - data
+            - model
+            - trainer
+            - seed
+            - tracking
+            - gpus
+      deps:
+        - solarnet/main.py
+        - solarnet/tasks/test.py
+        - solarnet/models/baseline.py
+        - data/sdo-benchmark.placeholder
+        - models/${item.path}/model.ckpt
+        - config/experiment/${item.experiment}.yaml
+      metrics:
+        - models/${item.path}/metrics.yaml:
+            cache: false
+      outs:
+        - models/${item.path}/test_samples.png:
+            cache: false
+        - models/${item.path}/confusion_matrix.png:
+            cache: false
 
   generate-report:
-    vars:
-      - report: "models/baseline/report.md"
-    # TODO: add model size (x kB)
-    # TODO: add diff with naive method
-    # TODO: add number of train/test samples
-    cmd: >-
-      echo # Model report > ${report} &&
-      echo ## Training >> ${report} &&
-      echo ### Parameters >> ${report} &&
-      echo ```>> ${report} &&
-      cat config/config.yaml >> ${report} &&
-      echo ```>> ${report} &&
-      echo ### Model architecture >> ${report} &&
-      echo ```>> ${report} &&
-      cat models/baseline/model_summary.txt >> ${report} &&
-      echo ```>> ${report} &&
-      echo ### Loss curve >> ${report} &&
-      printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${report} &&
-      echo ## Test >> ${report} &&
-      echo ### Metrics >> ${report} &&
-      dvc metrics show --show-md >> ${report} &&
-      echo ### Confusion matrix >> ${report} &&
-      printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> ${report} &&
-      echo ### Test samples >> ${report} &&
-      printf "![Test samples](test_samples.png 'Test samples')\n\n" >> ${report}
-    deps:
-      - models/baseline/history.png
-      - models/baseline/model_summary.txt
-      - models/baseline/metrics.yaml
-      - models/baseline/test_samples.png
-      - models/baseline/confusion_matrix.png
-    outs:
-      - ${report}:
-          cache: false
+    foreach:
+      binary:
+        report: "models/binary/report.md"
+        path: binary
+      multiclass:
+        report: "models/multiclass/report.md"
+        path: multiclass
+    do:
+      # TODO: add model size (x kB)
+      # TODO: add diff with naive method
+      # TODO: add number of train/test samples
+      # TODO: add early stopping epoch, running time, machine/gpu
+      cmd: >-
+        echo # Model report > ${item.report} &&
+        echo ## Training >> ${item.report} &&
+        echo ### Parameters >> ${item.report} &&
+        echo ```yaml>> ${item.report} &&
+        cat models/${item.path}/config.yaml >> ${item.report} &&
+        echo ```>> ${item.report} &&
+        echo ### Model architecture >> ${item.report} &&
+        echo ```>> ${item.report} &&
+        cat models/${item.path}/model_summary.txt >> ${item.report} &&
+        echo ```>> ${item.report} &&
+        echo ### Loss curve >> ${item.report} &&
+        printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${item.report} &&
+        echo ## Test >> ${item.report} &&
+        echo ### Metrics >> ${item.report} &&
+        dvc metrics show --show-md >> ${item.report} &&
+        echo ### Confusion matrix >> ${item.report} &&
+        printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> ${item.report} &&
+        echo ### Test samples >> ${item.report} &&
+        printf "![Test samples](test_samples.png 'Test samples')\n\n" >> ${item.report}
+      deps:
+        - models/${item.path}/config.yaml
+        - models/${item.path}/confusion_matrix.png
+        - models/${item.path}/history.png
+        - models/${item.path}/metrics.yaml
+        - models/${item.path}/model_summary.txt
+        - models/${item.path}/test_samples.png
+      outs:
+        - ${item.report}:
+            cache: false

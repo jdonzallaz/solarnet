@@ -24,7 +24,7 @@ def train(parameters: dict):
     seed_everything(parameters['seed'])
 
     ds_path = Path('data/sdo-benchmark')
-    model_path = Path('models/baseline/')
+    model_path = Path(parameters["path"])
 
     datamodule = SDOBenchmarkDataModule(
         ds_path,
@@ -90,6 +90,9 @@ def train(parameters: dict):
     trainer.fit(model, datamodule=datamodule)
     # trainer.tuner.scale_batch_size(model, init_val=32, mode='binsearch', datamodule=datamodule)
     # return
+
+    # Log actual config used for training
+    write_yaml(model_path / "config.yaml", parameters)
 
     # Log model summary
     pytorch_model_summary(model, model_path)

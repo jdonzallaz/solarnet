@@ -26,7 +26,7 @@ def test(parameters: dict, verbose: bool = False):
     seed_everything(parameters["seed"])
 
     ds_path = Path("data/sdo-benchmark")
-    model_path = Path("models/baseline/")
+    model_path = Path(parameters["path"])
     labels = [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
     parameters["gpus"] = min(1, parameters["gpus"])
 

@@ -42,4 +42,6 @@ dependencies:
      - optuna==2.7.0
      - plotly==4.14.3  # Needed for optuna
      - kaleido==0.2.1  # Needed for plotly
+     # Revisit this once omegaconf > 2.0.6 and hydra-core > 1.0.6
+     - "--editable=git+https://github.com/facebookresearch/hydra#egg=hydra-core"
 prefix: /home/jonathan.donzallaz/anaconda3/envs/solarnet-conda-env

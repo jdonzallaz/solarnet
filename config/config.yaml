@@ -6,7 +6,7 @@ data:
     classes:
       - Quiet: "< 1e-6"
       - ">=C": ">= 1e-6"
-  time_steps: [3]
+  time_steps: [ 3 ]
 
 model:
   activation: relu6
@@ -18,6 +18,7 @@ trainer:
   patience: 12
 
 name: Baseline binary classification model
+path: models/binary
 seed: 42
 tracking: true
 gpus: 1
