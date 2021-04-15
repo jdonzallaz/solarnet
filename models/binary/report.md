@@ -78,7 +78,7 @@ Total parameters: 24594
 ### Metrics
 | Path                       | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
 |----------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
-| models\binary\metrics.yaml | 0.78719    | 0.77327             | 0.64906 | 0.77616 | 0.21281 | 0.57437 | 0.78719 | 0.57437 |
+| models/binary/metrics.yaml | 0.79291    | 0.78546             | 0.65687 | 0.78506 | 0.20709 | 0.58581 | 0.79291 | 0.58581 |
 
 ### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')

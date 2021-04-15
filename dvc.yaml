@@ -34,6 +34,8 @@ stages:
         - config/experiment/${item.experiment}.yaml
       outs:
         - models/${item.path}/model.ckpt
+        - models/${item.path}/config.yaml:
+            cache: false
         - models/${item.path}/history.png:  # TODO: Fix not visible data
             cache: false
         - models/${item.path}/model_summary.txt:
@@ -89,13 +91,13 @@ stages:
         printf "# Model report\n" > ${item.report} &&
         printf "## Training\n" >> ${item.report} &&
         printf "### Parameters\n" >> ${item.report} &&
-        printf "```yaml\n" >> ${item.report} &&
+        printf '```yaml\n' >> ${item.report} &&
         cat models/${item.path}/config.yaml >> ${item.report} &&
-        printf "```\n" >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
         printf "### Model architecture\n" >> ${item.report} &&
-        printf "```\n" >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
         cat models/${item.path}/model_summary.txt >> ${item.report} &&
-        printf "```\n" >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
         printf "### Loss curve\n" >> ${item.report} &&
         printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${item.report} &&
         printf "## Test\n" >> ${item.report} &&
