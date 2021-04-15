@@ -2,7 +2,6 @@ stages:
   download-dataset:
     cmd: python -m solarnet.main download sdo-benchmark-zip
     deps:
-      - solarnet/main.py
       - config/minio.yaml
     outs:
       - data/sdo-benchmark.placeholder:
@@ -29,14 +28,13 @@ stages:
             - tracking
             - gpus
       deps:
-        - solarnet/main.py
         - solarnet/tasks/train.py
         - solarnet/models/baseline.py
         - data/sdo-benchmark.placeholder
         - config/experiment/${item.experiment}.yaml
       outs:
         - models/${item.path}/model.ckpt
-        - models/${item.path}/history.png:
+        - models/${item.path}/history.png:  # TODO: Fix not visible data
             cache: false
         - models/${item.path}/model_summary.txt:
             cache: false
@@ -60,7 +58,6 @@ stages:
             - tracking
             - gpus
       deps:
-        - solarnet/main.py
         - solarnet/tasks/test.py
         - solarnet/models/baseline.py
         - data/sdo-benchmark.placeholder
@@ -89,24 +86,24 @@ stages:
       # TODO: add number of train/test samples
       # TODO: add early stopping epoch, running time, machine/gpu
       cmd: >-
-        echo # Model report > ${item.report} &&
-        echo ## Training >> ${item.report} &&
-        echo ### Parameters >> ${item.report} &&
-        echo ```yaml>> ${item.report} &&
+        printf "# Model report\n" > ${item.report} &&
+        printf "## Training\n" >> ${item.report} &&
+        printf "### Parameters\n" >> ${item.report} &&
+        printf "```yaml\n" >> ${item.report} &&
         cat models/${item.path}/config.yaml >> ${item.report} &&
-        echo ```>> ${item.report} &&
-        echo ### Model architecture >> ${item.report} &&
-        echo ```>> ${item.report} &&
+        printf "```\n" >> ${item.report} &&
+        printf "### Model architecture\n" >> ${item.report} &&
+        printf "```\n" >> ${item.report} &&
         cat models/${item.path}/model_summary.txt >> ${item.report} &&
-        echo ```>> ${item.report} &&
-        echo ### Loss curve >> ${item.report} &&
+        printf "```\n" >> ${item.report} &&
+        printf "### Loss curve\n" >> ${item.report} &&
         printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${item.report} &&
-        echo ## Test >> ${item.report} &&
-        echo ### Metrics >> ${item.report} &&
-        dvc metrics show --show-md >> ${item.report} &&
-        echo ### Confusion matrix >> ${item.report} &&
+        printf "## Test\n" >> ${item.report} &&
+        printf "### Metrics\n" >> ${item.report} &&
+        dvc metrics show --show-md models/${item.path}/metrics.yaml >> ${item.report} &&
+        printf "### Confusion matrix\n" >> ${item.report} &&
         printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> ${item.report} &&
-        echo ### Test samples >> ${item.report} &&
+        printf "### Test samples\n" >> ${item.report} &&
         printf "![Test samples](test_samples.png 'Test samples')\n\n" >> ${item.report}
       deps:
         - models/${item.path}/config.yaml

@@ -6,9 +6,6 @@ stages:
     - path: config/minio.yaml
       md5: 2cf2c6bc04bcddb76df1d97aae80ba0a
       size: 117
-    - path: solarnet/main.py
-      md5: 369602374eb3d3bc0963f22e210c0f1c
-      size: 2042
     outs:
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
@@ -22,9 +19,6 @@ stages:
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: solarnet/main.py
-      md5: 369602374eb3d3bc0963f22e210c0f1c
-      size: 2042
     - path: solarnet/models/baseline.py
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6425
@@ -56,10 +50,10 @@ stages:
           patience: 12
     outs:
     - path: models/binary/history.png
-      md5: e46492da4b3047be095d183cc012cd1f
-      size: 49449
+      md5: c3a4fa3d765e5e97815e1df76c7899ea
+      size: 52730
     - path: models/binary/model.ckpt
-      md5: 526f065e8df7ef8d12662160625c51b7
+      md5: e0399de8cc284183f79b83ebda85328b
       size: 321431
     - path: models/binary/model_summary.txt
       md5: ea4d0736a2ad363d42b9d70caf6f186d
@@ -74,11 +68,8 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/binary/model.ckpt
-      md5: 526f065e8df7ef8d12662160625c51b7
+      md5: e0399de8cc284183f79b83ebda85328b
       size: 321431
-    - path: solarnet/main.py
-      md5: 369602374eb3d3bc0963f22e210c0f1c
-      size: 2042
     - path: solarnet/models/baseline.py
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6425
@@ -109,41 +100,42 @@ stages:
           patience: 12
     outs:
     - path: models/binary/confusion_matrix.png
-      md5: e6d7cf5e12ab4f2652bbfe8edfd2609b
-      size: 22614
+      md5: ca6a17cd58ebc08e8a1d9dfb3aa2de66
+      size: 22112
     - path: models/binary/metrics.yaml
-      md5: 6cb25be4734f98593620d455273e5f31
-      size: 219
+      md5: 3ae4b80c47155e0cc944ebcae0f1a427
+      size: 217
     - path: models/binary/test_samples.png
       md5: 0bbc632b1638ea51a66987b89b258b3c
       size: 756230
   generate-report@binary:
-    cmd: "echo # Model report > models/binary/report.md && echo ## Training >> models/binary/report.md\
-      \ && echo ### Parameters >> models/binary/report.md && echo ```yaml>> models/binary/report.md\
-      \ && cat models/binary/config.yaml >> models/binary/report.md && echo ```>>\
-      \ models/binary/report.md && echo ### Model architecture >> models/binary/report.md\
-      \ && echo ```>> models/binary/report.md && cat models/binary/model_summary.txt\
-      \ >> models/binary/report.md && echo ```>> models/binary/report.md && echo ###\
-      \ Loss curve >> models/binary/report.md && printf \"![Loss curve](history.png\
-      \ 'Loss curve')\\n\\n\" >> models/binary/report.md && echo ## Test >> models/binary/report.md\
-      \ && echo ### Metrics >> models/binary/report.md && dvc metrics show --show-md\
-      \ >> models/binary/report.md && echo ### Confusion matrix >> models/binary/report.md\
-      \ && printf \"![Confusion matrix](confusion_matrix.png 'Confusion matrix')\\\
-      n\\n\" >> models/binary/report.md && echo ### Test samples >> models/binary/report.md\
-      \ && printf \"![Test samples](test_samples.png 'Test samples')\\n\\n\" >> models/binary/report.md"
+    cmd: printf "# Model report\n" > models/binary/report.md && printf "## Training\n"
+      >> models/binary/report.md && printf "### Parameters\n" >> models/binary/report.md
+      && printf "```yaml\n" >> models/binary/report.md && cat models/binary/config.yaml
+      >> models/binary/report.md && printf "```\n" >> models/binary/report.md && printf
+      "### Model architecture\n" >> models/binary/report.md && printf "```\n" >> models/binary/report.md
+      && cat models/binary/model_summary.txt >> models/binary/report.md && printf
+      "```\n" >> models/binary/report.md && printf "### Loss curve\n" >> models/binary/report.md
+      && printf "![Loss curve](history.png 'Loss curve')\n\n" >> models/binary/report.md
+      && printf "## Test\n" >> models/binary/report.md && printf "### Metrics\n" >>
+      models/binary/report.md && dvc metrics show --show-md models/binary/metrics.yaml
+      >> models/binary/report.md && printf "### Confusion matrix\n" >> models/binary/report.md
+      && printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/binary/report.md && printf "### Test samples\n" >> models/binary/report.md
+      && printf "![Test samples](test_samples.png 'Test samples')\n\n" >> models/binary/report.md
     deps:
     - path: models/binary/config.yaml
       md5: c15096d09d027b92c186c5909fc6a39c
       size: 365
     - path: models/binary/confusion_matrix.png
-      md5: e6d7cf5e12ab4f2652bbfe8edfd2609b
-      size: 22614
+      md5: ca6a17cd58ebc08e8a1d9dfb3aa2de66
+      size: 22112
     - path: models/binary/history.png
-      md5: e46492da4b3047be095d183cc012cd1f
-      size: 49449
+      md5: c3a4fa3d765e5e97815e1df76c7899ea
+      size: 52730
     - path: models/binary/metrics.yaml
-      md5: 6cb25be4734f98593620d455273e5f31
-      size: 219
+      md5: 3ae4b80c47155e0cc944ebcae0f1a427
+      size: 217
     - path: models/binary/model_summary.txt
       md5: ea4d0736a2ad363d42b9d70caf6f186d
       size: 1643
@@ -152,8 +144,8 @@ stages:
       size: 756230
     outs:
     - path: models/binary/report.md
-      md5: c2757ee6ea0e811db33f3d0df15d34b8
-      size: 2880
+      md5: e7f58224d0c7f58db3c76be803bec676
+      size: 2702
   train@multiclass:
     cmd: python -m solarnet.main train +experiment=multiclass_classification
     deps:
@@ -163,9 +155,6 @@ stages:
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: solarnet/main.py
-      md5: 369602374eb3d3bc0963f22e210c0f1c
-      size: 2042
     - path: solarnet/models/baseline.py
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6425
@@ -197,10 +186,10 @@ stages:
           patience: 12
     outs:
     - path: models/multiclass/history.png
-      md5: e680136cb8e9b00851304e7fcefb8a42
-      size: 35678
+      md5: ef5563efa8598f48f7ac2effdf5f860e
+      size: 33787
     - path: models/multiclass/model.ckpt
-      md5: a65acc3481c0e1e67ed64fcd1a1d3e19
+      md5: f58231ab559ae0c33b3bd304006d44eb
       size: 321815
     - path: models/multiclass/model_summary.txt
       md5: 2651cfdcf7ac9b75a0bb7278b9e927b2
@@ -215,11 +204,8 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/multiclass/model.ckpt
-      md5: a65acc3481c0e1e67ed64fcd1a1d3e19
+      md5: f58231ab559ae0c33b3bd304006d44eb
       size: 321815
-    - path: solarnet/main.py
-      md5: 369602374eb3d3bc0963f22e210c0f1c
-      size: 2042
     - path: solarnet/models/baseline.py
       md5: 4d5632d2f513677fb49937a3fc44c602
       size: 6425
@@ -250,49 +236,50 @@ stages:
           patience: 12
     outs:
     - path: models/multiclass/confusion_matrix.png
-      md5: 64fc846ba43cbafeb602ea4ca2d8ad3d
-      size: 43661
+      md5: 14f9d787bc2ae78488391fbae1afda42
+      size: 43582
     - path: models/multiclass/metrics.yaml
-      md5: 64ea8b81ea7d2c1382f1e3050280d2bb
-      size: 218
+      md5: 2cbffdbdc7933660269f627cd479ea1c
+      size: 219
     - path: models/multiclass/test_samples.png
-      md5: 4c8f3cbad6848929e32c73f7ba847201
-      size: 759677
+      md5: 185c6c57f59b96c5bbd2fdd6a34f7889
+      size: 760844
   generate-report@multiclass:
-    cmd: "echo # Model report > models/multiclass/report.md && echo ## Training >>\
-      \ models/multiclass/report.md && echo ### Parameters >> models/multiclass/report.md\
-      \ && echo ```yaml>> models/multiclass/report.md && cat models/multiclass/config.yaml\
-      \ >> models/multiclass/report.md && echo ```>> models/multiclass/report.md &&\
-      \ echo ### Model architecture >> models/multiclass/report.md && echo ```>> models/multiclass/report.md\
-      \ && cat models/multiclass/model_summary.txt >> models/multiclass/report.md\
-      \ && echo ```>> models/multiclass/report.md && echo ### Loss curve >> models/multiclass/report.md\
-      \ && printf \"![Loss curve](history.png 'Loss curve')\\n\\n\" >> models/multiclass/report.md\
-      \ && echo ## Test >> models/multiclass/report.md && echo ### Metrics >> models/multiclass/report.md\
-      \ && dvc metrics show --show-md >> models/multiclass/report.md && echo ### Confusion\
-      \ matrix >> models/multiclass/report.md && printf \"![Confusion matrix](confusion_matrix.png\
-      \ 'Confusion matrix')\\n\\n\" >> models/multiclass/report.md && echo ### Test\
-      \ samples >> models/multiclass/report.md && printf \"![Test samples](test_samples.png\
-      \ 'Test samples')\\n\\n\" >> models/multiclass/report.md"
+    cmd: printf "# Model report\n" > models/multiclass/report.md && printf "## Training\n"
+      >> models/multiclass/report.md && printf "### Parameters\n" >> models/multiclass/report.md
+      && printf "```yaml\n" >> models/multiclass/report.md && cat models/multiclass/config.yaml
+      >> models/multiclass/report.md && printf "```\n" >> models/multiclass/report.md
+      && printf "### Model architecture\n" >> models/multiclass/report.md && printf
+      "```\n" >> models/multiclass/report.md && cat models/multiclass/model_summary.txt
+      >> models/multiclass/report.md && printf "```\n" >> models/multiclass/report.md
+      && printf "### Loss curve\n" >> models/multiclass/report.md && printf "![Loss
+      curve](history.png 'Loss curve')\n\n" >> models/multiclass/report.md && printf
+      "## Test\n" >> models/multiclass/report.md && printf "### Metrics\n" >> models/multiclass/report.md
+      && dvc metrics show --show-md models/multiclass/metrics.yaml >> models/multiclass/report.md
+      && printf "### Confusion matrix\n" >> models/multiclass/report.md && printf
+      "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> models/multiclass/report.md
+      && printf "### Test samples\n" >> models/multiclass/report.md && printf "![Test
+      samples](test_samples.png 'Test samples')\n\n" >> models/multiclass/report.md
     deps:
     - path: models/multiclass/config.yaml
       md5: 391f3b5da41eab5cb94a84e6281e92d0
       size: 403
     - path: models/multiclass/confusion_matrix.png
-      md5: 64fc846ba43cbafeb602ea4ca2d8ad3d
-      size: 43661
+      md5: 14f9d787bc2ae78488391fbae1afda42
+      size: 43582
     - path: models/multiclass/history.png
-      md5: e680136cb8e9b00851304e7fcefb8a42
-      size: 35678
+      md5: ef5563efa8598f48f7ac2effdf5f860e
+      size: 33787
     - path: models/multiclass/metrics.yaml
-      md5: 64ea8b81ea7d2c1382f1e3050280d2bb
-      size: 218
+      md5: 2cbffdbdc7933660269f627cd479ea1c
+      size: 219
     - path: models/multiclass/model_summary.txt
       md5: 2651cfdcf7ac9b75a0bb7278b9e927b2
       size: 1643
     - path: models/multiclass/test_samples.png
-      md5: 4c8f3cbad6848929e32c73f7ba847201
-      size: 759677
+      md5: 185c6c57f59b96c5bbd2fdd6a34f7889
+      size: 760844
     outs:
     - path: models/multiclass/report.md
-      md5: 3cfe765cebb7ba1c59ec479f4be60165
-      size: 2918
+      md5: f40ab2f0d4b519e502d3436440c92274
+      size: 2752

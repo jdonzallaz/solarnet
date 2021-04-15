@@ -1,7 +1,7 @@
-# Model report  
-## Training  
-### Parameters  
-```yaml 
+# Model report
+## Training
+### Parameters
+```yaml
 data:
   validation_size: 0.1
   channel: 211
@@ -26,9 +26,9 @@ path: models/multiclass
 seed: 42
 tracking: true
 gpus: 1
-``` 
-### Model architecture  
-``` 
+```
+### Model architecture
+```
 CNN(
   (conv_blocks): Sequential(
     (0): Sequential(
@@ -72,20 +72,19 @@ CNN(
 )
 ================================================================================
 Total parameters: 24628
-``` 
-### Loss curve  
+```
+### Loss curve
 ![Loss curve](history.png 'Loss curve')
 
-## Test  
-### Metrics  
+## Test
+### Metrics
 | Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
 |--------------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
-| models\binary\metrics.yaml     | 0.79405    | 0.78595             | 0.65844 | 0.78595 | 0.20595 | 0.5881  | 0.79405 | 0.5881  |
-| models\multiclass\metrics.yaml | 0.52746    | 0.41734             | 0.3582  | 0.39959 | 0.47254 | 0.36995 | 0.52746 | 0.36995 |
+| models\multiclass\metrics.yaml | 0.49314    | 0.3937              | 0.32726 | 0.36945 | 0.50686 | 0.32418 | 0.49314 | 0.32418 |
 
-### Confusion matrix  
+### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')
 
-### Test samples  
+### Test samples
 ![Test samples](test_samples.png 'Test samples')
 
