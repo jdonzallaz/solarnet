@@ -35,7 +35,9 @@ class SDOBenchmarkDataset(Dataset):
         for i in range(len(metadata)):
             sample_metadata = metadata.iloc[i]
             target = sample_metadata["peak_flux"]
-            if self.target_transform is not None and self.target_transform(target) < 0:
+            if self.target_transform is not None and \
+                isinstance(self.target_transform(target), int) and \
+                self.target_transform(target) < 0:
                 # Ignore sample if it is not part of a class
                 continue
 
@@ -58,7 +60,7 @@ class SDOBenchmarkDataset(Dataset):
     def get_y(self):
         if self.target_transform is not None:
             return [self.target_transform(y[1]) for y in self.ls]
-        
+
         return [y[1] for y in self.ls]
 
     def __len__(self) -> int:

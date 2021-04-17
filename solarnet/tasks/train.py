@@ -9,10 +9,10 @@ from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, Mode
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.logging import InMemoryLogger
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
-from solarnet.models.baseline import CNN
-from solarnet.models.baseline_regression import CNNRegression
+from solarnet.models import CNNClassification, CNNRegression
 from solarnet.utils.plots import plot_loss_curve
 from solarnet.utils.pytorch import pytorch_model_summary
+from solarnet.utils.scaling import log_min_max_scale
 from solarnet.utils.target import flux_to_class_builder
 from solarnet.utils.yaml import write_yaml
 
@@ -28,6 +28,8 @@ def train(parameters: dict):
     model_path = Path(parameters["path"])
 
     regression = parameters['data']['targets'] == "regression"
+    reg_tt = log_min_max_scale
+    target_transform = reg_tt if regression else flux_to_class_builder(parameters['data']['targets']['classes'])
 
     datamodule = SDOBenchmarkDataModule(
         ds_path,
@@ -37,7 +39,7 @@ def train(parameters: dict):
         resize=parameters['data']['size'],
         seed=parameters['seed'],
         num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
-        target_transform=None if regression else flux_to_class_builder(parameters['data']['targets']['classes']),
+        target_transform=target_transform,
         time_steps=parameters['data']['time_steps'],
     )
     datamodule.setup()
@@ -46,13 +48,19 @@ def train(parameters: dict):
     steps_per_epoch = len(datamodule.train_dataloader())
     total_steps = parameters['trainer']['epochs'] * steps_per_epoch
 
-    model_class = CNNRegression if regression else CNN
-    model = model_class(*datamodule.size(),
-                n_class=1 if regression else len(parameters['data']['targets']['classes']),
-                learning_rate=parameters['trainer']['learning_rate'],
-                class_weight=datamodule.class_weight,
-                total_steps=total_steps,
-                activation=parameters['model']['activation'])
+    if regression:
+        model = CNNRegression(*datamodule.size(),
+                              learning_rate=parameters['trainer']['learning_rate'],
+                              class_weight=datamodule.class_weight,
+                              total_steps=total_steps,
+                              activation=parameters['model']['activation'])
+    else:
+        model = CNNClassification(*datamodule.size(),
+                                  n_class=len(parameters['data']['targets']['classes']),
+                                  learning_rate=parameters['trainer']['learning_rate'],
+                                  class_weight=datamodule.class_weight,
+                                  total_steps=total_steps,
+                                  activation=parameters['model']['activation'])
     logger.info(f"Model: {model}")
 
     early_stop_callback = EarlyStopping(monitor="val_loss", min_delta=0.00, patience=parameters['trainer']['patience'],
@@ -102,7 +110,7 @@ def train(parameters: dict):
     pytorch_model_summary(model, model_path)
 
     # Save plot of history
-    plot_loss_curve(im_logger.metrics, save_path=model_path)
+    plot_loss_curve(im_logger.metrics, save_path=model_path / 'history.png')
 
     # Output tracking run id to continue logging in test step
     run_id = tracking.get_id()

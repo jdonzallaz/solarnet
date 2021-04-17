@@ -1,15 +1,22 @@
+import math
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn
 import seaborn as sns
 import torch
 from sklearn.metrics import confusion_matrix
 
 
-def plot_confusion_matrix(y_true: Union[list, np.ndarray, torch.Tensor], y_pred: Union[list, np.ndarray, torch.Tensor],
-                          labels: list, figsize: tuple = (6, 4), path: Optional[Path] = None):
+def plot_confusion_matrix(
+    y_true: Union[list, np.ndarray, torch.Tensor],
+    y_pred: Union[list, np.ndarray, torch.Tensor],
+    labels: list,
+    figsize: tuple = (6, 4),
+    save_path: Optional[Path] = None,
+):
     """
     Print a confusion matrix with number and percentages, in the order given by labels.
 
@@ -17,7 +24,7 @@ def plot_confusion_matrix(y_true: Union[list, np.ndarray, torch.Tensor], y_pred:
     :param y_pred: predicted values
     :param labels: list of labels
     :param figsize: size of the figure
-    :param path: optional path where the figure will be saved
+    :param save_path: optional path where the figure will be saved
     """
 
     if isinstance(labels[0], str) and not isinstance(y_true[0], str):
@@ -42,50 +49,60 @@ def plot_confusion_matrix(y_true: Union[list, np.ndarray, torch.Tensor], y_pred:
             p = cm_perc[i, j]
             if i == j:
                 s = cm_sum[i]
-                annot[i, j] = '%d/%d\n%.1f%%' % (c, s, p)
+                annot[i, j] = "%d/%d\n%.1f%%" % (c, s, p)
             elif c == 0:
-                annot[i, j] = ''
+                annot[i, j] = ""
             else:
-                annot[i, j] = '%d\n%.1f%%' % (c, p)
+                annot[i, j] = "%d\n%.1f%%" % (c, p)
 
     _, ax = plt.subplots(figsize=figsize)
-    sns.heatmap(cm_perc, annot=annot, fmt='', cmap='Blues', annot_kws={"fontsize": 12})
+    sns.heatmap(cm_perc, annot=annot, fmt="", cmap="Blues", annot_kws={"fontsize": 12})
 
     ax.xaxis.set_ticklabels(labels)
     ax.yaxis.set_ticklabels(labels)
     plt.yticks(rotation=0)
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
 
-    if path is None:
+    if save_path is None:
         plt.show()
     else:
-        plt.savefig(path, bbox_inches='tight')
+        plt.savefig(save_path, bbox_inches="tight")
 
 
 colors = {
-    'black': '#000000',
-    'green': '#34a853',
-    'red': '#af001e',
+    "black": "#000000",
+    "green": "#34a853",
+    "red": "#af001e",
 }
 
 
-def plot_image_grid(images: list, y: List[int], y_pred: Optional[List[int]] = None, labels: List[str] = None,
-                    columns: int = 5, width: int = 20, height: int = 6, max_images: int = 10, label_font_size: int = 14,
-                    path: Optional[Path] = None):
+def plot_image_grid(
+    images: list,
+    y: List[Union[int, float]],
+    y_pred: Optional[List[Union[int, float]]] = None,
+    labels: List[str] = None,
+    columns: int = 5,
+    width: int = 20,
+    height: int = 6,
+    max_images: int = 10,
+    label_font_size: int = 14,
+    save_path: Optional[Path] = None,
+):
     """
-    Display a grid of images with labels. Compares true labels and predictions if predictions are given
+    Display a grid of images with labels. Compares true labels and predictions if predictions are given.
+    The true values and predictions can be regression values (float).
 
     :param images: list of image (format supported by plt.imshow())
-    :param y: list of labels (int)
-    :param y_pred: list of predictions (int)
+    :param y: list of labels (int) or values (float for regression)
+    :param y_pred: list of predictions (int) or values (float for regression)
     :param labels: list of string labels
     :param columns: number of images to show in a row
     :param width: width of the figure
     :param height: height of the figure
     :param max_images: Number max of image to show from the given list
     :param label_font_size: Size of the labels
-    :param path: optional path where the figure will be saved
+    :param save_path: optional path where the figure will be saved
     """
 
     def pretty_label(label: int) -> str:
@@ -93,6 +110,10 @@ def plot_image_grid(images: list, y: List[int], y_pred: Optional[List[int]] = No
 
     if len(images) > max_images:
         images = images[0:max_images]
+
+    is_regression = not isinstance(y[0], int)
+    if is_regression:
+        pretty_label = lambda x: f'{x:.1e}'
 
     height = max(height, int(len(images) / columns) * height)
 
@@ -103,33 +124,36 @@ def plot_image_grid(images: list, y: List[int], y_pred: Optional[List[int]] = No
     for i, image in enumerate(images):
         plt.subplot(int(len(images) / columns + 1), columns, i + 1)
         plt.imshow(image)
-        plt.axis('off')
+        plt.axis("off")
 
         if y_pred is None:
             title = pretty_label(y[i])
-            color = colors['black']
+            color = colors["black"]
+        elif is_regression:
+            title = f"y_true: {pretty_label(y[i])}\ny_pred: {pretty_label(y_pred[i])}"
+            color = colors["black"]
         else:
             is_correct = y[i] == y_pred[i]
             if is_correct:
                 title = f"y_true & y_pred: {pretty_label(y[i])}"
-                color = colors['green']
+                color = colors["green"]
             else:
                 title = f"y_true: {pretty_label(y[i])} / y_pred: {pretty_label(y_pred[i])}"
-                color = colors['red']
-        plt.title(title, fontsize=label_font_size, color=color)
+                color = colors["red"]
+        plt.title(title, fontsize=label_font_size, color=color, wrap=True)
 
-    if path is None:
+    if save_path is None:
         plt.show()
     else:
-        plt.savefig(path, bbox_inches='tight')
+        plt.savefig(save_path, bbox_inches="tight")
 
 
 def plot_loss_curve(
     metrics: Dict[str, List[Dict[str, Union[float, int]]]],
-    save_path: Path = None,
     y_lim=None,
     step_name: str = "Steps",
-    smooth_factor=0.0
+    smooth_factor=0.0,
+    save_path: Path = None,
 ):
     """
     Plot the loss curve of training and validation.
@@ -161,12 +185,12 @@ def plot_loss_curve(
 
     fig = plt.figure(figsize=(8, 6))
 
-    plt.plot(train_loss_steps, train_loss_values, 'dodgerblue', label='Training loss')
-    plt.plot(val_loss_steps, val_loss_values, 'g', label='Validation loss')  # g is for "solid green line"
+    plt.plot(train_loss_steps, train_loss_values, "dodgerblue", label="Training loss")
+    plt.plot(val_loss_steps, val_loss_values, "g", label="Validation loss")  # g is for "solid green line"
 
-    plt.title('Training and validation loss')
+    plt.title("Training and validation loss")
     plt.xlabel(step_name)
-    plt.ylabel('Loss')
+    plt.ylabel("Loss")
     plt.gca().set_ylim(y_lim)
     plt.grid(alpha=0.75)
     plt.legend()
@@ -174,8 +198,7 @@ def plot_loss_curve(
     if save_path is None:
         plt.show()
     else:
-        save_path.mkdir(parents=True, exist_ok=True)
-        plt.savefig(save_path / 'history.png')
+        plt.savefig(save_path)
 
     plt.close(fig)
 
@@ -199,3 +222,49 @@ def smooth_curve(points, factor=0.0):
             smoothed_points.append(point)
 
     return smoothed_points
+
+
+def plot_regression_line(
+    y_true: Union[list, np.ndarray, torch.Tensor],
+    y_pred: Union[list, np.ndarray, torch.Tensor],
+    lim: Tuple[float] = (8e-10, 5e-4),
+    save_path: Path = None,
+    figsize: tuple = (10, 8),
+):
+    plt.figure(figsize=figsize)
+
+    if not isinstance(y_true, list):
+        y_true = y_true.tolist()
+    if not isinstance(y_pred, list):
+        y_pred = y_pred.tolist()
+
+    # Plot join with scatter and histogram for density information
+    g = seaborn.JointGrid(x=y_pred, y=y_true)
+
+    # Add linear line for reference
+    line = np.linspace(*lim, 10)
+    g.ax_joint.plot(line, line, color="r", label="True values")
+
+    # Add scatterplot
+    g.plot_joint(plt.scatter, s=25, edgecolors="#ffffff", label="Predictions")
+
+    # Add histogram with log-scaled bins
+    bins = np.logspace(math.log10(lim[0]), math.log10(lim[1]), 100)
+    g.plot_marginals(seaborn.histplot, bins=bins)
+
+    # Make axis log-scaled
+    g.ax_joint.set(xscale="log", yscale="log", xlim=lim, ylim=lim)
+    g.ax_marg_x.set_xscale('log')
+    g.ax_marg_y.set_yscale('log')
+
+    # Add title, labels, legend, grid
+    plt.suptitle("Regression line of predictions", y=1.01)
+    g.set_axis_labels("Predicted peak emission flux [W/m\N{SUPERSCRIPT TWO}]",
+                      "True peak emission flux [W/m\N{SUPERSCRIPT TWO}]")
+    g.ax_joint.legend()
+    g.ax_joint.grid(alpha=0.75)
+
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path, bbox_inches='tight')

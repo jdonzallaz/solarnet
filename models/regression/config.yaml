@@ -1,0 +1,19 @@
+data:
+  validation_size: 0.1
+  channel: 211
+  size: 256
+  targets: regression
+  time_steps:
+  - 3
+model:
+  activation: relu6
+trainer:
+  epochs: 20
+  batch_size: 128
+  learning_rate: 0.005
+  patience: 12
+name: Baseline regression model
+path: models/regression
+seed: 42
+tracking: true
+gpus: 1

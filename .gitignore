@@ -1,7 +1,6 @@
 # Remove all IDE files
 .idea
 .vscode
-/src/
 
 # Remove config with sensible data
 config/minio.yaml

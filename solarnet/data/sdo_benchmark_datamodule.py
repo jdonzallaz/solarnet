@@ -76,5 +76,6 @@ class SDOBenchmarkDataModule(pl.LightningDataModule):
 
     @property
     def class_weight(self):
-        self.compute_class_weight(self.dataset_train_val.get_y())
+        if self._class_weight is None:
+            self.compute_class_weight(self.dataset_train_val.get_y())
         return self._class_weight

@@ -11,11 +11,11 @@ from torch.utils.data import DataLoader, Dataset, Subset
 
 from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
-from solarnet.models.baseline import CNN
-from solarnet.models.baseline_regression import CNNRegression
-from solarnet.utils.plots import plot_image_grid, plot_confusion_matrix
-from solarnet.utils.target import flux_to_class_builder
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
+from solarnet.models import CNNClassification, CNNRegression
+from solarnet.utils.plots import plot_confusion_matrix, plot_image_grid, plot_regression_line
+from solarnet.utils.scaling import log_min_max_inverse_scale, log_min_max_scale
+from solarnet.utils.target import flux_to_class_builder
 from solarnet.utils.yaml import load_yaml, write_yaml
 
 logger = logging.getLogger(__name__)
@@ -29,8 +29,10 @@ def test(parameters: dict, verbose: bool = False):
     ds_path = Path("data/sdo-benchmark")
     model_path = Path(parameters["path"])
     regression = parameters['data']['targets'] == "regression"
-    labels = ["Peak flux"] if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
+    labels = None if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
     parameters["gpus"] = min(1, parameters["gpus"])
+    reg_tt = log_min_max_scale
+    target_transform = reg_tt if regression else flux_to_class_builder(parameters['data']['targets']['classes'])
 
     # Tracking
     tracking_path = model_path / "tracking.yaml"
@@ -48,13 +50,13 @@ def test(parameters: dict, verbose: bool = False):
         resize=parameters["data"]["size"],
         seed=parameters["seed"],
         num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
-        target_transform=None if regression else flux_to_class_builder(parameters['data']['targets']['classes']),
+        target_transform=target_transform,
         time_steps=parameters['data']['time_steps'],
     )
     datamodule.setup('test')
     logger.info(f"Data format: {datamodule.size()}")
 
-    model_class = CNNRegression if regression else CNN
+    model_class = CNNRegression if regression else CNNClassification
     model = model_class.load_from_checkpoint(str(model_path / "model.ckpt"))
     logger.info(f"Model: {model}")
 
@@ -67,41 +69,39 @@ def test(parameters: dict, verbose: bool = False):
     raw_metrics = trainer.test(model, datamodule=datamodule, verbose=verbose)
 
     if regression:
-        print(raw_metrics)
-        if tracking:
-            tracking.log_metrics({
-                'mae': raw_metrics[0]["test_mae"],
-                'mse': raw_metrics[0]["test_mse"],
-            }, "metrics/test")
-        return
+        metrics = {
+            'mae': raw_metrics[0]["test_mae"],
+            'mse': raw_metrics[0]["test_mse"],
+        }
+    else:
+        tp = raw_metrics[0]["test_tp"]  # hits
+        fp = raw_metrics[0]["test_fp"]  # false alarm
+        tn = raw_metrics[0]["test_tn"]  # correct negative
+        fn = raw_metrics[0]["test_fn"]  # miss
+        sensitivity = tp / (tp + fn)
+        specificity = tn / (tn + fp)
 
-    tp = raw_metrics[0]["test_tp"]  # hits
-    fp = raw_metrics[0]["test_fp"]  # false alarm
-    tn = raw_metrics[0]["test_tn"]  # correct negative
-    fn = raw_metrics[0]["test_fn"]  # miss
-    sensitivity = tp / (tp + fn)
-    specificity = tn / (tn + fp)
+        # Write metrics
+        # Metric computation is inspired by hydrogo/rainymotion.
+        metrics = {
+            # Accuracy
+            "accuracy": raw_metrics[0]["test_accuracy"],
+            # Balanced accuracy is the recall using average=macro
+            "balanced_accuracy": raw_metrics[0]["test_recall"],
+            # F1-score macro
+            "f1": raw_metrics[0]["test_f1"],
+            # False Alarm Rate - computation inspired by hydrogo/rainymotion
+            "far": fp / (tp + fp),
+            # Heidke Skill Score - computation inspired by hydrogo/rainymotion
+            "hss": (2 * (tp * tn - fn * fp)) / (fn ** 2 + fp ** 2 + 2 * tp * tn + (fn + fp) * (tp + tn)),
+            # Probability Of Detection - computation inspired by hydrogo/rainymotion
+            "pod": sensitivity,
+            # Critical Success Index - computation inspired by hydrogo/rainymotion
+            "csi": tp / (tp + fn + fp),
+            # True Skill Statistic
+            "tss": sensitivity + specificity - 1,
+        }
 
-    # Write metrics
-    # Metric computation is inspired by hydrogo/rainymotion.
-    metrics = {
-        # Accuracy
-        "accuracy": raw_metrics[0]["test_accuracy"],
-        # Balanced accuracy is the recall using average=macro
-        "balanced_accuracy": raw_metrics[0]["test_recall"],
-        # F1-score macro
-        "f1": raw_metrics[0]["test_f1"],
-        # False Alarm Rate - computation inspired by hydrogo/rainymotion
-        "far": fp / (tp + fp),
-        # Heidke Skill Score - computation inspired by hydrogo/rainymotion
-        "hss": (2 * (tp * tn - fn * fp)) / (fn ** 2 + fp ** 2 + 2 * tp * tn + (fn + fp) * (tp + tn)),
-        # Probability Of Detection - computation inspired by hydrogo/rainymotion
-        "pod": sensitivity,
-        # Critical Success Index - computation inspired by hydrogo/rainymotion
-        "csi": tp / (tp + fn + fp),
-        # True Skill Statistic
-        "tss": sensitivity + specificity - 1,
-    }
     write_yaml(model_path / "metrics.yaml", metrics)
     if tracking:
         tracking.log_metrics(metrics, "metrics/test")
@@ -111,20 +111,26 @@ def test(parameters: dict, verbose: bool = False):
     dataset_image, dataloader = get_random_test_samples_dataloader(
         ds_path,
         transforms=datamodule.transform,
-        target_transform=flux_to_class_builder(parameters['data']['targets']['classes']),
+        target_transform=target_transform,
         channel=parameters["data"]["channel"],
         time_steps=parameters['data']['time_steps'],
     )
-    y_pred, _ = predict(model, dataloader)
-    images, y = map(list, zip(*dataset_image))
-    plot_image_grid(images, y, y_pred, labels=labels, path=Path(model_path / "test_samples.png"))
+    y, y_pred = predict(model, dataloader, regression)
+    images, _ = map(list, zip(*dataset_image))
+    plot_image_grid(images, y, y_pred, labels=labels, save_path=Path(model_path / "test_samples.png"))
 
-    # Confusion matrix
-    y_pred, y = predict(model, datamodule.test_dataloader())
-    confusion_matrix_path = Path(model_path / "confusion_matrix.png")
-    plot_confusion_matrix(y, y_pred, labels, path=confusion_matrix_path)
+    # Confusion matrix or regression line
+    y, y_pred = predict(model, datamodule.test_dataloader(), regression)
+
+    if regression:
+        plot_path = Path(model_path / "regression_line.png")
+        plot_regression_line(y, y_pred, save_path=plot_path)
+    else:
+        plot_path = Path(model_path / "confusion_matrix.png")
+        plot_confusion_matrix(y, y_pred, labels, save_path=plot_path)
     if tracking:
-        tracking.log_artifact(confusion_matrix_path, "metrics/test/confusion_matrix")
+        plot_name = "regression_line" if regression else "confusion_matrix"
+        tracking.log_artifact(plot_path, f"metrics/test/{plot_name}")
         tracking.end()
 
 
@@ -162,7 +168,22 @@ def get_random_test_samples_dataloader(
     return subset_images, dataloader_tensors
 
 
-def predict(model, dataloader):
+def predict(model, dataloader, is_regression: bool = False):
+
+    if is_regression:
+        y_pred = torch.tensor([])
+        y = torch.tensor([])
+
+        with torch.no_grad():
+            for i in dataloader:
+                y_pred = torch.cat((y_pred, model(i[0]).cpu().flatten()))
+                y = torch.cat((y, i[1].cpu().flatten()))
+
+        y = log_min_max_inverse_scale(y)
+        y_pred = log_min_max_inverse_scale(y_pred)
+
+        return y.tolist(), y_pred.tolist()
+
     y_pred = []
     y = []
 
@@ -170,6 +191,6 @@ def predict(model, dataloader):
         for i in dataloader:
             logits = model(i[0])
             y_pred += torch.argmax(logits, dim=1).tolist()
-            y += i[1]
+            y += i[1].tolist()
 
-    return y_pred, y
+    return y, y_pred

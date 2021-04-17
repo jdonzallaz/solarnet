@@ -13,9 +13,15 @@ stages:
       binary:
         experiment: binary_classification
         path: binary
+        model: cnn_classification
       multiclass:
         experiment: multiclass_classification
         path: multiclass
+        model: cnn_classification
+      regression:
+        experiment: regression
+        path: regression
+        model: cnn_regression
     do:
       cmd: python -m solarnet.main train +experiment=${item.experiment}
       params:
@@ -29,14 +35,15 @@ stages:
             - gpus
       deps:
         - solarnet/tasks/train.py
-        - solarnet/models/baseline.py
+        - solarnet/models/cnn_module.py
+        - solarnet/models/${item.model}.py
         - data/sdo-benchmark.placeholder
         - config/experiment/${item.experiment}.yaml
       outs:
         - models/${item.path}/model.ckpt
         - models/${item.path}/config.yaml:
             cache: false
-        - models/${item.path}/history.png:  # TODO: Fix not visible data
+        - models/${item.path}/history.png: # TODO: Fix not visible data
             cache: false
         - models/${item.path}/model_summary.txt:
             cache: false
@@ -46,9 +53,18 @@ stages:
       binary:
         experiment: binary_classification
         path: binary
+        model: cnn_classification
+        plot: confusion_matrix
       multiclass:
         experiment: multiclass_classification
         path: multiclass
+        model: cnn_classification
+        plot: confusion_matrix
+      regression:
+        experiment: regression
+        path: regression
+        model: cnn_regression
+        plot: regression_line
     do:
       cmd: python -m solarnet.main test +experiment=${item.experiment}
       params:
@@ -61,7 +77,8 @@ stages:
             - gpus
       deps:
         - solarnet/tasks/test.py
-        - solarnet/models/baseline.py
+        - solarnet/models/cnn_module.py
+        - solarnet/models/${item.model}.py
         - data/sdo-benchmark.placeholder
         - models/${item.path}/model.ckpt
         - config/experiment/${item.experiment}.yaml
@@ -71,7 +88,7 @@ stages:
       outs:
         - models/${item.path}/test_samples.png:
             cache: false
-        - models/${item.path}/confusion_matrix.png:
+        - models/${item.path}/${item.plot}.png:
             cache: false
 
   generate-report:
@@ -79,9 +96,18 @@ stages:
       binary:
         report: "models/binary/report.md"
         path: binary
+        plot_name: confusion_matrix
+        plot_title: "Confusion matrix"
       multiclass:
         report: "models/multiclass/report.md"
         path: multiclass
+        plot_name: confusion_matrix
+        plot_title: "Confusion matrix"
+      regression:
+        report: "models/regression/report.md"
+        path: regression
+        plot_name: regression_line
+        plot_title: "Regression line"
     do:
       # TODO: add model size (x kB)
       # TODO: add diff with naive method
@@ -103,13 +129,13 @@ stages:
         printf "## Test\n" >> ${item.report} &&
         printf "### Metrics\n" >> ${item.report} &&
         dvc metrics show --show-md models/${item.path}/metrics.yaml >> ${item.report} &&
-        printf "### Confusion matrix\n" >> ${item.report} &&
-        printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> ${item.report} &&
+        printf "### ${item.plot_title}\n" >> ${item.report} &&
+        printf "![${item.plot_title}](${item.plot_name}.png '${item.plot_title}')\n\n" >> ${item.report} &&
         printf "### Test samples\n" >> ${item.report} &&
         printf "![Test samples](test_samples.png 'Test samples')\n\n" >> ${item.report}
       deps:
         - models/${item.path}/config.yaml
-        - models/${item.path}/confusion_matrix.png
+        - models/${item.path}/${item.plot_name}.png
         - models/${item.path}/history.png
         - models/${item.path}/metrics.yaml
         - models/${item.path}/model_summary.txt

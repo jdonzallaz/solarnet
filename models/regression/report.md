@@ -1,4 +1,30 @@
-CNNClassification(
+# Model report
+## Training
+### Parameters
+```yaml
+data:
+  validation_size: 0.1
+  channel: 211
+  size: 256
+  targets: regression
+  time_steps:
+  - 3
+model:
+  activation: relu6
+trainer:
+  epochs: 20
+  batch_size: 128
+  learning_rate: 0.005
+  patience: 12
+name: Baseline regression model
+path: models/regression
+seed: 42
+tracking: true
+gpus: 1
+```
+### Model architecture
+```
+CNNRegression(
   (cnn): CNNModule(
     (conv_blocks): Sequential(
       (0): Sequential(
@@ -30,16 +56,30 @@ CNNClassification(
       (2): Dropout2d(p=0.2, inplace=False)
     )
     (out): Sequential(
-      (0): Linear(in_features=16, out_features=2, bias=True)
+      (0): Linear(in_features=16, out_features=1, bias=True)
     )
   )
-  (loss_fn): CrossEntropyLoss()
+  (loss_fn): MSELoss()
   (test_metrics): MetricCollection(
-    (Accuracy): Accuracy()
-    (F1): F1()
-    (Recall): Recall()
-    (StatScores): StatScores()
+    (MeanAbsoluteError): MeanAbsoluteError()
+    (MeanSquaredError): MeanSquaredError()
   )
 )
 ================================================================================
-Total parameters: 24594
+Total parameters: 24577
+```
+### Loss curve
+![Loss curve](history.png 'Loss curve')
+
+## Test
+### Metrics
+| Path                           | mae   | mse   |
+|--------------------------------|-------|-------|
+| models\regression\metrics.yaml | 1e-05 | 0.0   |
+
+### Regression line
+![Regression line](regression_line.png 'Regression line')
+
+### Test samples
+![Test samples](test_samples.png 'Test samples')
+

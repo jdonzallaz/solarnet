@@ -1,4 +1,4 @@
-CNNClassification(
+CNNRegression(
   (cnn): CNNModule(
     (conv_blocks): Sequential(
       (0): Sequential(
@@ -30,16 +30,14 @@ CNNClassification(
       (2): Dropout2d(p=0.2, inplace=False)
     )
     (out): Sequential(
-      (0): Linear(in_features=16, out_features=2, bias=True)
+      (0): Linear(in_features=16, out_features=1, bias=True)
     )
   )
-  (loss_fn): CrossEntropyLoss()
+  (loss_fn): MSELoss()
   (test_metrics): MetricCollection(
-    (Accuracy): Accuracy()
-    (F1): F1()
-    (Recall): Recall()
-    (StatScores): StatScores()
+    (MeanAbsoluteError): MeanAbsoluteError()
+    (MeanSquaredError): MeanSquaredError()
   )
 )
 ================================================================================
-Total parameters: 24594
+Total parameters: 24577
