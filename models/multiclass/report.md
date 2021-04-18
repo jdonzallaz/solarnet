@@ -80,9 +80,9 @@ Total parameters: 24628
 
 ## Test
 ### Metrics
-| Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss    | pod     | tss    |
-|--------------------------------|------------|---------------------|---------|---------|---------|--------|---------|--------|
-| models\multiclass\metrics.yaml | 0.47597    | 0.39489             | 0.31231 | 0.36351 | 0.52403 | 0.3013 | 0.47597 | 0.3013 |
+| Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
+|--------------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
+| models\multiclass\metrics.yaml | 0.54005    | 0.41093             | 0.36991 | 0.39266 | 0.45995 | 0.38673 | 0.54005 | 0.38673 |
 
 ### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')

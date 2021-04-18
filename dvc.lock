@@ -20,14 +20,14 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: solarnet/models/cnn_classification.py
-      md5: 4b9fddd64e3d2b3bbe21eb2ec996e22e
-      size: 3062
+      md5: ae503c50e236766b345d3403e4102d34
+      size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+      size: 1830
     - path: solarnet/tasks/train.py
       md5: f549fdef9bb902754bd242a55bae4bce
-      size: 4920
+      size: 5040
     params:
       config/config.yaml:
         data:
@@ -56,10 +56,10 @@ stages:
       md5: c15096d09d027b92c186c5909fc6a39c
       size: 365
     - path: models/binary/history.png
-      md5: d3c3ff9e73b28d9ecf93adbd6892294e
-      size: 54350
+      md5: 6afec330ee487c8ae5bd82bf66c3a918
+      size: 53325
     - path: models/binary/model.ckpt
-      md5: e3791c9757bd28587dff701ec6e8af3a
+      md5: 70a661ed23fa1063f45f79c0ec0549bb
       size: 321623
     - path: models/binary/model_summary.txt
       md5: d2a8c1d8bcf0840f821abc096ff30489
@@ -74,17 +74,17 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/binary/model.ckpt
-      md5: e3791c9757bd28587dff701ec6e8af3a
+      md5: 70a661ed23fa1063f45f79c0ec0549bb
       size: 321623
     - path: solarnet/models/cnn_classification.py
-      md5: 4b9fddd64e3d2b3bbe21eb2ec996e22e
-      size: 3062
+      md5: ae503c50e236766b345d3403e4102d34
+      size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+      size: 1830
     - path: solarnet/tasks/test.py
-      md5: f7bcd91df7f53e73496b79b1d9a65e49
-      size: 7265
+      md5: 5a107563fcd04d9b8c34b22f7d722bad
+      size: 6454
     params:
       config/config.yaml:
         data:
@@ -109,11 +109,11 @@ stages:
           patience: 12
     outs:
     - path: models/binary/confusion_matrix.png
-      md5: 27847f8fda5cb447ebf799982770aace
-      size: 22749
+      md5: 8f8a2da1d92bb339bf41c1c3a7b1a12a
+      size: 22054
     - path: models/binary/metrics.yaml
-      md5: 381e181fd07c368541e9c79c7e4ff2f9
-      size: 219
+      md5: b200159751ef8d61b910b2893c8ff435
+      size: 218
     - path: models/binary/test_samples.png
       md5: 0bbc632b1638ea51a66987b89b258b3c
       size: 756230
@@ -137,14 +137,14 @@ stages:
       md5: c15096d09d027b92c186c5909fc6a39c
       size: 365
     - path: models/binary/confusion_matrix.png
-      md5: 27847f8fda5cb447ebf799982770aace
-      size: 22749
+      md5: 8f8a2da1d92bb339bf41c1c3a7b1a12a
+      size: 22054
     - path: models/binary/history.png
-      md5: d3c3ff9e73b28d9ecf93adbd6892294e
-      size: 54350
+      md5: 6afec330ee487c8ae5bd82bf66c3a918
+      size: 53325
     - path: models/binary/metrics.yaml
-      md5: 381e181fd07c368541e9c79c7e4ff2f9
-      size: 219
+      md5: b200159751ef8d61b910b2893c8ff435
+      size: 218
     - path: models/binary/model_summary.txt
       md5: d2a8c1d8bcf0840f821abc096ff30489
       size: 1747
@@ -153,7 +153,7 @@ stages:
       size: 756230
     outs:
     - path: models/binary/report.md
-      md5: 67ca158c7c2f7310a5099e787cd8ed18
+      md5: 27ddf32dc5f26f72f70926d046d2b57a
       size: 2803
   train@multiclass:
     cmd: python -m solarnet.main train +experiment=multiclass_classification
@@ -165,14 +165,14 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: solarnet/models/cnn_classification.py
-      md5: 4b9fddd64e3d2b3bbe21eb2ec996e22e
-      size: 3062
+      md5: ae503c50e236766b345d3403e4102d34
+      size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+      size: 1830
     - path: solarnet/tasks/train.py
       md5: f549fdef9bb902754bd242a55bae4bce
-      size: 4920
+      size: 5040
     params:
       config/config.yaml:
         data:
@@ -201,10 +201,10 @@ stages:
       md5: 391f3b5da41eab5cb94a84e6281e92d0
       size: 403
     - path: models/multiclass/history.png
-      md5: 6780abebdc2d12ece2f41218347bfb69
-      size: 34866
+      md5: 0676ab02aa5f30f1a84f4d4ba085bf50
+      size: 31264
     - path: models/multiclass/model.ckpt
-      md5: ee3af3b17e1cd270d5a137411ea7eb19
+      md5: 6767b260e14232f2239ebe66346da756
       size: 322007
     - path: models/multiclass/model_summary.txt
       md5: 6ed4bd423e1e54a4258cbbd982fa31ed
@@ -219,17 +219,17 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/multiclass/model.ckpt
-      md5: ee3af3b17e1cd270d5a137411ea7eb19
+      md5: 6767b260e14232f2239ebe66346da756
       size: 322007
     - path: solarnet/models/cnn_classification.py
-      md5: 4b9fddd64e3d2b3bbe21eb2ec996e22e
-      size: 3062
+      md5: ae503c50e236766b345d3403e4102d34
+      size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+      size: 1830
     - path: solarnet/tasks/test.py
-      md5: f7bcd91df7f53e73496b79b1d9a65e49
-      size: 7265
+      md5: 5a107563fcd04d9b8c34b22f7d722bad
+      size: 6454
     params:
       config/config.yaml:
         data:
@@ -254,14 +254,14 @@ stages:
           patience: 12
     outs:
     - path: models/multiclass/confusion_matrix.png
-      md5: 5b201bd54087091866c4a8ce59e19c75
-      size: 43851
+      md5: c612098a6f5f00f00d17af2e5ffde1a6
+      size: 45492
     - path: models/multiclass/metrics.yaml
-      md5: 00ec911512ae2cd0333fc84ad688113d
+      md5: 5339414fe65b6e095a9230a74ea3020f
       size: 220
     - path: models/multiclass/test_samples.png
-      md5: e526a04312e8ade80a1dcd94343bfdf7
-      size: 761257
+      md5: 34eeeac280a28e589b698abf06690651
+      size: 759897
   generate-report@multiclass:
     cmd: printf "# Model report\n" > models/multiclass/report.md && printf "## Training\n"
       >> models/multiclass/report.md && printf "### Parameters\n" >> models/multiclass/report.md
@@ -283,24 +283,24 @@ stages:
       md5: 391f3b5da41eab5cb94a84e6281e92d0
       size: 403
     - path: models/multiclass/confusion_matrix.png
-      md5: 5b201bd54087091866c4a8ce59e19c75
-      size: 43851
+      md5: c612098a6f5f00f00d17af2e5ffde1a6
+      size: 45492
     - path: models/multiclass/history.png
-      md5: 6780abebdc2d12ece2f41218347bfb69
-      size: 34866
+      md5: 0676ab02aa5f30f1a84f4d4ba085bf50
+      size: 31264
     - path: models/multiclass/metrics.yaml
-      md5: 00ec911512ae2cd0333fc84ad688113d
+      md5: 5339414fe65b6e095a9230a74ea3020f
       size: 220
     - path: models/multiclass/model_summary.txt
       md5: 6ed4bd423e1e54a4258cbbd982fa31ed
       size: 1747
     - path: models/multiclass/test_samples.png
-      md5: e526a04312e8ade80a1dcd94343bfdf7
-      size: 761257
+      md5: 34eeeac280a28e589b698abf06690651
+      size: 759897
     outs:
     - path: models/multiclass/report.md
-      md5: 0d8efde96bde9884f0f51b942dd685c8
-      size: 2850
+      md5: 83b6027221720c41b9518d36dd8b7200
+      size: 2856
   train@regression:
     cmd: python -m solarnet.main train +experiment=regression
     deps:
@@ -360,7 +360,7 @@ stages:
     deps:
     - path: config/experiment/regression.yaml
       md5: e0a2b69e4f4c731b8967a9053e28dad9
-      size: 106
+      size: 113
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -369,13 +369,13 @@ stages:
       size: 321999
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+      size: 1830
     - path: solarnet/models/cnn_regression.py
       md5: e82c034188e4e34f06d4c0fd83cc09f3
-      size: 2944
+      size: 3028
     - path: solarnet/tasks/test.py
-      md5: f7bcd91df7f53e73496b79b1d9a65e49
-      size: 7265
+      md5: 5a107563fcd04d9b8c34b22f7d722bad
+      size: 6454
     params:
       config/config.yaml:
         data:

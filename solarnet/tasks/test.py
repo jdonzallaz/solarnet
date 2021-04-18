@@ -13,6 +13,7 @@ from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
 from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.models import CNNClassification, CNNRegression
+from solarnet.utils.metrics import stats_metrics
 from solarnet.utils.plots import plot_confusion_matrix, plot_image_grid, plot_regression_line
 from solarnet.utils.scaling import log_min_max_inverse_scale, log_min_max_scale
 from solarnet.utils.target import flux_to_class_builder
@@ -78,28 +79,12 @@ def test(parameters: dict, verbose: bool = False):
         fp = raw_metrics[0]["test_fp"]  # false alarm
         tn = raw_metrics[0]["test_tn"]  # correct negative
         fn = raw_metrics[0]["test_fn"]  # miss
-        sensitivity = tp / (tp + fn)
-        specificity = tn / (tn + fp)
 
-        # Write metrics
-        # Metric computation is inspired by hydrogo/rainymotion.
         metrics = {
-            # Accuracy
             "accuracy": raw_metrics[0]["test_accuracy"],
-            # Balanced accuracy is the recall using average=macro
             "balanced_accuracy": raw_metrics[0]["test_recall"],
-            # F1-score macro
             "f1": raw_metrics[0]["test_f1"],
-            # False Alarm Rate - computation inspired by hydrogo/rainymotion
-            "far": fp / (tp + fp),
-            # Heidke Skill Score - computation inspired by hydrogo/rainymotion
-            "hss": (2 * (tp * tn - fn * fp)) / (fn ** 2 + fp ** 2 + 2 * tp * tn + (fn + fp) * (tp + tn)),
-            # Probability Of Detection - computation inspired by hydrogo/rainymotion
-            "pod": sensitivity,
-            # Critical Success Index - computation inspired by hydrogo/rainymotion
-            "csi": tp / (tp + fn + fp),
-            # True Skill Statistic
-            "tss": sensitivity + specificity - 1,
+            **stats_metrics(tp, fp, tn, fn)
         }
 
     write_yaml(model_path / "metrics.yaml", metrics)
@@ -169,7 +154,6 @@ def get_random_test_samples_dataloader(
 
 
 def predict(model, dataloader, is_regression: bool = False):
-
     if is_regression:
         y_pred = torch.tensor([])
         y = torch.tensor([])

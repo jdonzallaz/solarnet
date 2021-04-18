@@ -23,7 +23,11 @@ class CNNClassification(pl.LightningModule):
             Accuracy(),
             F1(num_classes=self.hparams.n_class, average="macro"),
             Recall(num_classes=self.hparams.n_class, average='macro'),
-            StatScores(num_classes=self.hparams.n_class, reduce="micro"),
+            StatScores(
+                num_classes=self.hparams.n_class if self.hparams.n_class > 2 else 1,
+                reduce="micro",
+                is_multiclass=self.hparams.n_class > 2
+            ),
         ])
 
     @auto_move_data
