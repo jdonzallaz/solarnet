@@ -2,6 +2,8 @@ image: "python:3.8"
 
 before_script:
   - python --version
+  - pip install -U pip setuptools wheel
+  - pip --version
   - pip install -r requirements.txt
 
 stages:

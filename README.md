@@ -12,7 +12,7 @@ Using pip:
 python -m venv venv
 
 source venv/bin/activate  # On Unix
-.\env\Scripts\activate  # On Windows
+.\venv\Scripts\activate  # On Windows
 
 pip install -r requirements.txt
 
