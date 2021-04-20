@@ -2,8 +2,8 @@ image: "python:3.8"
 
 before_script:
   - python --version
-  - pip install -U pip setuptools wheel pep517
   - pip --version
+  - apt-get install -y default-jre
   - pip install -r requirements.txt
 
 stages:
