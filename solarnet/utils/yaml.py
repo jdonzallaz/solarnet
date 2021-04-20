@@ -26,4 +26,5 @@ def write_yaml(file: Path, data: dict):
     """
 
     yaml = YAML()
+    yaml.width = 4096
     yaml.dump(data, file)

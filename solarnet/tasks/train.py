@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from pathlib import Path
 
 import pytorch_lightning as pl
@@ -11,7 +12,7 @@ from solarnet.logging import InMemoryLogger
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.models import CNNClassification, CNNRegression
 from solarnet.utils.plots import plot_loss_curve
-from solarnet.utils.pytorch import pytorch_model_summary
+from solarnet.utils.pytorch import get_training_summary, pytorch_model_summary
 from solarnet.utils.scaling import log_min_max_scale
 from solarnet.utils.target import flux_to_class_builder
 from solarnet.utils.yaml import write_yaml
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 def train(parameters: dict):
     logger.info("Training...")
+    start_time = time.perf_counter()
 
     seed_everything(parameters['seed'])
 
@@ -114,7 +116,10 @@ def train(parameters: dict):
 
     # Output tracking run id to continue logging in test step
     run_id = tracking.get_id()
-    if run_id is not None:
-        write_yaml(model_path / "tracking.yaml", {"run_id": run_id})
+
+    # Metadata
+    metadata = get_training_summary(model_path / "model.ckpt", run_id, start_time, datamodule, early_stop_callback,
+                                    checkpoint_callback)
+    write_yaml(model_path / "metadata.yaml", metadata)
 
     tracking.end()

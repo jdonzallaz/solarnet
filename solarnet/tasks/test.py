@@ -29,6 +29,9 @@ def test(parameters: dict, verbose: bool = False):
 
     ds_path = Path("data/sdo-benchmark")
     model_path = Path(parameters["path"])
+    metadata_path = model_path / "metadata.yaml"
+    metadata = load_yaml(metadata_path) if metadata_path.exists() else None
+
     regression = parameters['data']['targets'] == "regression"
     labels = None if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
     parameters["gpus"] = min(1, parameters["gpus"])
@@ -36,11 +39,9 @@ def test(parameters: dict, verbose: bool = False):
     target_transform = reg_tt if regression else flux_to_class_builder(parameters['data']['targets']['classes'])
 
     # Tracking
-    tracking_path = model_path / "tracking.yaml"
     tracking: Optional[Tracking] = None
-    if parameters["tracking"] and tracking_path.exists():
-        tracking_data = load_yaml(tracking_path)
-        run_id = tracking_data["run_id"]
+    if parameters["tracking"] and metadata is not None and metadata["tracking_id"] is not None:
+        run_id = metadata["tracking_id"]
         tracking = NeptuneNewTracking.resume(run_id)
 
     datamodule = SDOBenchmarkDataModule(

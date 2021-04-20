@@ -76,11 +76,24 @@ Total parameters: 24594
 ### Loss curve
 ![Loss curve](history.png 'Loss curve')
 
+### Metadata
+```yaml
+machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
+training_time: 44.13s
+model_size: 321kB
+early_stopping_epoch: 12
+model_checkpoint_step: 765
+tracking_id: SOLN-55
+dataset:
+  training_set_size: 7446
+  validation_set_size: 827
+  test_set_size: 874
+```
 ## Test
 ### Metrics
-| Path                       | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod    | tss     |
-|----------------------------|------------|---------------------|---------|---------|---------|---------|--------|---------|
-| models\binary\metrics.yaml | 0.78261    | 0.78007             | 0.68543 | 0.77654 | 0.16532 | 0.55349 | 0.7931 | 0.56015 |
+| Path                       | accuracy   | balanced_accuracy   | csi    | f1      | far     | hss     | pod     | tss     |
+|----------------------------|------------|---------------------|--------|---------|---------|---------|---------|---------|
+| models/binary/metrics.yaml | 0.79863    | 0.77961             | 0.7224 | 0.78527 | 0.19649 | 0.57191 | 0.87739 | 0.55921 |
 
 ### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')

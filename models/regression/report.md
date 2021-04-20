@@ -71,11 +71,24 @@ Total parameters: 24577
 ### Loss curve
 ![Loss curve](history.png 'Loss curve')
 
+### Metadata
+```yaml
+machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
+training_time: 38.49s
+model_size: 322kB
+early_stopping_epoch: 10
+model_checkpoint_step: 618
+tracking_id: SOLN-66
+dataset:
+  training_set_size: 7446
+  validation_set_size: 827
+  test_set_size: 874
+```
 ## Test
 ### Metrics
 | Path                           | mae   | mse   |
 |--------------------------------|-------|-------|
-| models\regression\metrics.yaml | 1e-05 | 0.0   |
+| models/regression/metrics.yaml | 1e-05 | 0.0   |
 
 ### Regression line
 ![Regression line](regression_line.png 'Regression line')

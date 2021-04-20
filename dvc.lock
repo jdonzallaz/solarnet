@@ -15,7 +15,7 @@ stages:
     deps:
     - path: config/experiment/binary_classification.yaml
       md5: 939b8a7c696a6036e1aeeff3364c13c1
-      size: 61
+      size: 58
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -24,10 +24,10 @@ stages:
       size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/tasks/train.py
-      md5: f549fdef9bb902754bd242a55bae4bce
-      size: 5040
+      md5: c2d012834492fc6cbbc42f437da17d53
+      size: 5139
     params:
       config/config.yaml:
         data:
@@ -54,37 +54,40 @@ stages:
     outs:
     - path: models/binary/config.yaml
       md5: c15096d09d027b92c186c5909fc6a39c
-      size: 365
+      size: 343
     - path: models/binary/history.png
-      md5: 6afec330ee487c8ae5bd82bf66c3a918
-      size: 53325
+      md5: adfdfcf92336de12dac7d4fc2b2b3f39
+      size: 46556
+    - path: models/binary/metadata.yaml
+      md5: 5c6d17b15345f8ac878a70e30c30bd8c
+      size: 320
     - path: models/binary/model.ckpt
-      md5: 70a661ed23fa1063f45f79c0ec0549bb
-      size: 321623
+      md5: fab0f36e8b8d37cb9220bcbb1f876134
+      size: 321812
     - path: models/binary/model_summary.txt
       md5: d2a8c1d8bcf0840f821abc096ff30489
-      size: 1747
+      size: 1702
   test@binary:
     cmd: python -m solarnet.main test +experiment=binary_classification
     deps:
     - path: config/experiment/binary_classification.yaml
       md5: 939b8a7c696a6036e1aeeff3364c13c1
-      size: 61
+      size: 58
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/binary/model.ckpt
-      md5: 70a661ed23fa1063f45f79c0ec0549bb
-      size: 321623
+      md5: fab0f36e8b8d37cb9220bcbb1f876134
+      size: 321812
     - path: solarnet/models/cnn_classification.py
       md5: ae503c50e236766b345d3403e4102d34
       size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/tasks/test.py
-      md5: 5a107563fcd04d9b8c34b22f7d722bad
-      size: 6454
+      md5: db54cdc97ae0b881fea979c3751b4709
+      size: 6520
     params:
       config/config.yaml:
         data:
@@ -109,14 +112,14 @@ stages:
           patience: 12
     outs:
     - path: models/binary/confusion_matrix.png
-      md5: 8f8a2da1d92bb339bf41c1c3a7b1a12a
-      size: 22054
+      md5: 14e98b6285fc79633765687ea7b48e53
+      size: 21558
     - path: models/binary/metrics.yaml
-      md5: b200159751ef8d61b910b2893c8ff435
-      size: 218
+      md5: 59e5033fbac20c67eb5e249df280246f
+      size: 209
     - path: models/binary/test_samples.png
-      md5: 0bbc632b1638ea51a66987b89b258b3c
-      size: 756230
+      md5: fe209658ea12ec9c5b3dfeba3a27e001
+      size: 755993
   generate-report@binary:
     cmd: printf "# Model report\n" > models/binary/report.md && printf "## Training\n"
       >> models/binary/report.md && printf "### Parameters\n" >> models/binary/report.md
@@ -126,41 +129,44 @@ stages:
       && cat models/binary/model_summary.txt >> models/binary/report.md && printf
       '```\n' >> models/binary/report.md && printf "### Loss curve\n" >> models/binary/report.md
       && printf "![Loss curve](history.png 'Loss curve')\n\n" >> models/binary/report.md
-      && printf "## Test\n" >> models/binary/report.md && printf "### Metrics\n" >>
-      models/binary/report.md && dvc metrics show --show-md models/binary/metrics.yaml
-      >> models/binary/report.md && printf "### Confusion matrix\n" >> models/binary/report.md
-      && printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n"
-      >> models/binary/report.md && printf "### Test samples\n" >> models/binary/report.md
-      && printf "![Test samples](test_samples.png 'Test samples')\n\n" >> models/binary/report.md
+      && printf "### Metadata\n" >> models/binary/report.md && printf '```yaml\n'
+      >> models/binary/report.md && cat models/binary/metadata.yaml >> models/binary/report.md
+      && printf '```\n' >> models/binary/report.md && printf "## Test\n" >> models/binary/report.md
+      && printf "### Metrics\n" >> models/binary/report.md && dvc metrics show --show-md
+      models/binary/metrics.yaml >> models/binary/report.md && printf "### Confusion
+      matrix\n" >> models/binary/report.md && printf "![Confusion matrix](confusion_matrix.png
+      'Confusion matrix')\n\n" >> models/binary/report.md && printf "### Test samples\n"
+      >> models/binary/report.md && printf "![Test samples](test_samples.png 'Test
+      samples')\n\n" >> models/binary/report.md
     deps:
     - path: models/binary/config.yaml
       md5: c15096d09d027b92c186c5909fc6a39c
-      size: 365
+      size: 343
     - path: models/binary/confusion_matrix.png
-      md5: 8f8a2da1d92bb339bf41c1c3a7b1a12a
-      size: 22054
+      md5: 14e98b6285fc79633765687ea7b48e53
+      size: 21558
     - path: models/binary/history.png
-      md5: 6afec330ee487c8ae5bd82bf66c3a918
-      size: 53325
+      md5: adfdfcf92336de12dac7d4fc2b2b3f39
+      size: 46556
     - path: models/binary/metrics.yaml
-      md5: b200159751ef8d61b910b2893c8ff435
-      size: 218
+      md5: 59e5033fbac20c67eb5e249df280246f
+      size: 209
     - path: models/binary/model_summary.txt
       md5: d2a8c1d8bcf0840f821abc096ff30489
-      size: 1747
+      size: 1702
     - path: models/binary/test_samples.png
-      md5: 0bbc632b1638ea51a66987b89b258b3c
-      size: 756230
+      md5: fe209658ea12ec9c5b3dfeba3a27e001
+      size: 755993
     outs:
     - path: models/binary/report.md
-      md5: 27ddf32dc5f26f72f70926d046d2b57a
-      size: 2803
+      md5: 4d65bf06e8ec7a9edbe18a9afda0b9c1
+      size: 3077
   train@multiclass:
     cmd: python -m solarnet.main train +experiment=multiclass_classification
     deps:
     - path: config/experiment/multiclass_classification.yaml
       md5: 002b003ae6fca6d8b3b3732c667fbfc1
-      size: 220
+      size: 208
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -169,10 +175,10 @@ stages:
       size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/tasks/train.py
-      md5: f549fdef9bb902754bd242a55bae4bce
-      size: 5040
+      md5: c2d012834492fc6cbbc42f437da17d53
+      size: 5139
     params:
       config/config.yaml:
         data:
@@ -199,37 +205,40 @@ stages:
     outs:
     - path: models/multiclass/config.yaml
       md5: 391f3b5da41eab5cb94a84e6281e92d0
-      size: 403
+      size: 379
     - path: models/multiclass/history.png
-      md5: 0676ab02aa5f30f1a84f4d4ba085bf50
-      size: 31264
+      md5: 8bf862a86484b320bc4af203f5a74bfc
+      size: 33549
+    - path: models/multiclass/metadata.yaml
+      md5: 0b541460ef420e86787b65ade24edbae
+      size: 321
     - path: models/multiclass/model.ckpt
-      md5: 6767b260e14232f2239ebe66346da756
-      size: 322007
+      md5: 975099b16b12e8b518719aae31c71620
+      size: 322196
     - path: models/multiclass/model_summary.txt
       md5: 6ed4bd423e1e54a4258cbbd982fa31ed
-      size: 1747
+      size: 1702
   test@multiclass:
     cmd: python -m solarnet.main test +experiment=multiclass_classification
     deps:
     - path: config/experiment/multiclass_classification.yaml
       md5: 002b003ae6fca6d8b3b3732c667fbfc1
-      size: 220
+      size: 208
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/multiclass/model.ckpt
-      md5: 6767b260e14232f2239ebe66346da756
-      size: 322007
+      md5: 975099b16b12e8b518719aae31c71620
+      size: 322196
     - path: solarnet/models/cnn_classification.py
       md5: ae503c50e236766b345d3403e4102d34
       size: 3199
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/tasks/test.py
-      md5: 5a107563fcd04d9b8c34b22f7d722bad
-      size: 6454
+      md5: db54cdc97ae0b881fea979c3751b4709
+      size: 6520
     params:
       config/config.yaml:
         data:
@@ -254,14 +263,14 @@ stages:
           patience: 12
     outs:
     - path: models/multiclass/confusion_matrix.png
-      md5: c612098a6f5f00f00d17af2e5ffde1a6
-      size: 45492
+      md5: ce6983662c8af25f30dd64fe6283fb8d
+      size: 38907
     - path: models/multiclass/metrics.yaml
-      md5: 5339414fe65b6e095a9230a74ea3020f
-      size: 220
+      md5: c57dd79b84573324860474dc7baaa3c9
+      size: 209
     - path: models/multiclass/test_samples.png
-      md5: 34eeeac280a28e589b698abf06690651
-      size: 759897
+      md5: 7b5b064bab16d8df01c86bd8c5b465b3
+      size: 759877
   generate-report@multiclass:
     cmd: printf "# Model report\n" > models/multiclass/report.md && printf "## Training\n"
       >> models/multiclass/report.md && printf "### Parameters\n" >> models/multiclass/report.md
@@ -272,35 +281,38 @@ stages:
       >> models/multiclass/report.md && printf '```\n' >> models/multiclass/report.md
       && printf "### Loss curve\n" >> models/multiclass/report.md && printf "![Loss
       curve](history.png 'Loss curve')\n\n" >> models/multiclass/report.md && printf
-      "## Test\n" >> models/multiclass/report.md && printf "### Metrics\n" >> models/multiclass/report.md
-      && dvc metrics show --show-md models/multiclass/metrics.yaml >> models/multiclass/report.md
-      && printf "### Confusion matrix\n" >> models/multiclass/report.md && printf
-      "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> models/multiclass/report.md
+      "### Metadata\n" >> models/multiclass/report.md && printf '```yaml\n' >> models/multiclass/report.md
+      && cat models/multiclass/metadata.yaml >> models/multiclass/report.md && printf
+      '```\n' >> models/multiclass/report.md && printf "## Test\n" >> models/multiclass/report.md
+      && printf "### Metrics\n" >> models/multiclass/report.md && dvc metrics show
+      --show-md models/multiclass/metrics.yaml >> models/multiclass/report.md && printf
+      "### Confusion matrix\n" >> models/multiclass/report.md && printf "![Confusion
+      matrix](confusion_matrix.png 'Confusion matrix')\n\n" >> models/multiclass/report.md
       && printf "### Test samples\n" >> models/multiclass/report.md && printf "![Test
       samples](test_samples.png 'Test samples')\n\n" >> models/multiclass/report.md
     deps:
     - path: models/multiclass/config.yaml
       md5: 391f3b5da41eab5cb94a84e6281e92d0
-      size: 403
+      size: 379
     - path: models/multiclass/confusion_matrix.png
-      md5: c612098a6f5f00f00d17af2e5ffde1a6
-      size: 45492
+      md5: ce6983662c8af25f30dd64fe6283fb8d
+      size: 38907
     - path: models/multiclass/history.png
-      md5: 0676ab02aa5f30f1a84f4d4ba085bf50
-      size: 31264
+      md5: 8bf862a86484b320bc4af203f5a74bfc
+      size: 33549
     - path: models/multiclass/metrics.yaml
-      md5: 5339414fe65b6e095a9230a74ea3020f
-      size: 220
+      md5: c57dd79b84573324860474dc7baaa3c9
+      size: 209
     - path: models/multiclass/model_summary.txt
       md5: 6ed4bd423e1e54a4258cbbd982fa31ed
-      size: 1747
+      size: 1702
     - path: models/multiclass/test_samples.png
-      md5: 34eeeac280a28e589b698abf06690651
-      size: 759897
+      md5: 7b5b064bab16d8df01c86bd8c5b465b3
+      size: 759877
     outs:
     - path: models/multiclass/report.md
-      md5: 83b6027221720c41b9518d36dd8b7200
-      size: 2856
+      md5: 1ef2d27c9932a7b413015ebe6b2b05f1
+      size: 3129
   train@regression:
     cmd: python -m solarnet.main train +experiment=regression
     deps:
@@ -317,8 +329,8 @@ stages:
       md5: e82c034188e4e34f06d4c0fd83cc09f3
       size: 2944
     - path: solarnet/tasks/train.py
-      md5: f549fdef9bb902754bd242a55bae4bce
-      size: 4920
+      md5: c2d012834492fc6cbbc42f437da17d53
+      size: 5139
     params:
       config/config.yaml:
         data:
@@ -345,37 +357,40 @@ stages:
     outs:
     - path: models/regression/config.yaml
       md5: 916b90d1dff46bca183d07ec0ed8f752
-      size: 310
+      size: 291
     - path: models/regression/history.png
-      md5: 36d633b42c5d2c96aa30eef599a7961c
-      size: 29631
+      md5: 1511814ea606baeff78bfb3fadc5fba1
+      size: 27355
+    - path: models/regression/metadata.yaml
+      md5: 1b615a60546d8aeafeb2bb532cad4e79
+      size: 320
     - path: models/regression/model.ckpt
-      md5: cbf83718e300b0b09c6d7e22ab6977ec
-      size: 321999
+      md5: ff89e17136f0e5bbcdfe7a941e282418
+      size: 322251
     - path: models/regression/model_summary.txt
       md5: 62ab02cfe8d9a07c728765f49baaa541
-      size: 1724
+      size: 1681
   test@regression:
     cmd: python -m solarnet.main test +experiment=regression
     deps:
     - path: config/experiment/regression.yaml
       md5: e0a2b69e4f4c731b8967a9053e28dad9
-      size: 113
+      size: 106
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/regression/model.ckpt
-      md5: cbf83718e300b0b09c6d7e22ab6977ec
-      size: 321999
+      md5: ff89e17136f0e5bbcdfe7a941e282418
+      size: 322251
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/models/cnn_regression.py
       md5: e82c034188e4e34f06d4c0fd83cc09f3
-      size: 3028
+      size: 2944
     - path: solarnet/tasks/test.py
-      md5: 5a107563fcd04d9b8c34b22f7d722bad
-      size: 6454
+      md5: db54cdc97ae0b881fea979c3751b4709
+      size: 6520
     params:
       config/config.yaml:
         data:
@@ -400,14 +415,14 @@ stages:
           patience: 12
     outs:
     - path: models/regression/metrics.yaml
-      md5: fdc8c97d74d63f696dc3d747108c5310
-      size: 58
+      md5: e5c11ba2cd8c4a8f69d2a6ce003bea27
+      size: 55
     - path: models/regression/regression_line.png
-      md5: c9d1a84bc2891f30f912247aaa03e8fd
-      size: 68421
+      md5: bc79c03a511ff862222283d650e558af
+      size: 68242
     - path: models/regression/test_samples.png
-      md5: 93ae21887143d92a70c0f08dd0168ff2
-      size: 769770
+      md5: 5f41901178402d69a6de2e7d3a72cb4c
+      size: 765296
   generate-report@regression:
     cmd: printf "# Model report\n" > models/regression/report.md && printf "## Training\n"
       >> models/regression/report.md && printf "### Parameters\n" >> models/regression/report.md
@@ -418,32 +433,35 @@ stages:
       >> models/regression/report.md && printf '```\n' >> models/regression/report.md
       && printf "### Loss curve\n" >> models/regression/report.md && printf "![Loss
       curve](history.png 'Loss curve')\n\n" >> models/regression/report.md && printf
-      "## Test\n" >> models/regression/report.md && printf "### Metrics\n" >> models/regression/report.md
-      && dvc metrics show --show-md models/regression/metrics.yaml >> models/regression/report.md
-      && printf "### Regression line\n" >> models/regression/report.md && printf "![Regression
+      "### Metadata\n" >> models/regression/report.md && printf '```yaml\n' >> models/regression/report.md
+      && cat models/regression/metadata.yaml >> models/regression/report.md && printf
+      '```\n' >> models/regression/report.md && printf "## Test\n" >> models/regression/report.md
+      && printf "### Metrics\n" >> models/regression/report.md && dvc metrics show
+      --show-md models/regression/metrics.yaml >> models/regression/report.md && printf
+      "### Regression line\n" >> models/regression/report.md && printf "![Regression
       line](regression_line.png 'Regression line')\n\n" >> models/regression/report.md
       && printf "### Test samples\n" >> models/regression/report.md && printf "![Test
       samples](test_samples.png 'Test samples')\n\n" >> models/regression/report.md
     deps:
     - path: models/regression/config.yaml
       md5: 916b90d1dff46bca183d07ec0ed8f752
-      size: 310
+      size: 291
     - path: models/regression/history.png
-      md5: 36d633b42c5d2c96aa30eef599a7961c
-      size: 29631
+      md5: 1511814ea606baeff78bfb3fadc5fba1
+      size: 27355
     - path: models/regression/metrics.yaml
-      md5: fdc8c97d74d63f696dc3d747108c5310
-      size: 58
+      md5: e5c11ba2cd8c4a8f69d2a6ce003bea27
+      size: 55
     - path: models/regression/model_summary.txt
       md5: 62ab02cfe8d9a07c728765f49baaa541
-      size: 1724
+      size: 1681
     - path: models/regression/regression_line.png
-      md5: c9d1a84bc2891f30f912247aaa03e8fd
-      size: 68421
+      md5: bc79c03a511ff862222283d650e558af
+      size: 68242
     - path: models/regression/test_samples.png
-      md5: 93ae21887143d92a70c0f08dd0168ff2
-      size: 769770
+      md5: 5f41901178402d69a6de2e7d3a72cb4c
+      size: 765296
     outs:
     - path: models/regression/report.md
-      md5: 1f91337c660a4b384fc1d60d54512b0a
-      size: 2499
+      md5: 400c6513077a114543c2aad7f6b2365d
+      size: 2778

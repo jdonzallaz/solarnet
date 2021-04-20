@@ -43,6 +43,8 @@ stages:
         - models/${item.path}/model.ckpt
         - models/${item.path}/config.yaml:
             cache: false
+        - models/${item.path}/metadata.yaml:
+            cache: false
         - models/${item.path}/history.png: # TODO: Fix not visible data
             cache: false
         - models/${item.path}/model_summary.txt:
@@ -109,10 +111,6 @@ stages:
         plot_name: regression_line
         plot_title: "Regression line"
     do:
-      # TODO: add model size (x kB)
-      # TODO: add diff with naive method
-      # TODO: add number of train/test samples
-      # TODO: add early stopping epoch, running time, machine/gpu
       cmd: >-
         printf "# Model report\n" > ${item.report} &&
         printf "## Training\n" >> ${item.report} &&
@@ -126,6 +124,10 @@ stages:
         printf '```\n' >> ${item.report} &&
         printf "### Loss curve\n" >> ${item.report} &&
         printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${item.report} &&
+        printf "### Metadata\n" >> ${item.report} &&
+        printf '```yaml\n' >> ${item.report} &&
+        cat models/${item.path}/metadata.yaml >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
         printf "## Test\n" >> ${item.report} &&
         printf "### Metrics\n" >> ${item.report} &&
         dvc metrics show --show-md models/${item.path}/metrics.yaml >> ${item.report} &&
