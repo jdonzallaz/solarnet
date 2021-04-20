@@ -11,6 +11,7 @@ pandas==1.2.3
 Pillow==8.2.0
 plotly==4.14.3  # Needed for optuna
 psutil==5.8.0  # Needed to log hardware consumption in neptune
+pytest==6.2.3
 pytorch-lightning==1.2.7
 ruamel.yaml==0.17.4
 scikit-learn==0.24.1

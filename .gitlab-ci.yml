@@ -1,0 +1,17 @@
+image: "python:3.8"
+
+before_script:
+  - python --version
+  - pip install -r requirements.txt
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - pytest tests -v --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
