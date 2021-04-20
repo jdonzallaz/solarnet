@@ -1,5 +1,7 @@
 image: "python:3.8"
 
+# Java is needed for hydra-core wheel build (can be removed when hydra 1.1 is out)
+# libtinfo5 is needed by Pytorch
 before_script:
   - python --version
   - pip --version
