@@ -119,7 +119,7 @@ def train(parameters: dict):
 
     # Metadata
     metadata = get_training_summary(model_path / "model.ckpt", run_id, start_time, datamodule, early_stop_callback,
-                                    checkpoint_callback)
+                                    checkpoint_callback, steps_per_epoch)
     write_yaml(model_path / "metadata.yaml", metadata)
 
     tracking.end()

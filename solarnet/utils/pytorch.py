@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Union
 
 import pytorch_lightning as pl
+import torch
 from torch import nn
 
 from solarnet.utils.hardware import machine_summary
@@ -25,15 +26,19 @@ def get_training_summary(
     datamodule: pl.LightningDataModule,
     early_stop_callback: pl.callbacks.EarlyStopping,
     checkpoint_callback: pl.callbacks.ModelCheckpoint,
+    steps_per_epoch: int,
 ):
     model_size_kB = int(model_file.stat().st_size / 1000)
+
+    model_checkpoint_step = torch.load(checkpoint_callback.best_model_path)["global_step"]
 
     return {
         "machine": machine_summary(),
         "training_time": f"{time.perf_counter() - start_time:.2f}s",
         "model_size": f"{model_size_kB}kB",
         "early_stopping_epoch": early_stop_callback.stopped_epoch,
-        "model_checkpoint_step": checkpoint_callback._last_global_step_saved,
+        "model_checkpoint_step": model_checkpoint_step,
+        "model_checkpoint_epoch": model_checkpoint_step // steps_per_epoch,
         "tracking_id": tracking_id,
         "dataset": {
             "training_set_size": len(datamodule.train_dataloader().dataset),
