@@ -1,5 +1,5 @@
 # Choose destination for the dataset file(s). Default to current dir.
-destination: ./
+destination: E:/data/sdodataset
 filename: sdo-dataset.csv
 dataset_path: E:/data/sdodataset
 # Whether to write the path as relative (from dataset root) or absolute (using dataset_path) in the csv file

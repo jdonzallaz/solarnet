@@ -3,8 +3,10 @@ from typing import Callable, Optional
 
 import numpy as np
 import pandas as pd
+import pytorch_lightning as pl
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset
+from torchvision.transforms import transforms
 
 
 class SDODataset(Dataset):
@@ -93,3 +95,80 @@ class SDODataset(Dataset):
             target = self.target_transform(target)
 
         return tensor, target
+
+
+class SDODatasetDataModule(pl.LightningDataModule):
+    def __init__(
+        self,
+        dataset_path: Path,
+        target_transform: Optional[Callable] = None,
+        batch_size: int = 32,
+        num_workers: int = 0,
+        resize: int = 512,
+    ):
+        """
+        Dataset class for the sdo-dataset.
+        The accepted format is the one of the sdo-dataset, using the special utility for dataset creation.
+        It needs a path to the dataset folder. The dataset must also contains 3 csv-files for metadata:
+            sdo-dataset-train.csv, sdo-dataset-val.csv, sdo-dataset-test.csv
+
+        :param dataset_path: Path to the dataset folder (with metadata files in it)
+        :param target_transform: Optional transform for the targets
+        :param batch_size: batch size for the dataloader
+        :param num_workers: num_workers for the dataloaders. Changing it is not advised on Windows.
+                            It is encouraged on Unix systems (~ 4x number of GPUs).
+        :param resize: Target size to which the image should be resized.
+        """
+
+        super().__init__()
+        self.dataset_path = dataset_path
+        self.target_transform = target_transform
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.transform = transforms.Compose([
+            transforms.Resize(resize),
+            transforms.Normalize(mean=[0.5], std=[0.5]),
+        ])
+
+    def prepare_data(self):
+        pass
+
+    def setup(self, stage: Optional[str] = None):
+        if stage == 'fit' or stage is None:
+            self.dataset_train = SDODataset(
+                self.dataset_path / "sdo-dataset-train.csv",
+                None,
+                transform=self.transform,
+                target_transform=self.target_transform
+            )
+            self.dataset_val = SDODataset(
+                self.dataset_path / "sdo-dataset-val.csv",
+                None,
+                transform=self.transform,
+                target_transform=self.target_transform
+            )
+            self.dims = tuple(self.dataset_train[0][0].shape)
+
+        if stage == 'test' or stage is None:
+            self.dataset_test = SDODataset(
+                self.dataset_path / "sdo-dataset-test.csv",
+                None,
+                transform=self.transform,
+                target_transform=self.target_transform
+            )
+            self.dims = tuple(self.dataset_test[0][0].shape)
+
+    def train_dataloader(self):
+        if not self.has_setup_fit:
+            raise RuntimeError("The SDODatasetDataModule setup has not been called.")
+        return DataLoader(self.dataset_train, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True)
+
+    def val_dataloader(self):
+        if not self.has_setup_fit:
+            raise RuntimeError("The SDODatasetDataModule setup has not been called.")
+        return DataLoader(self.dataset_val, batch_size=self.batch_size, num_workers=self.num_workers)
+
+    def test_dataloader(self):
+        if not self.has_setup_test:
+            raise RuntimeError("The SDODatasetDataModule setup has not been called.")
+        return DataLoader(self.dataset_test, batch_size=self.batch_size, num_workers=self.num_workers)
