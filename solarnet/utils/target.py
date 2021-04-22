@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Union
 
 
 def operator_to_lambda(operator: str) -> Callable[[float, float], bool]:
@@ -47,11 +47,12 @@ def make_classes_definitions(class_list: List[dict]) -> List[dict]:
     return classes_definitions
 
 
-def flux_to_class_builder(class_list: List[dict]) -> Callable[[float], int]:
+def flux_to_class_builder(class_list: List[dict], return_names: bool = False) -> Callable[[float], Union[int, str]]:
     """
     Construct a function transforming a flux in a class, according to class_list.
 
     :param class_list: list of dicts, one class per dict
+    :param return_names: Whether to return the class name or the integer-index of the class
     :return: a function transforming a flux to a class
     """
 
@@ -67,7 +68,7 @@ def flux_to_class_builder(class_list: List[dict]) -> Callable[[float], int]:
 
         for i, c in enumerate(classes_definitions):
             if c['comparator'](flux, c['flux']):
-                return i
+                return i if not return_names else c["class"]
         return -1
 
     return flux_to_class

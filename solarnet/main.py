@@ -1,13 +1,17 @@
 import logging
 import os
+from pathlib import Path
 from typing import List, Optional
 
 import hydra
 import typer
 from omegaconf import OmegaConf
 
+from solarnet.tasks.dataset import make_dataset, test_dataset
 from solarnet.tasks.download_dataset import download_dataset
 from solarnet.utils.log import init_log, set_log_level
+from solarnet.utils.yaml import load_yaml
+
 init_log()
 
 from solarnet.tasks.test import test
@@ -60,6 +64,28 @@ def download_command(
     if verbose: set_log_level(logging.INFO)
 
     download_dataset(dataset)
+
+
+@app.command('dataset')
+def dataset_command(
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+):
+    if verbose: set_log_level(logging.INFO)
+
+    params = load_yaml(Path('config') / 'dataset.yaml')
+
+    make_dataset(params)
+
+
+@app.command('data')
+def data_command(
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+):
+    if verbose: set_log_level(logging.INFO)
+
+    params = load_yaml(Path('config') / 'dataset.yaml')
+
+    test_dataset(params)
 
 
 # Command to add options before the command (-v train ...)

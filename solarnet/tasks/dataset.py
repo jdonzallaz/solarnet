@@ -1,0 +1,218 @@
+import logging
+from pathlib import Path
+from typing import Dict, List, Union
+
+import pandas as pd
+from sunpy.net import Fido, attrs as a
+from torchvision.transforms import transforms
+
+from solarnet.data.sdo_dataset import SDODataset
+from solarnet.utils.dict import print_dict
+from solarnet.utils.physics import class_to_flux
+from solarnet.utils.target import flux_to_class_builder
+
+logger = logging.getLogger(__name__)
+
+
+def test_dataset(parameters: dict):
+    csv = Path("sdo-dataset.csv")
+    root = Path("E:/data/sdodataset")
+
+    ds = SDODataset(csv, root, transform=transforms.Compose([
+        transforms.Resize(128),
+        transforms.Normalize(mean=[0.5], std=[0.5]),
+    ]))
+
+    print('len', len(ds))
+    print(ds[0][0].shape, ds[0][0].min(), ds[0][0].max(), ds[0][0].mean(), ds[0][0].std())
+
+
+def make_dataset(parameters: dict):
+    print_dict(parameters)
+
+    destination = Path(parameters["destination"])
+    csv_path = destination / parameters["filename"]
+    dataset_path = Path(parameters["dataset_path"])
+    relative_paths = parameters["relative_paths"]
+
+    channel = parameters["channel"]
+
+    time_steps = [pd.Timedelta(t) for t in parameters["time-steps"]]
+    flare_time_range = pd.Timedelta(parameters["flare-time-range"])
+    search_image_time_range = pd.Timedelta(parameters["search-image-time-range"])
+    target = parameters["target"]
+    classification = "classes" in target
+
+    first_known_datetime = pd.Timestamp("2018/01/01T00:00:00")
+    last_known_datetime = pd.Timestamp("2018/01/31T23:59:59")
+
+    datetime_start = first_known_datetime
+    datetime_end = last_known_datetime
+
+    if not dataset_path.exists():
+        raise ValueError("Dataset not found at this location")
+
+    logger.info("Downloading flares from HEK...")
+    df = get_flares(datetime_start, datetime_end)
+
+    print(df)
+
+    # Samples
+    samples: List[Dict[str, Union[List[str], float, pd.Timestamp, bool]]] = []
+
+    time_offset = pd.DateOffset(seconds=flare_time_range.total_seconds())
+    intervals = pd.interval_range(
+        datetime_start,  # + max(time_steps),
+        datetime_end,
+        freq=time_offset
+    )
+
+    for interval in intervals:
+        try:
+            images_paths, all_found = find_paths(
+                dataset_path, interval.left, time_steps, channel, search_image_time_range, relative_paths)
+        except FileNotFoundError as e:
+            print("1 path not found", interval.left)
+            continue
+        peak_flux = find_flare_peak_flux(df, interval.left, interval.right)
+
+        # samples.append((images_paths, peak_flux, interval.left, all_found))
+        samples.append({
+            "images_paths": images_paths,
+            "peak_flux": peak_flux,
+            "datetime": interval.left,
+            "all_found": all_found,
+        })
+        # samples.append(flux_to_class(peak_flux))
+
+    samples_ls = [[*i["images_paths"], i["peak_flux"], i["datetime"], i["all_found"]] for i in samples]
+
+    columns = [f"path_{i}_before" for i in parameters["time-steps"]] + ["peak_flux", "datetime", "all_found"]
+    df = pd.DataFrame(samples_ls, columns=columns)
+
+    # Map target to classes if necessary
+    if classification:
+        target_transform = flux_to_class_builder(target["classes"], return_names=True)
+        df["peak_flux"] = df["peak_flux"].map(target_transform)
+
+    print(df.head())
+    df.to_csv(csv_path, index=False)
+
+
+def time_ranges_generator(datetime: pd.Timestamp, range: int = 6, unit: str = "min"):
+    """
+    Generate times around a datetime with a given range.
+    It takes the initial datetime and generate:
+        datetime - {range}{unit}, datetime + {range}{unit}, datetime - 2*{range}{unit}, datetime + 2*{range}{unit}, ...
+
+    :param datetime: The initial datetime
+    :param range: The range for the jumps
+    :param unit: The unit of the range
+    :return: yield an infinite number of datetime with given range
+    """
+
+    current_range = range
+    while True:
+        td = pd.Timedelta(current_range, unit)
+        yield datetime - td
+        yield datetime + td
+        current_range += range
+
+
+def make_path(base_path, time, channel) -> Path:
+    year = str(time.year)
+    month = f"{time.month:02d}"
+    day = f"{time.day:02d}"
+    hours = f"{time.hour:02d}"
+    minutes = f"{time.minute:02d}"
+    padded_channel = f"{channel:04d}"
+
+    return base_path / str(channel) / year / month / day / \
+           f"AIA{year}{month}{day}_{hours}{minutes}_{padded_channel}.npz"
+
+
+def find_paths(
+    base_path: Path,
+    datetime: pd.Timestamp,
+    time_steps: List[pd.Timedelta],
+    channel: str,
+    search_time_range: pd.Timedelta,
+    relative_paths: bool,
+) -> (List[Path], bool):
+    paths = []
+    all_found = True
+
+    for time_step in time_steps:
+        datetime_before = datetime - time_step
+        datetime_before = datetime_before.round("6min")
+
+        path = make_path(base_path, datetime_before, channel)
+
+        if not path.exists():
+            all_found = False
+
+            datetime_bottom_search_range = datetime_before - search_time_range
+            datetime_top_search_range = datetime_before + search_time_range
+            search_range = pd.Interval(datetime_bottom_search_range, datetime_top_search_range)
+
+            gen = time_ranges_generator(datetime_before)
+            while True:
+                new_time = next(gen)
+                if new_time not in search_range:
+                    raise FileNotFoundError()
+                path = make_path(base_path, new_time, channel)
+                if path.exists():
+                    break
+
+        if relative_paths:
+            path = path.relative_to(base_path)
+
+        paths.append(path)
+
+    return paths, all_found
+
+
+def find_flare_peak_flux(df: pd.DataFrame, start, end) -> float:
+    flares_df = df.loc[start:end]
+    flux_values = flares_df["fl_goescls"].values
+
+    if len(flux_values) == 0:
+        return 1e-9
+
+    return max(map(class_to_flux, flux_values))
+
+
+def get_flares(datetime_start, datetime_end):
+    observatory = "GOES"
+    instrument = "GOES"
+    from_name = "SWPC"
+    columns = [
+        "frm_name",
+        "obs_observatory",
+        "obs_instrument",
+        "ar_noaanum",
+        "event_starttime",
+        "event_endtime",
+        "event_peaktime",
+        "fl_goescls",
+        "fl_peakflux",
+    ]
+
+    result = Fido.search(
+        a.Time(datetime_start, datetime_end),
+        a.hek.FL,
+        a.hek.OBS.Observatory == observatory,
+        a.hek.OBS.Instrument == instrument,
+        a.hek.FRM.Name == from_name,
+    )
+
+    hek = result["hek"]
+    hek.keep_columns(columns)
+    hek = hek[hek["ar_noaanum"] != 0]
+    df = hek.to_pandas()
+
+    # Index by event_peaktime column and parse date
+    df = df.astype({"event_peaktime": "datetime64[ns]"})
+    df = df.set_index("event_peaktime")
+
+    return df

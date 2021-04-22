@@ -1,0 +1,57 @@
+# Choose destination for the dataset file(s). Default to current dir.
+destination: ./
+filename: sdo-dataset.csv
+dataset_path: E:/data/sdodataset
+# Whether to write the path as relative (from dataset root) or absolute (using dataset_path) in the csv file
+relative_paths: true
+
+# Choose whether files (images) are copied to the destination folder.
+copy: false  # TODO: add support
+
+# Choose an image size (if images are copied to another folder) to be resized or null for no resize.
+resize: null  # TODO: add support
+
+# Choose channel among: 94, 131, 171, 193, 211, 304, 335, 1600, 1700, 4500.
+channel: 171
+
+# The different times before the flare to choose images. Format supported by pandas.Timedelta.
+time-steps:
+  - 12h
+  - 5h
+  - 1h30m
+  - 10m
+
+# The time range to search for an image if not found at the exact search time.
+# This is because there is not an image for each minute, and some images are missing.
+# A range of 15 minutes will search 15m before and after the original time.
+search-image-time-range: 20m
+
+# Set of splits with years to include in each
+split: # TODO: add support
+  train:
+    - 2010
+    - 2011
+    - 2014
+    - 2015
+    - 2016
+  val:
+    - 2013
+    - 2018
+  test:
+    - 2012
+    - 2017
+
+# In which time span the target (peak flux) will be selected. Format supported by pandas.Timedelta.
+flare-time-range: 12h
+
+# Choose type of targets between regression and classification
+# With classification, the classes must be defined as a list of key (name of the class) - value (comparison) which are
+# evaluated in the defined order to map the peak flux to the classes.
+# target: regression  # to define a regression (example)
+target: # to define a classification
+  classes:
+    - Quiet: "< 1e-7"
+    - B: "< 1e-6"
+    - C: "< 1e-5"
+    - M: "< 1e-4"
+    - X: ">= 1e-4"
