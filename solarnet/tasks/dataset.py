@@ -43,6 +43,13 @@ def make_dataset(parameters: dict):
     target = parameters["target"]
     classification = "classes" in target
 
+    splits = parameters["splits"]
+    splits_separate_files = parameters["splits-separate-files"]
+    if splits is None or len(splits) < 1:
+        raise AttributeError("At least one split is required")
+    print_dict(splits)
+    year_to_split_dict = {year: split for split, years in splits.items() for year in years}
+
     first_known_datetime = pd.Timestamp("2018/01/01T00:00:00")
     last_known_datetime = pd.Timestamp("2018/01/31T23:59:59")
 
@@ -76,18 +83,19 @@ def make_dataset(parameters: dict):
             continue
         peak_flux = find_flare_peak_flux(df, interval.left, interval.right)
 
-        # samples.append((images_paths, peak_flux, interval.left, all_found))
+        sample_datetime: pd.Timestamp = interval.left
+
         samples.append({
             "images_paths": images_paths,
             "peak_flux": peak_flux,
-            "datetime": interval.left,
+            "datetime": sample_datetime,
             "all_found": all_found,
+            "split": year_to_split_dict.get(sample_datetime.year, None),
         })
-        # samples.append(flux_to_class(peak_flux))
 
-    samples_ls = [[*i["images_paths"], i["peak_flux"], i["datetime"], i["all_found"]] for i in samples]
+    samples_ls = [[*i["images_paths"], i["peak_flux"], i["datetime"], i["all_found"], i["split"]] for i in samples]
 
-    columns = [f"path_{i}_before" for i in parameters["time-steps"]] + ["peak_flux", "datetime", "all_found"]
+    columns = [f"path_{i}_before" for i in parameters["time-steps"]] + ["peak_flux", "datetime", "all_found", "split"]
     df = pd.DataFrame(samples_ls, columns=columns)
 
     # Map target to classes if necessary
@@ -95,7 +103,13 @@ def make_dataset(parameters: dict):
         target_transform = flux_to_class_builder(target["classes"], return_names=True)
         df["peak_flux"] = df["peak_flux"].map(target_transform)
 
-    print(df.head())
+    if splits_separate_files:
+        for split in splits:
+            df_split = df[df['split'] == split]
+            split_csv_path = csv_path.parent / f"{csv_path.stem}-{split}{csv_path.suffix}"
+            df_split.to_csv(split_csv_path, index=False)
+        return
+
     df.to_csv(csv_path, index=False)
 
 

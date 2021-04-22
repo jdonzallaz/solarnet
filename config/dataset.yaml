@@ -27,7 +27,7 @@ time-steps:
 search-image-time-range: 20m
 
 # Set of splits with years to include in each
-split: # TODO: add support
+splits:
   train:
     - 2010
     - 2011
@@ -40,6 +40,8 @@ split: # TODO: add support
   test:
     - 2012
     - 2017
+# Whether to put splits in separate files. Otherwise, a column in the csv will specify the split
+splits-separate-files: true
 
 # In which time span the target (peak flux) will be selected. Format supported by pandas.Timedelta.
 flare-time-range: 12h
