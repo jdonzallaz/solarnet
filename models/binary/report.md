@@ -22,7 +22,7 @@ trainer:
 name: Baseline binary classification model
 path: models/binary
 seed: 42
-tracking: true
+tracking: false
 gpus: 1
 ```
 ### Model architecture
@@ -79,11 +79,12 @@ Total parameters: 24594
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 44.13s
+training_time: 49.14s
 model_size: 321kB
-early_stopping_epoch: 12
-model_checkpoint_step: 765
-tracking_id: SOLN-55
+early_stopping_epoch: 16
+model_checkpoint_step: 648
+model_checkpoint_epoch: 10
+tracking_id:
 dataset:
   training_set_size: 7446
   validation_set_size: 827
@@ -91,9 +92,9 @@ dataset:
 ```
 ## Test
 ### Metrics
-| Path                       | accuracy   | balanced_accuracy   | csi    | f1      | far     | hss     | pod     | tss     |
-|----------------------------|------------|---------------------|--------|---------|---------|---------|---------|---------|
-| models/binary/metrics.yaml | 0.79863    | 0.77961             | 0.7224 | 0.78527 | 0.19649 | 0.57191 | 0.87739 | 0.55921 |
+| Path                       | accuracy   | balanced_accuracy   | csi   | f1      | far     | hss     | pod    | tss     |
+|----------------------------|------------|---------------------|-------|---------|---------|---------|--------|---------|
+| models/binary/metrics.yaml | 0.79405    | 0.7915              | 0.7   | 0.78814 | 0.15663 | 0.57661 | 0.8046 | 0.58301 |
 
 ### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')

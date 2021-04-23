@@ -18,5 +18,5 @@ trainer:
 name: Baseline binary classification model
 path: models/binary
 seed: 42
-tracking: true
+tracking: false
 gpus: 1
