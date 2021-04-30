@@ -5,11 +5,17 @@ import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 
+from solarnet.data.dataset_utils import BaseDataset
 
-class SDODataset(Dataset):
+
+class SDODataset(BaseDataset):
+    TARGET_COLUMN = "peak_flux"
+    DATETIME_COLUMN = "datetime"
+    PATH_COLUMN_PREFIX = "path_"
+
     def __init__(
         self,
         dataset_path: Path,
@@ -63,7 +69,10 @@ class SDODataset(Dataset):
         self.target_transform = target_transform
 
         # Load dataset metadata
-        self.dataset = pd.read_csv(self.csv_file, parse_dates=["datetime"])
+        self.dataset = pd.read_csv(self.csv_file, parse_dates=[self.DATETIME_COLUMN])
+
+        if len(self.dataset) == 0:
+            raise RuntimeError(f"Dataset in {self.csv_file} is empty.")
 
     def __len__(self) -> int:
         return len(self.dataset)
@@ -73,10 +82,10 @@ class SDODataset(Dataset):
         sample: pd.Series = self.dataset.iloc[index]
 
         # Get the target
-        target = sample["peak_flux"]
+        target = sample[self.TARGET_COLUMN]
 
         # Get the paths to images
-        paths = sample.filter(like='path_', axis=0).values
+        paths = sample.filter(like=self.PATH_COLUMN_PREFIX, axis=0).values
 
         # Load a numpy array from .npz and convert to pytorch tensor, for each image
         tensors = [
@@ -95,6 +104,15 @@ class SDODataset(Dataset):
             target = self.target_transform(target)
 
         return tensor, target
+
+    @property
+    def y(self) -> list:
+        targets = self.dataset[self.TARGET_COLUMN].tolist()
+
+        if self.target_transform is not None:
+            targets = list(map(self.target_transform, targets))
+
+        return targets
 
 
 class SDODatasetDataModule(pl.LightningDataModule):

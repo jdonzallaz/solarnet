@@ -1,0 +1,8 @@
+name: sdo-dataset
+channel: 211
+size: 256
+targets:
+  classes:
+    - Quiet: "< 1e-6"
+    - ">=C": ">= 1e-6"
+path: data/sdo-dataset

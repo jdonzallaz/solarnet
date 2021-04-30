@@ -4,27 +4,13 @@ from typing import Dict, List, Union
 
 import pandas as pd
 from sunpy.net import Fido, attrs as a
-from torchvision.transforms import transforms
 
-from solarnet.data.sdo_dataset import SDODataset
 from solarnet.utils.dict import print_dict
 from solarnet.utils.physics import class_to_flux
 from solarnet.utils.target import flux_to_class_builder
+from solarnet.utils.yaml import write_yaml
 
 logger = logging.getLogger(__name__)
-
-
-def test_dataset(parameters: dict):
-    csv = Path("sdo-dataset.csv")
-    root = Path("E:/data/sdodataset")
-
-    ds = SDODataset(csv, root, transform=transforms.Compose([
-        transforms.Resize(128),
-        transforms.Normalize(mean=[0.5], std=[0.5]),
-    ]))
-
-    print('len', len(ds))
-    print(ds[0][0].shape, ds[0][0].min(), ds[0][0].max(), ds[0][0].mean(), ds[0][0].std())
 
 
 def make_dataset(parameters: dict):
@@ -34,6 +20,9 @@ def make_dataset(parameters: dict):
     csv_path = destination / parameters["filename"]
     dataset_path = Path(parameters["dataset_path"])
     relative_paths = parameters["relative_paths"]
+
+    # Write config
+    write_yaml(destination / "sdo-dataset-config.yaml", parameters)
 
     channel = parameters["channel"]
 
@@ -50,8 +39,8 @@ def make_dataset(parameters: dict):
     print_dict(splits)
     year_to_split_dict = {year: split for split, years in splits.items() for year in years}
 
-    first_known_datetime = pd.Timestamp("2018/01/01T00:00:00")
-    last_known_datetime = pd.Timestamp("2018/01/31T23:59:59")
+    first_known_datetime = pd.Timestamp("2010/05/13T00:00:00")
+    last_known_datetime = pd.Timestamp("2018/12/31T23:59:59")
 
     datetime_start = first_known_datetime
     datetime_end = last_known_datetime
@@ -79,7 +68,7 @@ def make_dataset(parameters: dict):
             images_paths, all_found = find_paths(
                 dataset_path, interval.left, time_steps, channel, search_image_time_range, relative_paths)
         except FileNotFoundError as e:
-            print("1 path not found", interval.left)
+            # print("1 path not found", interval.left)
             continue
         peak_flux = find_flare_peak_flux(df, interval.left, interval.right)
 
@@ -212,6 +201,7 @@ def get_flares(datetime_start, datetime_end):
         "fl_peakflux",
     ]
 
+    # TODO: add caching
     result = Fido.search(
         a.Time(datetime_start, datetime_end),
         a.hek.FL,
@@ -228,5 +218,6 @@ def get_flares(datetime_start, datetime_end):
     # Index by event_peaktime column and parse date
     df = df.astype({"event_peaktime": "datetime64[ns]"})
     df = df.set_index("event_peaktime")
+    df = df.sort_index()
 
     return df

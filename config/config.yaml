@@ -1,12 +1,5 @@
-data:
-  validation_size: 0.1
-  channel: 211
-  size: 256
-  targets:
-    classes:
-      - Quiet: "< 1e-6"
-      - ">=C": ">= 1e-6"
-  time_steps: [ 3 ]
+defaults:
+  - data: sdo-benchmark
 
 model:
   activation: relu6
