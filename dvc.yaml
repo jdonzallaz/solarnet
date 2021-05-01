@@ -22,11 +22,14 @@ stages:
         experiment: regression
         path: regression
         model: cnn_regression
+      binary_sdodataset:
+        experiment: binary_sdodataset
+        path: binary_sdodataset
+        model: cnn_classification
     do:
       cmd: python -m solarnet.main train +experiment=${item.experiment}
       params:
         - config/config.yaml:
-            - data
             - model
             - trainer
             - name
@@ -67,11 +70,15 @@ stages:
         path: regression
         model: cnn_regression
         plot: regression_line
+      binary_sdodataset:
+        experiment: binary_sdodataset
+        path: binary_sdodataset
+        model: cnn_classification
+        plot: confusion_matrix
     do:
       cmd: python -m solarnet.main test +experiment=${item.experiment}
       params:
         - config/config.yaml:
-            - data
             - model
             - trainer
             - seed
@@ -110,6 +117,11 @@ stages:
         path: regression
         plot_name: regression_line
         plot_title: "Regression line"
+      binary_sdodataset:
+        report: "models/binary_sdodataset/report.md"
+        path: binary_sdodataset
+        plot_name: confusion_matrix
+        plot_title: "Confusion matrix"
     do:
       cmd: >-
         printf "# Model report\n" > ${item.report} &&

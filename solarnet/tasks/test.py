@@ -1,22 +1,20 @@
 import logging
-import os
 import random
 from pathlib import Path
-from typing import Callable, List, Optional, Union
+from typing import Callable, Optional
 
 import pytorch_lightning as pl
 import torch
 from pytorch_lightning import seed_everything
 from torch.utils.data import DataLoader, Dataset, Subset
+from torchvision.transforms import transforms
 
-from solarnet.data.sdo_benchmark_datamodule import SDOBenchmarkDataModule
-from solarnet.data.sdo_benchmark_dataset import SDOBenchmarkDataset
+from solarnet.data import datamodule_from_config, dataset_from_config
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.models import CNNClassification, CNNRegression
 from solarnet.utils.metrics import stats_metrics
 from solarnet.utils.plots import plot_confusion_matrix, plot_image_grid, plot_regression_line
-from solarnet.utils.scaling import log_min_max_inverse_scale, log_min_max_scale
-from solarnet.utils.target import flux_to_class_builder
+from solarnet.utils.scaling import log_min_max_inverse_scale
 from solarnet.utils.yaml import load_yaml, write_yaml
 
 logger = logging.getLogger(__name__)
@@ -27,7 +25,6 @@ def test(parameters: dict, verbose: bool = False):
 
     seed_everything(parameters["seed"])
 
-    ds_path = Path("data/sdo-benchmark")
     model_path = Path(parameters["path"])
     metadata_path = model_path / "metadata.yaml"
     metadata = load_yaml(metadata_path) if metadata_path.exists() else None
@@ -35,8 +32,6 @@ def test(parameters: dict, verbose: bool = False):
     regression = parameters['data']['targets'] == "regression"
     labels = None if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
     parameters["gpus"] = min(1, parameters["gpus"])
-    reg_tt = log_min_max_scale
-    target_transform = reg_tt if regression else flux_to_class_builder(parameters['data']['targets']['classes'])
 
     # Tracking
     tracking: Optional[Tracking] = None
@@ -44,17 +39,7 @@ def test(parameters: dict, verbose: bool = False):
         run_id = metadata["tracking_id"]
         tracking = NeptuneNewTracking.resume(run_id)
 
-    datamodule = SDOBenchmarkDataModule(
-        ds_path,
-        batch_size=parameters["trainer"]["batch_size"],
-        validation_size=parameters["data"]["validation_size"],
-        channel=parameters["data"]["channel"],
-        resize=parameters["data"]["size"],
-        seed=parameters["seed"],
-        num_workers=0 if os.name == 'nt' else 4,  # Windows supports only 1, Linux supports more
-        target_transform=target_transform,
-        time_steps=parameters['data']['time_steps'],
-    )
+    datamodule = datamodule_from_config(parameters)
     datamodule.setup('test')
     logger.info(f"Data format: {datamodule.size()}")
 
@@ -95,11 +80,8 @@ def test(parameters: dict, verbose: bool = False):
     # Prepare a set of test samples
     model.freeze()
     dataset_image, dataloader = get_random_test_samples_dataloader(
-        ds_path,
-        transforms=datamodule.transform,
-        target_transform=target_transform,
-        channel=parameters["data"]["channel"],
-        time_steps=parameters['data']['time_steps'],
+        parameters,
+        transform=datamodule.transform,
     )
     y, y_pred = predict(model, dataloader, regression)
     images, _ = map(list, zip(*dataset_image))
@@ -121,30 +103,14 @@ def test(parameters: dict, verbose: bool = False):
 
 
 def get_random_test_samples_dataloader(
-    ds_path: Path,
+    parameters: dict,
     nb_sample: int = 10,
-    channel: str = '171',
-    transforms: Optional[Callable] = None,
-    target_transform: Optional[Callable] = None,
-    time_steps: Union[int, List[int]] = 0,
+    transform: Optional[Callable] = None,
 ) -> (Dataset, DataLoader):
     """ Return a random set of test samples """
 
-    dataset_test_image = SDOBenchmarkDataset(
-        ds_path / 'test' / 'meta_data.csv',
-        ds_path / 'test',
-        transform=None,
-        target_transform=target_transform,
-        channel=channel
-    )
-    dataset_test_tensors = SDOBenchmarkDataset(
-        ds_path / 'test' / 'meta_data.csv',
-        ds_path / 'test',
-        transform=transforms,
-        target_transform=target_transform,
-        channel=channel,
-        time_steps=time_steps
-    )
+    dataset_test_image = dataset_from_config(parameters, "test", transforms.Lambda(lambda x: x[0]))
+    dataset_test_tensors = dataset_from_config(parameters, "test", transform)
 
     subset_indices = [random.randrange(len(dataset_test_image)) for _ in range(nb_sample)]
     subset_images = Subset(dataset_test_image, subset_indices)

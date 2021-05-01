@@ -3,6 +3,7 @@
 ### Parameters
 ```yaml
 data:
+  name: sdo-benchmark
   validation_size: 0.1
   channel: 211
   size: 256
@@ -14,6 +15,7 @@ data:
     - X: '>= 1e-4'
   time_steps:
   - 3
+  path: data/sdo-benchmark
 model:
   activation: relu6
 trainer:
@@ -81,11 +83,12 @@ Total parameters: 24628
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 59.74s
+training_time: 51.88s
 model_size: 322kB
-early_stopping_epoch: 18
-model_checkpoint_step: 1119
-tracking_id: SOLN-63
+early_stopping_epoch: 13
+model_checkpoint_step: 442
+model_checkpoint_epoch: 7
+tracking_id: SOLN-111
 dataset:
   training_set_size: 7446
   validation_set_size: 827
@@ -95,7 +98,7 @@ dataset:
 ### Metrics
 | Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
 |--------------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
-| models/multiclass/metrics.yaml | 0.52174    | 0.41866             | 0.35294 | 0.38985 | 0.47826 | 0.36232 | 0.52174 | 0.36232 |
+| models/multiclass/metrics.yaml | 0.50114    | 0.43271             | 0.33435 | 0.39862 | 0.49886 | 0.33486 | 0.50114 | 0.33486 |
 
 ### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')
