@@ -3,12 +3,14 @@
 ### Parameters
 ```yaml
 data:
+  name: sdo-benchmark
   validation_size: 0.1
   channel: 211
   size: 256
   targets: regression
   time_steps:
   - 3
+  path: data/sdo-benchmark
 model:
   activation: relu6
 trainer:
@@ -74,11 +76,12 @@ Total parameters: 24577
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 38.49s
+training_time: 73.38s
 model_size: 322kB
-early_stopping_epoch: 10
-model_checkpoint_step: 618
-tracking_id: SOLN-66
+early_stopping_epoch: 19
+model_checkpoint_step: 825
+model_checkpoint_epoch: 13
+tracking_id: SOLN-107
 dataset:
   training_set_size: 7446
   validation_set_size: 827

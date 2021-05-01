@@ -3,17 +3,14 @@
 ### Parameters
 ```yaml
 data:
-  name: sdo-benchmark
-  validation_size: 0.1
+  name: sdo-dataset
   channel: 211
   size: 256
   targets:
     classes:
     - Quiet: < 1e-6
     - '>=C': '>= 1e-6'
-  time_steps:
-  - 3
-  path: data/sdo-benchmark
+  path: /data1/data/sdo-dataset
 model:
   activation: relu6
 trainer:
@@ -21,8 +18,8 @@ trainer:
   batch_size: 128
   learning_rate: 0.005
   patience: 12
-name: Baseline binary classification model
-path: models/binary
+name: Binary classification model on SDO-Dataset
+path: models/binary_sdodataset
 seed: 42
 tracking: true
 gpus: 1
@@ -33,7 +30,7 @@ CNNClassification(
   (cnn): CNNModule(
     (conv_blocks): Sequential(
       (0): Sequential(
-        (0): Conv2d(1, 16, kernel_size=(3, 3), stride=(3, 3))
+        (0): Conv2d(4, 16, kernel_size=(3, 3), stride=(3, 3))
         (1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
         (2): MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0, dilation=1, ceil_mode=False)
         (3): ReLU6()
@@ -73,7 +70,7 @@ CNNClassification(
   )
 )
 ================================================================================
-Total parameters: 24594
+Total parameters: 25026
 ```
 ### Loss curve
 ![Loss curve](history.png 'Loss curve')
@@ -81,22 +78,22 @@ Total parameters: 24594
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 65.46s
-model_size: 321kB
-early_stopping_epoch: 17
-model_checkpoint_step: 678
-model_checkpoint_epoch: 11
-tracking_id: SOLN-105
+training_time: 315.16s
+model_size: 326kB
+early_stopping_epoch: 13
+model_checkpoint_step: 262
+model_checkpoint_epoch: 7
+tracking_id: SOLN-104
 dataset:
-  training_set_size: 7446
-  validation_set_size: 827
-  test_set_size: 874
+  training_set_size: 4402
+  validation_set_size: 672
+  test_set_size: 646
 ```
 ## Test
 ### Metrics
-| Path                       | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
-|----------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
-| models/binary/metrics.yaml | 0.78719    | 0.77465             | 0.70192 | 0.77686 | 0.18889 | 0.55392 | 0.83908 | 0.54931 |
+| Path                                  | accuracy   | balanced_accuracy   | csi    | f1      | far     | hss    | pod     | tss     |
+|---------------------------------------|------------|---------------------|--------|---------|---------|--------|---------|---------|
+| models/binary_sdodataset/metrics.yaml | 0.66873    | 0.61404             | 0.6304 | 0.57918 | 0.14319 | 0.1795 | 0.70463 | 0.22807 |
 
 ### Confusion matrix
 ![Confusion matrix](confusion_matrix.png 'Confusion matrix')

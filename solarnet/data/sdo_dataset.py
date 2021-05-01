@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -105,9 +105,11 @@ class SDODataset(BaseDataset):
 
         return tensor, target
 
-    @property
-    def y(self) -> list:
-        targets = self.dataset[self.TARGET_COLUMN].tolist()
+    def y(self, indices: Optional[Sequence[int]] = None) -> list:
+        if indices is None:
+            targets = self.dataset[self.TARGET_COLUMN].tolist()
+        else:
+            targets = self.dataset.iloc[indices][self.TARGET_COLUMN].tolist()
 
         if self.target_transform is not None:
             targets = list(map(self.target_transform, targets))
@@ -143,9 +145,10 @@ class SDODatasetDataModule(pl.LightningDataModule):
         self.target_transform = target_transform
         self.batch_size = batch_size
         self.num_workers = num_workers
+        # TODO: clean transforms
         self.transform = transforms.Compose([
             transforms.Resize(resize),
-            transforms.Normalize(mean=[0.5], std=[0.5]),
+            transforms.Normalize(mean=[177.9239959716797], std=[330.2225341796875]),  # 211 train
         ])
 
     def prepare_data(self):

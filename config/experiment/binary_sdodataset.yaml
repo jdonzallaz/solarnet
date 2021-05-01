@@ -1,0 +1,6 @@
+# @package _global_
+defaults:
+  - override /data: sdo-dataset
+
+name: Binary classification model on SDO-Dataset
+path: models/binary_sdodataset

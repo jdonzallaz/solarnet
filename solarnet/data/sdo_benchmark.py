@@ -1,6 +1,6 @@
 import datetime as dt
 from pathlib import Path
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Sequence, Union
 
 import pandas as pd
 import pytorch_lightning as pl
@@ -69,6 +69,8 @@ class SDOBenchmarkDataset(BaseDataset):
         metadata = self.ls[index]
         target = metadata[1]
         images = [Image.open(self.root_folder / path) for path in metadata[0]]
+        to_tensor = transforms.ToTensor()
+        images = [to_tensor(image) for image in images]
 
         if self.transform:
             images = [self.transform(image) for image in images]
@@ -83,12 +85,15 @@ class SDOBenchmarkDataset(BaseDataset):
 
         return image, target
 
-    @property
-    def y(self) -> list:
-        if self.target_transform is not None:
-            return [self.target_transform(y[1]) for y in self.ls]
+    def y(self, indices: Optional[Sequence[int]] = None) -> list:
+        ls = self.ls
+        if indices is not None:
+            ls = (self.ls[i] for i in indices)
 
-        return [y[1] for y in self.ls]
+        if self.target_transform is not None:
+            return [self.target_transform(y[1]) for y in ls]
+
+        return [y[1] for y in ls]
 
 
 class SDOBenchmarkDataModule(pl.LightningDataModule):
@@ -111,7 +116,6 @@ class SDOBenchmarkDataModule(pl.LightningDataModule):
         self.validation_size = validation_size
         self.seed = seed
         self.transform = transforms.Compose([
-            transforms.ToTensor(),
             transforms.Resize(resize),
             transforms.Normalize(mean=[0.5], std=[0.5]),
         ])

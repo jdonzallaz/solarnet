@@ -1,15 +1,12 @@
 data:
-  name: sdo-benchmark
-  validation_size: 0.1
+  name: sdo-dataset
   channel: 211
   size: 256
   targets:
     classes:
     - Quiet: < 1e-6
     - '>=C': '>= 1e-6'
-  time_steps:
-  - 3
-  path: data/sdo-benchmark
+  path: /data1/data/sdo-dataset
 model:
   activation: relu6
 trainer:
@@ -17,8 +14,8 @@ trainer:
   batch_size: 128
   learning_rate: 0.005
   patience: 12
-name: Baseline binary classification model
-path: models/binary
+name: Binary classification model on SDO-Dataset
+path: models/binary_sdodataset
 seed: 42
 tracking: true
 gpus: 1

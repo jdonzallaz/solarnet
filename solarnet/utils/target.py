@@ -3,6 +3,7 @@ from typing import Callable, Dict, List, Union
 import numpy as np
 import torch
 from sklearn.utils import class_weight
+from torch.utils.data import Subset
 
 from solarnet.data.dataset_utils import BaseDataset
 
@@ -89,7 +90,15 @@ def compute_class_weight(dataset: BaseDataset):
     :return: A tensor of weights for each class
     """
 
-    y = dataset.y
+    if isinstance(dataset, BaseDataset):
+        y = dataset.y()
+    elif isinstance(dataset, Subset):
+        ds = dataset.dataset
+        if not isinstance(ds, BaseDataset):
+            raise AttributeError("dataset must be a BaseDataset or a Subset of a BaseDataset.")
+        y = ds.y(dataset.indices)
+    else:
+        raise AttributeError("dataset must be a BaseDataset or a Subset of a BaseDataset.")
 
     cw = class_weight.compute_class_weight('balanced', classes=np.unique(y), y=y)
     cw = torch.tensor(cw, dtype=torch.float)
