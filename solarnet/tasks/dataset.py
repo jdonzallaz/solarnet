@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from sunpy.net import Fido, attrs as a
@@ -185,7 +185,62 @@ def find_flare_peak_flux(df: pd.DataFrame, start, end) -> float:
     return max(map(class_to_flux, flux_values))
 
 
-def get_flares(datetime_start, datetime_end):
+def get_flares_cache_filename(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
+    """
+    Return a corretly formatted filename for a parquet flares cache file, with dates (range) for reference.
+    """
+
+    return f"hek_flares_{datetime_start.isoformat().replace(':', '-')}_" \
+           f"{datetime_end.isoformat().replace(':', '-')}.parquet"
+
+
+def get_flares_from_cache(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp) -> Optional[pd.DataFrame]:
+    """
+    Check in the cache for data in the given dates range. Return None if nothing is found.
+    """
+
+    folder = Path.home() / ".solarnet" / "hek"
+    filename = get_flares_cache_filename(datetime_start, datetime_end)
+    path = folder / filename
+
+    if not path.exists():
+        return None
+
+    logger.info("Loading flares from cache")
+
+    try:
+        df = pd.read_parquet(path)
+    except:
+        logger.warning("Error while loading flares cache")
+        return None
+
+    return df
+
+
+def write_flares_to_cache(df: pd.DataFrame, datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
+    """
+    Write the given dataframe to a .parquet file for caching. Uses the given dates range for reference.
+    The cache is in the .solarnet/hek/ folder of the user home directory.
+    """
+
+    folder = Path.home() / ".solarnet" / "hek"
+    folder.mkdir(parents=True, exist_ok=True)
+    filename = get_flares_cache_filename(datetime_start, datetime_end)
+    path = folder / filename
+
+    logger.info("Writing flares to cache")
+
+    try:
+        df.to_parquet(path)
+    except:
+        logger.warning("Error while writing flares to cache")
+
+
+def get_flares(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
+    df = get_flares_from_cache(datetime_start, datetime_end)
+    if df is not None:
+        return df
+
     observatory = "GOES"
     instrument = "GOES"
     from_name = "SWPC"
@@ -219,5 +274,7 @@ def get_flares(datetime_start, datetime_end):
     df = df.astype({"event_peaktime": "datetime64[ns]"})
     df = df.set_index("event_peaktime")
     df = df.sort_index()
+
+    write_flares_to_cache(df, datetime_start, datetime_end)
 
     return df
