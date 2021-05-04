@@ -5,6 +5,7 @@ from typing import Callable, Optional
 
 import pytorch_lightning as pl
 import torch
+import torch.nn.functional as F
 from pytorch_lightning import seed_everything
 from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision.transforms import transforms
@@ -79,13 +80,16 @@ def test(parameters: dict, verbose: bool = False):
 
     # Prepare a set of test samples
     model.freeze()
+    nb_image_grid = 10
     dataset_image, dataloader = get_random_test_samples_dataloader(
         parameters,
         transform=datamodule.transform,
+        nb_sample=nb_image_grid,
     )
-    y, y_pred = predict(model, dataloader, regression)
+    y, y_pred, y_proba = predict(model, dataloader, regression, return_proba=True)
     images, _ = map(list, zip(*dataset_image))
-    plot_image_grid(images, y, y_pred, labels=labels, save_path=Path(model_path / "test_samples.png"))
+    plot_image_grid(images, y, y_pred, y_proba, labels=labels, save_path=Path(model_path / "test_samples.png"),
+                    max_images=nb_image_grid)
 
     # Confusion matrix or regression line
     y, y_pred = predict(model, datamodule.test_dataloader(), regression)
@@ -120,7 +124,7 @@ def get_random_test_samples_dataloader(
     return subset_images, dataloader_tensors
 
 
-def predict(model, dataloader, is_regression: bool = False):
+def predict(model, dataloader, is_regression: bool = False, return_proba: bool = False):
     if is_regression:
         y_pred = torch.tensor([])
         y = torch.tensor([])
@@ -136,12 +140,17 @@ def predict(model, dataloader, is_regression: bool = False):
         return y.tolist(), y_pred.tolist()
 
     y_pred = []
+    y_proba = []
     y = []
 
     with torch.no_grad():
         for i in dataloader:
             logits = model(i[0])
             y_pred += torch.argmax(logits, dim=1).tolist()
+            y_proba += F.softmax(logits, dim=1).tolist()
             y += i[1].tolist()
+
+    if return_proba:
+        return y, y_pred, y_proba
 
     return y, y_pred

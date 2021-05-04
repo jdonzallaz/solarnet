@@ -81,9 +81,10 @@ def plot_image_grid(
     images: list,
     y: List[Union[int, float]],
     y_pred: Optional[List[Union[int, float]]] = None,
+    y_proba: Optional[List[List[float]]] = None,
     labels: List[str] = None,
     columns: int = 5,
-    width: int = 20,
+    width: int = 22,
     height: int = 6,
     max_images: int = 10,
     label_font_size: int = 14,
@@ -96,6 +97,7 @@ def plot_image_grid(
     :param images: list of image (format supported by plt.imshow())
     :param y: list of labels (int) or values (float for regression)
     :param y_pred: list of predictions (int) or values (float for regression)
+    :param y_proba: list of probabilities (float) for predictions
     :param labels: list of string labels
     :param columns: number of images to show in a row
     :param width: width of the figure
@@ -118,8 +120,12 @@ def plot_image_grid(
     height = max(height, int(len(images) / columns) * height)
 
     plt.figure(figsize=(width, height))
-    plt.subplots_adjust(wspace=0.05)
-    plt.subplots_adjust(hspace=0.2)
+    # plt.subplots_adjust(wspace=0.05)
+    # plt.subplots_adjust(hspace=0.2)
+
+    if y_proba is not None:
+        # Take probability of y_pred
+        y_proba = [p[y_pred[i]] for i, p in enumerate(y_proba)]
 
     for i, image in enumerate(images):
         plt.subplot(int(len(images) / columns + 1), columns, i + 1)
@@ -140,6 +146,8 @@ def plot_image_grid(
             else:
                 title = f"y_true: {pretty_label(y[i])} / y_pred: {pretty_label(y_pred[i])}"
                 color = colors["red"]
+            if y_proba is not None:
+                title += f" ({y_proba[i]:.2f})"
         plt.title(title, fontsize=label_font_size, color=color, wrap=True)
 
     if save_path is None:
