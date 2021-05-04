@@ -10,7 +10,7 @@ from pathlib import Path
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 
-def objective_builder(model: str):
+def objective_builder(model: str, metric: str = "f1"):
     def objective(trial):
         # Load parameters
         config_path = Path("config") / "config.yaml"
@@ -50,16 +50,19 @@ def objective_builder(model: str):
 
         # Check metric
         metrics = load_yaml(Path("models") / model / "metrics.yaml")
-        f1 = metrics["f1"]
-
-        return f1
+        return metrics[metric]
 
     return objective
 
 
-def run(model: str):
-    study = optuna.create_study(direction=optuna.study.StudyDirection.MAXIMIZE)
-    study.optimize(objective_builder(model), n_trials=100)
+def run(model: str, metric: str = "f1", direction: str = "max", n_trials: int = 100):
+    if direction == "max":
+        direction = optuna.study.StudyDirection.MAXIMIZE
+    else:
+        direction = optuna.study.StudyDirection.MINIMIZE
+
+    study = optuna.create_study(direction=direction)
+    study.optimize(objective_builder(model, metric), n_trials=n_trials)
 
     print("\nBest parameters:")
     for key, value in study.best_params.items():
