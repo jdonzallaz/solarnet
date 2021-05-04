@@ -76,8 +76,8 @@ stages:
       md5: ead31bd3b8f3e956b9630234c1e6b693
       size: 1776
     - path: solarnet/tasks/test.py
-      md5: 1f35375407b0cd6206b8d4665651ebf5
-      size: 5220
+      md5: 2aec85f75a53bd4e5fba44a2f7928573
+      size: 5628
     params:
       config/config.yaml:
         gpus: 1
@@ -98,8 +98,8 @@ stages:
       md5: 2f564f4932d5283f6024eadb6be78966
       size: 210
     - path: models/binary/test_samples.png
-      md5: 4129f4533f79739c22328d3ace5f87f0
-      size: 743090
+      md5: 7da1c3d228ad1971da1a38fe7818bea2
+      size: 758799
   generate-report@binary:
     cmd: printf "# Model report\n" > models/binary/report.md && printf "## Training\n"
       >> models/binary/report.md && printf "### Parameters\n" >> models/binary/report.md
@@ -135,8 +135,8 @@ stages:
       md5: d2a8c1d8bcf0840f821abc096ff30489
       size: 1702
     - path: models/binary/test_samples.png
-      md5: 4129f4533f79739c22328d3ace5f87f0
-      size: 743090
+      md5: 7da1c3d228ad1971da1a38fe7818bea2
+      size: 758799
     outs:
     - path: models/binary/report.md
       md5: c3d8faf7ddfc2d1264e08967933bba76
@@ -207,8 +207,8 @@ stages:
       md5: ead31bd3b8f3e956b9630234c1e6b693
       size: 1776
     - path: solarnet/tasks/test.py
-      md5: 1f35375407b0cd6206b8d4665651ebf5
-      size: 5220
+      md5: 2aec85f75a53bd4e5fba44a2f7928573
+      size: 5628
     params:
       config/config.yaml:
         gpus: 1
@@ -229,8 +229,8 @@ stages:
       md5: 51f6db537a011c3807eb91e68a1db8a0
       size: 213
     - path: models/multiclass/test_samples.png
-      md5: 6eaca102dc74bc07488cf70cbd1c78ba
-      size: 748037
+      md5: b09013da9086dfcf314213facd657614
+      size: 765574
   generate-report@multiclass:
     cmd: printf "# Model report\n" > models/multiclass/report.md && printf "## Training\n"
       >> models/multiclass/report.md && printf "### Parameters\n" >> models/multiclass/report.md
@@ -267,8 +267,8 @@ stages:
       md5: 6ed4bd423e1e54a4258cbbd982fa31ed
       size: 1702
     - path: models/multiclass/test_samples.png
-      md5: 6eaca102dc74bc07488cf70cbd1c78ba
-      size: 748037
+      md5: b09013da9086dfcf314213facd657614
+      size: 765574
     outs:
     - path: models/multiclass/report.md
       md5: 8325e1ca6495700b1dc747d5fb4bfe13
@@ -339,8 +339,8 @@ stages:
       md5: e82c034188e4e34f06d4c0fd83cc09f3
       size: 2944
     - path: solarnet/tasks/test.py
-      md5: 1f35375407b0cd6206b8d4665651ebf5
-      size: 5220
+      md5: 2aec85f75a53bd4e5fba44a2f7928573
+      size: 5628
     params:
       config/config.yaml:
         gpus: 1
@@ -361,8 +361,8 @@ stages:
       md5: f9d7d36a93a0eeabad83eff020bf72bf
       size: 69191
     - path: models/regression/test_samples.png
-      md5: 2941073e2726c51817e3825e30edc33b
-      size: 752449
+      md5: 048f7855bdc47dd792cf55d803c44fd7
+      size: 758941
   generate-report@regression:
     cmd: printf "# Model report\n" > models/regression/report.md && printf "## Training\n"
       >> models/regression/report.md && printf "### Parameters\n" >> models/regression/report.md
@@ -399,8 +399,8 @@ stages:
       md5: f9d7d36a93a0eeabad83eff020bf72bf
       size: 69191
     - path: models/regression/test_samples.png
-      md5: 2941073e2726c51817e3825e30edc33b
-      size: 752449
+      md5: 048f7855bdc47dd792cf55d803c44fd7
+      size: 758941
     outs:
     - path: models/regression/report.md
       md5: 59d1727a8c81767624f91d9262a61c20
@@ -424,8 +424,8 @@ stages:
       md5: ead31bd3b8f3e956b9630234c1e6b693
       size: 1776
     - path: solarnet/tasks/test.py
-      md5: 1f35375407b0cd6206b8d4665651ebf5
-      size: 5220
+      md5: 2aec85f75a53bd4e5fba44a2f7928573
+      size: 5628
     params:
       config/config.yaml:
         gpus: 1
@@ -446,8 +446,8 @@ stages:
       md5: c7c6dbcba1c9cfacb82767817ab8cc4a
       size: 212
     - path: models/binary_sdodataset/test_samples.png
-      md5: 7498a6bd854a2ce2bf1c7ab083a264a4
-      size: 418913
+      md5: cf77093d1a1006302304557f55c8695b
+      size: 431985
   train@binary_sdodataset:
     cmd: python -m solarnet.main train +experiment=binary_sdodataset
     deps:
@@ -532,8 +532,8 @@ stages:
       md5: f4659c7295d32e213ae8135fc795071c
       size: 1702
     - path: models/binary_sdodataset/test_samples.png
-      md5: 7498a6bd854a2ce2bf1c7ab083a264a4
-      size: 418913
+      md5: cf77093d1a1006302304557f55c8695b
+      size: 431985
     outs:
     - path: models/binary_sdodataset/report.md
       md5: 199e245bd310a92edd1dc0441be13bf5
