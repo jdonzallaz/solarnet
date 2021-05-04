@@ -28,7 +28,7 @@ def stats_dataset(params: dict, split: str):
     print("Min:", min)
     print("Max:", max)
 
-    y = dataset.y
+    y = dataset.y()
     print("First 10 targets:", y[:10])
     print("Targets distribution:", np.unique(y, return_counts=True))
     print("Resulting class-weight distribution:", compute_class_weight(dataset))
