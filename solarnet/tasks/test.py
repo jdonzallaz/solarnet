@@ -137,6 +137,9 @@ def predict(model, dataloader, is_regression: bool = False, return_proba: bool =
         y = log_min_max_inverse_scale(y)
         y_pred = log_min_max_inverse_scale(y_pred)
 
+        if return_proba:
+            return y.tolist(), y_pred.tolist(), None
+
         return y.tolist(), y_pred.tolist()
 
     y_pred = []

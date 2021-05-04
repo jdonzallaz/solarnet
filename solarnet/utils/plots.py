@@ -123,7 +123,7 @@ def plot_image_grid(
     # plt.subplots_adjust(wspace=0.05)
     # plt.subplots_adjust(hspace=0.2)
 
-    if y_proba is not None:
+    if y_proba is not None and not is_regression:
         # Take probability of y_pred
         y_proba = [p[y_pred[i]] for i, p in enumerate(y_proba)]
 
