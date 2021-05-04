@@ -9,6 +9,7 @@ from omegaconf import OmegaConf
 
 from solarnet.tasks.dataset import make_dataset, test_dataset
 from solarnet.tasks.download_dataset import download_dataset
+from solarnet.tasks.upload import upload_model
 from solarnet.utils.log import init_log, set_log_level
 from solarnet.utils.yaml import load_yaml
 
@@ -86,6 +87,16 @@ def data_command(
     params = load_yaml(Path('config') / 'dataset.yaml')
 
     test_dataset(params)
+
+
+@app.command('upload')
+def upload_command(
+    path: Path,
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+):
+    if verbose: set_log_level(logging.INFO)
+
+    upload_model(path)
 
 
 # Command to add options before the command (-v train ...)

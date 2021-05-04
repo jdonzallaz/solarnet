@@ -2,7 +2,7 @@ import logging
 import zipfile
 from pathlib import Path
 
-from solarnet.utils.s3 import download_s3_folder
+from solarnet.utils.s3 import s3_download_folder
 from solarnet.utils.yaml import load_yaml
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def download_dataset(dataset: str):
     is_zip = dataset.split("-")[-1] == "zip"
     if is_zip:
         dataset = "-".join(dataset.split("-")[:-1])
-    
+
     if (Path('data') / f"{dataset}.placeholder").exists():
         return
 
@@ -34,7 +34,7 @@ def download_dataset(dataset: str):
             'Missing Minio config. Create config/minio.yaml with aws_access_key_id, aws_secret_access_key and endpoint_url keys.')
 
     # Download dataset
-    download_s3_folder(bucket_name, local_dir=Path('data') / dataset, s3_config=config)
+    s3_download_folder(bucket_name, local_dir=Path('data') / dataset)
 
     # Unzip archive
     if is_zip:

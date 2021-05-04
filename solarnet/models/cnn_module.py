@@ -1,5 +1,7 @@
 from torch import nn
 
+from solarnet.models.model_utils import BaseModel
+
 
 def conv_block(input_size, output_size, activation: str, *args, **kwargs):
     if activation == "leakyrelu":
@@ -26,7 +28,7 @@ def conv_block(input_size, output_size, activation: str, *args, **kwargs):
     )
 
 
-class CNNModule(nn.Module):
+class CNNModule(BaseModel):
     def __init__(self, channels: int, n_class: int, activation: str = 'relu'):
         super().__init__()
         self.conv_blocks = nn.Sequential(
