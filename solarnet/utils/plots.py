@@ -276,3 +276,34 @@ def plot_regression_line(
         plt.show()
     else:
         plt.savefig(save_path, bbox_inches='tight')
+
+
+def plot_histogram(
+    hist: torch.Tensor,
+    min: float = 0.0,
+    max: float = 1.0,
+    save_path: Path = None,
+    figsize: tuple = (10, 8),
+):
+    """
+    Print an histogram of values.
+
+    :param hist: histogram of values
+    :param min: minimum of values appearing in histogram
+    :param max: maximum of values appearing in histogram
+    :param figsize: size of the figure
+    :param save_path: optional path where the figure will be saved
+    """
+
+    plt.figure(figsize=figsize)
+
+    n_bins = len(hist)
+    bins = torch.linspace(min, max, n_bins)
+    plt.bar(bins, hist, width=max / n_bins * 0.5)
+    plt.ylabel('Number of values in each bin')
+    plt.grid(alpha=0.75)
+
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path)
