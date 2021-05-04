@@ -256,7 +256,6 @@ def get_flares(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
         "fl_peakflux",
     ]
 
-    # TODO: add caching
     result = Fido.search(
         a.Time(datetime_start, datetime_end),
         a.hek.FL,
