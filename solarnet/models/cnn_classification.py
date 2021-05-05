@@ -19,6 +19,8 @@ class CNNClassification(pl.LightningModule):
 
         self.loss_fn = nn.CrossEntropyLoss(weight=class_weight)
 
+        self.train_accuracy = Accuracy()
+        self.val_accuracy = Accuracy()
         self.test_metrics = MetricCollection([
             Accuracy(),
             F1(num_classes=self.hparams.n_class, average="macro"),
@@ -46,6 +48,11 @@ class CNNClassification(pl.LightningModule):
         loss = self.loss_fn(y_pred, y)
 
         self.log(f"{step_type}_loss", loss, prog_bar=True, sync_dist=False)
+
+        # Compute accuracy
+        y_pred = F.softmax(y_pred, dim=1)
+        self.__getattr__(f"{step_type}_accuracy")(y_pred, y)
+        self.log(f"{step_type}_accuracy", self.__getattr__(f"{step_type}_accuracy"), on_step=True, on_epoch=True)
 
         return loss
 
