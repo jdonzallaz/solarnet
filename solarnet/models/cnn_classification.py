@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch_optimizer
 from pytorch_lightning.core.decorators import auto_move_data
 from torch import nn, optim
-from torchmetrics import Accuracy, F1, MetricCollection, Recall, StatScores
+from torchmetrics import AUROC, Accuracy, F1, MetricCollection, Recall, StatScores
 
 from solarnet.models.cnn_module import CNNModule
 
@@ -32,6 +32,8 @@ class CNNClassification(pl.LightningModule):
                 is_multiclass=self.hparams.n_class > 2
             ),
         ])
+        if n_class <= 2:
+            self.test_metrics.add_module("AUROC", AUROC(num_classes=self.hparams.n_class, average="macro"))
 
     @auto_move_data
     def forward(self, image):
@@ -59,22 +61,22 @@ class CNNClassification(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         image, y = batch
-        logits = self(image)
-        y_pred = torch.argmax(logits, dim=1)
+        y_pred = self(image)
+        y_pred = F.softmax(y_pred, dim=1)
 
         self.test_metrics(y_pred, y)
 
     def test_epoch_end(self, outs):
         test_metrics = self.test_metrics.compute()
-        self.log('test_accuracy', test_metrics["Accuracy"])
-        self.log('test_recall', test_metrics["Recall"])
-        self.log('test_f1', test_metrics["F1"])
 
-        tp, fp, tn, fn, _ = test_metrics["StatScores"]
+        tp, fp, tn, fn, _ = test_metrics.pop("StatScores")
         self.log('test_tp', tp)
         self.log('test_fp', fp)
         self.log('test_tn', tn)
         self.log('test_fn', fn)
+
+        for key, value in test_metrics.items():
+            self.log(f"test_{key.lower()}", value)
 
     def configure_optimizers(self):
         optimizer = torch_optimizer.RAdam(

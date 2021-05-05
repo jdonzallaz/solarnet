@@ -55,24 +55,27 @@ def test(parameters: dict, verbose: bool = False):
 
     # Evaluate model
     raw_metrics = trainer.test(model, datamodule=datamodule, verbose=verbose)
+    raw_metrics = raw_metrics[0]
 
     if regression:
         metrics = {
-            'mae': raw_metrics[0]["test_mae"],
-            'mse': raw_metrics[0]["test_mse"],
+            'mae': raw_metrics["test_mae"],
+            'mse': raw_metrics["test_mse"],
         }
     else:
-        tp = raw_metrics[0]["test_tp"]  # hits
-        fp = raw_metrics[0]["test_fp"]  # false alarm
-        tn = raw_metrics[0]["test_tn"]  # correct negative
-        fn = raw_metrics[0]["test_fn"]  # miss
+        tp = raw_metrics.pop("test_tp")  # hits
+        fp = raw_metrics.pop("test_fp")  # false alarm
+        tn = raw_metrics.pop("test_tn")  # correct negative
+        fn = raw_metrics.pop("test_fn")  # miss
 
         metrics = {
-            "accuracy": raw_metrics[0]["test_accuracy"],
-            "balanced_accuracy": raw_metrics[0]["test_recall"],
-            "f1": raw_metrics[0]["test_f1"],
+            "balanced_accuracy": raw_metrics.pop("test_recall"),
             **stats_metrics(tp, fp, tn, fn)
         }
+
+        for key, value in raw_metrics.items():
+            metrics[key[len("test_"):]] = value
+        metrics = dict(sorted(metrics.items()))
 
     write_yaml(model_path / "metrics.yaml", metrics)
     if tracking:
