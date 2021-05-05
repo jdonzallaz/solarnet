@@ -10,7 +10,7 @@ from solarnet.data.dataset_config import datamodule_from_config
 from solarnet.logging import InMemoryLogger
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.models import model_from_config
-from solarnet.utils.plots import plot_loss_curve
+from solarnet.utils.plots import plot_train_val_curve
 from solarnet.utils.pytorch import get_training_summary, pytorch_model_summary
 from solarnet.utils.yaml import write_yaml
 
@@ -32,6 +32,10 @@ def _train(parameters: dict, datamodule: LightningDataModule, model: LightningMo
 
     seed_everything(parameters['seed'])
     model_path = Path(parameters["path"])
+    plot_path = Path(parameters["path"]) / "train_plots"
+    plot_path.mkdir(parents=True, exist_ok=True)
+    regression = parameters["data"]['targets'] == "regression"
+    n_class = 1 if regression else len(parameters['data']['targets']['classes'])
 
     if not datamodule.has_setup_fit:
         datamodule.setup("fit")
@@ -80,7 +84,11 @@ def _train(parameters: dict, datamodule: LightningDataModule, model: LightningMo
     pytorch_model_summary(model, model_path)
 
     # Save plot of history
-    plot_loss_curve(im_logger.metrics, save_path=model_path / 'history.png')
+    y_lim_loss = [0, 0.25] if regression else [0, 2] if n_class > 2 else [0, 1]
+    plot_train_val_curve(im_logger.metrics, metric="loss", save_path=plot_path / "loss_curve.png", y_lim=y_lim_loss)
+    if not regression:
+        plot_train_val_curve(im_logger.metrics, metric="accuracy", key_suffix="_epoch",
+                             save_path=plot_path / "accuracy_curve.png", y_lim=[0.25, 1.0])
 
     # Output tracking run id to continue logging in test step
     run_id = tracking.get_id()

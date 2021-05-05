@@ -65,28 +65,34 @@ CNNClassification(
     )
   )
   (loss_fn): CrossEntropyLoss()
+  (train_accuracy): Accuracy()
+  (val_accuracy): Accuracy()
   (test_metrics): MetricCollection(
     (Accuracy): Accuracy()
     (F1): F1()
     (Recall): Recall()
     (StatScores): StatScores()
+    (AUROC): AUROC()
   )
 )
 ================================================================================
 Total parameters: 24594
 ```
 ### Loss curve
-![Loss curve](history.png 'Loss curve')
+![Loss curve](train_plots/loss_curve.png 'Loss curve')
+
+### Accuracy curve
+![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')
 
 ### Metadata
 ```yaml
-machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 65.46s
+machine: eifrpoeisc45 | Windows 10.0.19041 | 4 cores @ 2592.00Mhz | RAM 16 GB | 1x Quadro M2000M
+training_time: 279.53s
 model_size: 321kB
-early_stopping_epoch: 17
-model_checkpoint_step: 678
-model_checkpoint_epoch: 11
-tracking_id: SOLN-105
+early_stopping_epoch: 13
+model_checkpoint_step: 442
+model_checkpoint_epoch: 7
+tracking_id: SOLN-123
 dataset:
   training_set_size: 7446
   validation_set_size: 827
@@ -94,13 +100,16 @@ dataset:
 ```
 ## Test
 ### Metrics
-| Path                       | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
-|----------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
-| models/binary/metrics.yaml | 0.78719    | 0.77465             | 0.70192 | 0.77686 | 0.18889 | 0.55392 | 0.83908 | 0.54931 |
+| Path                       | accuracy   | auroc   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
+|----------------------------|------------|---------|---------------------|---------|---------|---------|---------|---------|---------|
+| models\binary\metrics.yaml | 0.78833    | 0.86527 | 0.77607             | 0.70305 | 0.77817 | 0.18738 | 0.55653 | 0.83908 | 0.55215 |
 
 ### Confusion matrix
-![Confusion matrix](confusion_matrix.png 'Confusion matrix')
+![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')
+
+### ROC Curve
+![ROC Curve](test_plots/roc_curve.png 'ROC Curve')
 
 ### Test samples
-![Test samples](test_samples.png 'Test samples')
+![Test samples](test_plots/test_samples.png 'Test samples')
 

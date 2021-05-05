@@ -34,6 +34,8 @@ CNNClassification(
     )
   )
   (loss_fn): CrossEntropyLoss()
+  (train_accuracy): Accuracy()
+  (val_accuracy): Accuracy()
   (test_metrics): MetricCollection(
     (Accuracy): Accuracy()
     (F1): F1()

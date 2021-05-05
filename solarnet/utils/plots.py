@@ -157,49 +157,53 @@ def plot_image_grid(
         plt.savefig(save_path, bbox_inches="tight")
 
 
-def plot_loss_curve(
+def plot_train_val_curve(
     metrics: Dict[str, List[Dict[str, Union[float, int]]]],
+    metric: str,
+    key_suffix: str = "",
     y_lim=None,
     step_name: str = "Steps",
     smooth_factor=0.0,
     save_path: Path = None,
 ):
     """
-    Plot the loss curve of training and validation.
-    The metrics dict should have keys "train_loss" and "val_loss", each with a list as value. Lists should have "value"
-     and step key. The step could be an arbitrary step, a batch number or an epoch and is used to align training
-     and validation curves.
+    Plot the "metric" curve of training and validation.
+    The metrics dict should have keys "train_{metric}{key_suffix}" and "val_{metric}{key_suffix}",
+     each with a list as value. Lists should have "value" and step key. The step could be an arbitrary step,
+     a batch number or an epoch and is used to align training and validation curves.
 
     :param metrics: A dict of train/val metrics, with list of values per step.
-    :param save_path: optional path where the figure will be saved.
+    :param metric: A string for the name of the metric. Also used as key in the metrics dict.
+    :param key_suffix: A suffix for the key in the metrics dict. E.g. "_epoch" or "_batch".
     :param y_lim: An optional array (2 entries) to specify y-axis limits. Default to [0, 1].
     :param step_name: The name to give to the step axis on the plot. Default to "Steps".
     :param smooth_factor: A factor for smoothing the plot in [0, 1]. Default to 0 (no smoothing).
+    :param save_path: optional path where the figure will be saved.
     """
 
     if y_lim is None:
         y_lim = [0, 1]
 
-    train_loss = metrics["train_loss"]
-    train_loss = {k: [dic[k] for dic in train_loss] for k in train_loss[0]}
-    train_loss_steps = train_loss["step"]
-    train_loss_values = smooth_curve(train_loss["value"], smooth_factor)
+    train_metric = metrics[f"train_{metric}{key_suffix}"]
+    train_metric = {k: [dic[k] for dic in train_metric] for k in train_metric[0]}
+    train_metric_steps = train_metric["step"]
+    train_metric_values = smooth_curve(train_metric["value"], smooth_factor)
 
-    val_loss = metrics["val_loss"]
-    val_loss = {k: [dic[k] for dic in val_loss] for k in val_loss[0]}
-    val_loss_steps = val_loss["step"]
-    val_loss_values = smooth_curve(val_loss["value"], smooth_factor)
+    val_metric = metrics[f"val_{metric}{key_suffix}"]
+    val_metric = {k: [dic[k] for dic in val_metric] for k in val_metric[0]}
+    val_metric_steps = val_metric["step"]
+    val_metric_values = smooth_curve(val_metric["value"], smooth_factor)
 
     plt.ioff()
 
     fig = plt.figure(figsize=(8, 6))
 
-    plt.plot(train_loss_steps, train_loss_values, "dodgerblue", label="Training loss")
-    plt.plot(val_loss_steps, val_loss_values, "g", label="Validation loss")  # g is for "solid green line"
+    plt.plot(train_metric_steps, train_metric_values, "dodgerblue", label=f"Training {metric}")
+    plt.plot(val_metric_steps, val_metric_values, "g", label=f"Validation {metric}")  # g is for "solid green line"
 
-    plt.title("Training and validation loss")
+    plt.title(f"Training and validation {metric}")
     plt.xlabel(step_name)
-    plt.ylabel("Loss")
+    plt.ylabel(metric.capitalize())
     plt.gca().set_ylim(y_lim)
     plt.grid(alpha=0.75)
     plt.legend()

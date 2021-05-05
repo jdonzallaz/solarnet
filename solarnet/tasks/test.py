@@ -27,6 +27,8 @@ def test(parameters: dict, verbose: bool = False):
     seed_everything(parameters["seed"])
 
     model_path = Path(parameters["path"])
+    plot_path = Path(parameters["path"]) / "test_plots"
+    plot_path.mkdir(parents=True, exist_ok=True)
     metadata_path = model_path / "metadata.yaml"
     metadata = load_yaml(metadata_path) if metadata_path.exists() else None
 
@@ -91,28 +93,35 @@ def test(parameters: dict, verbose: bool = False):
     )
     y, y_pred, y_proba = predict(model, dataloader, regression, return_proba=True)
     images, _ = map(list, zip(*dataset_image))
-    plot_image_grid(images, y, y_pred, y_proba, labels=labels, save_path=Path(model_path / "test_samples.png"),
+    plot_image_grid(images, y, y_pred, y_proba, labels=labels,
+                    save_path=Path(plot_path / "test_samples.png"),
                     max_images=nb_image_grid)
 
     # Confusion matrix or regression line
     y, y_pred, y_proba = predict(model, datamodule.test_dataloader(), regression, return_proba=True)
 
     if regression:
-        plot_path = Path(model_path / "regression_line.png")
+        plot_path = Path(plot_path / "regression_line.png")
         plot_regression_line(y, y_pred, save_path=plot_path)
+
+        if tracking:
+            tracking.log_artifact(plot_path, "metrics/test/regression_line")
     else:
         # Confusion matrix
-        plot_path = Path(model_path / "confusion_matrix.png")
-        plot_confusion_matrix(y, y_pred, labels, save_path=plot_path)
+        confusion_matrix_path = Path(plot_path / "confusion_matrix.png")
+        plot_confusion_matrix(y, y_pred, labels, save_path=confusion_matrix_path)
         # Roc curve
         n_class = len(parameters['data']['targets']['classes'])
         if n_class <= 2:
-            plot_path = Path(model_path / "roc_curve.png")
-            plot_roc_curve(y, y_proba, n_class=n_class, save_path=plot_path)
-    if tracking:
-        plot_name = "regression_line" if regression else "confusion_matrix"
-        tracking.log_artifact(plot_path, f"metrics/test/{plot_name}")
-        tracking.end()
+            roc_curve_path = Path(plot_path / "roc_curve.png")
+            plot_roc_curve(y, y_proba, n_class=n_class, save_path=roc_curve_path, figsize=(7,5))
+
+        if tracking:
+            tracking.log_artifact(confusion_matrix_path, "metrics/test/confusion_matrix")
+            if n_class <= 2:
+                tracking.log_artifact(roc_curve_path, "metrics/test/roc_curve")
+
+    if tracking: tracking.end()
 
 
 def get_random_test_samples_dataloader(
