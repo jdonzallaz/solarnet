@@ -8,6 +8,7 @@ import seaborn
 import seaborn as sns
 import torch
 from sklearn.metrics import confusion_matrix
+from torchmetrics.functional import auroc, roc
 
 
 def plot_confusion_matrix(
@@ -239,6 +240,16 @@ def plot_regression_line(
     save_path: Path = None,
     figsize: tuple = (10, 8),
 ):
+    """
+    Plot a regression line which shows regression prediction against true values in a scatter plot.
+
+    :param y_true: The true values
+    :param y_pred: The prediction (real values / float)
+    :param lim: The limit of the axis
+    :param save_path: optional path where the figure will be saved.
+    :param figsize: size of the figure
+    """
+
     plt.figure(figsize=figsize)
 
     if not isinstance(y_true, list):
@@ -276,6 +287,56 @@ def plot_regression_line(
         plt.show()
     else:
         plt.savefig(save_path, bbox_inches='tight')
+
+
+def plot_roc_curve(
+    y: Union[list, torch.Tensor],
+    y_proba: Union[list, torch.Tensor],
+    n_class: int = 2,
+    save_path: Path = None,
+    figsize: tuple = (10, 8),
+):
+    """
+    Print a roc curve with auroc value.
+
+    :param y_true: true values
+    :param y_proba: probabilities of predicted values
+    :param n_class: number of classes
+    :param figsize: size of the figure
+    :param save_path: optional path where the figure will be saved
+    """
+
+    if isinstance(y, list):
+        y = torch.tensor(y)
+    if isinstance(y_proba, list):
+        y_proba = torch.tensor(y_proba)
+
+    plt.figure(figsize=figsize)
+
+    fpr, tpr, _ = roc(y_proba, y, num_classes=n_class)
+    auroc_value = auroc(y_proba, y, num_classes=n_class)
+
+    if isinstance(fpr, list) and len(fpr) == 2:
+        # Take only positive class for multi-class with 2 class (equivalent to binary case)
+        fpr = fpr[1]
+        tpr = tpr[1]
+    if isinstance(fpr, list) and len(fpr) > 2:
+        raise ValueError("ROC curve not implemented for multiclass")
+
+    plt.plot(fpr, tpr, label="ROC curve")
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.plot([], [], ' ', label=f"AUROC = {auroc_value:.3f}")
+    plt.xlim([-0.005, 1.005])
+    plt.ylim([-0.005, 1.005])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.legend(loc=4)
+    plt.grid(alpha=0.75)
+
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path)
 
 
 def plot_histogram(

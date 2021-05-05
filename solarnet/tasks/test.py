@@ -14,7 +14,7 @@ from solarnet.data import datamodule_from_config, dataset_from_config
 from solarnet.logging.tracking import NeptuneNewTracking, Tracking
 from solarnet.models import CNNClassification, CNNRegression
 from solarnet.utils.metrics import stats_metrics
-from solarnet.utils.plots import plot_confusion_matrix, plot_image_grid, plot_regression_line
+from solarnet.utils.plots import plot_confusion_matrix, plot_image_grid, plot_regression_line, plot_roc_curve
 from solarnet.utils.scaling import log_min_max_inverse_scale
 from solarnet.utils.yaml import load_yaml, write_yaml
 
@@ -95,14 +95,20 @@ def test(parameters: dict, verbose: bool = False):
                     max_images=nb_image_grid)
 
     # Confusion matrix or regression line
-    y, y_pred = predict(model, datamodule.test_dataloader(), regression)
+    y, y_pred, y_proba = predict(model, datamodule.test_dataloader(), regression, return_proba=True)
 
     if regression:
         plot_path = Path(model_path / "regression_line.png")
         plot_regression_line(y, y_pred, save_path=plot_path)
     else:
+        # Confusion matrix
         plot_path = Path(model_path / "confusion_matrix.png")
         plot_confusion_matrix(y, y_pred, labels, save_path=plot_path)
+        # Roc curve
+        n_class = len(parameters['data']['targets']['classes'])
+        if n_class <= 2:
+            plot_path = Path(model_path / "roc_curve.png")
+            plot_roc_curve(y, y_proba, n_class=n_class, save_path=plot_path)
     if tracking:
         plot_name = "regression_line" if regression else "confusion_matrix"
         tracking.log_artifact(plot_path, f"metrics/test/{plot_name}")
