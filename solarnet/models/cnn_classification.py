@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch
+import torch.nn.functional as F
 import torch_optimizer
 from pytorch_lightning.core.decorators import auto_move_data
 from torch import nn, optim
