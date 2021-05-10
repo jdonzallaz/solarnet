@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 from typing import Callable, Optional, Sequence
 
@@ -7,6 +8,7 @@ import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
+import torchvision.transforms.functional as transforms_functional
 
 from solarnet.data.dataset_utils import BaseDataset
 
@@ -145,10 +147,20 @@ class SDODatasetDataModule(pl.LightningDataModule):
         self.target_transform = target_transform
         self.batch_size = batch_size
         self.num_workers = num_workers
-        # TODO: clean transforms
+
+        clip_min = 5
+        clip_max = 3500
+        lambda_transform = lambda x: torch.log10(
+            torch.clamp(
+                transforms_functional.vflip(x),
+                min=clip_min, max=clip_max)
+        )
+
         self.transform = transforms.Compose([
             transforms.Resize(resize),
-            transforms.Normalize(mean=[177.9239959716797], std=[330.2225341796875]),  # 211 train
+            transforms.Lambda(lambda_transform),
+            transforms.Normalize(mean=[math.log10(clip_min)], std=[math.log10(clip_max) - math.log10(clip_min)]),
+            transforms.Normalize(mean=[0.5], std=[0.5]),
         ])
 
     def prepare_data(self):

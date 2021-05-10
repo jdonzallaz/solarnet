@@ -3,24 +3,35 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+import torch
+from torchvision.transforms import transforms
+from tqdm import tqdm
 
-from solarnet.data import dataset_from_config, dataset_mean_std, dataset_min_max
+from solarnet.data import datamodule_from_config, dataset_from_config, dataset_mean_std, dataset_min_max
 from solarnet.utils.plots import plot_histogram
 from solarnet.utils.target import compute_class_weight
-import torch
-from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
 
 def stats_dataset(
-    params: dict, split: str, n_bins: int = 100, hist_path: Optional[Path] = None
+    params: dict,
+    split: str,
+    n_bins: int = 100,
+    hist_path: Optional[Path] = None,
+    transform: bool = False,
 ):
     """
     Compute and print stats about datasets.
     """
 
-    dataset = dataset_from_config(params, split)
+    if transform:
+        dm = datamodule_from_config(params)
+        transform_fn = dm.transform
+    else:
+        transform_fn = None
+
+    dataset = dataset_from_config(params, split, transform=transform_fn)
 
     print("Size:", len(dataset))
     print("Shape:", dataset[0][0].shape)

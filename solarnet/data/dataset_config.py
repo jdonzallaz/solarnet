@@ -25,7 +25,7 @@ def datamodule_from_config(parameters: dict) -> LightningDataModule:
             target_transform=target_transform,
             batch_size=parameters['trainer']['batch_size'],
             resize=parameters['data']['size'],
-            num_workers=0 if os.name == 'nt' else 8,  # Windows supports only 1, Linux supports more
+            num_workers=0 if os.name == 'nt' else 16,  # Windows supports only 1, Linux supports more
         )
     elif name == "sdo-benchmark":
         datamodule = SDOBenchmarkDataModule(
@@ -35,7 +35,7 @@ def datamodule_from_config(parameters: dict) -> LightningDataModule:
             channel=parameters['data']['channel'],
             resize=parameters['data']['size'],
             seed=parameters['seed'],
-            num_workers=0 if os.name == 'nt' else 8,  # Windows supports only 1, Linux supports more
+            num_workers=0 if os.name == 'nt' else 16,  # Windows supports only 1, Linux supports more
             target_transform=target_transform,
             time_steps=parameters['data']['time_steps'],
         )

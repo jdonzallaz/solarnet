@@ -12,7 +12,7 @@ copy: false  # TODO: add support
 resize: null  # TODO: add support
 
 # Choose channel among: 94, 131, 171, 193, 211, 304, 335, 1600, 1700, 4500.
-channel: 211
+channel: 171
 
 # The different times before the flare to choose images. Format supported by pandas.Timedelta.
 time-steps:

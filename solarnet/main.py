@@ -90,6 +90,7 @@ def data_stats_command(
     split: Split = Split.train,
     n_bins: int = 100,
     hist_path: Optional[Path] = None,
+    transform: bool = typer.Option(False, "--transform", "-t"),
     parameters_overrides: Optional[List[str]] = typer.Argument(None),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
@@ -98,7 +99,7 @@ def data_stats_command(
     config = read_config(parameters_overrides)
     logger.info(f"Params: {config}")
 
-    stats_dataset(config, split.value, n_bins, hist_path)
+    stats_dataset(config, split.value, n_bins, hist_path, transform)
 
 
 # Command to add options before the command (-v train ...)
