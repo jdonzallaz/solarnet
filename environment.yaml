@@ -12,7 +12,6 @@ dependencies:
   - dvc=2.0.17=py38h578d9bd_0
   - jupyter=1.0.0=py38_7
   - matplotlib=3.3.4=py38h06a4308_0
-  - neptune-client=0.9.4=pyhd8ed1ab_0
   - numpy=1.19.2=py38h54aff64_0
   - pandas=1.2.3=py38ha9443f7_0  # needed for sunpy[net]
   - pillow=8.2.0=py38he98fc37_0
@@ -37,6 +36,7 @@ dependencies:
   - zeep=4.0.0=pyh9f0ad1d_0  # needed for sunpy[net]
   - pip:
      - "-e ."
+     - neptune-client==0.9.7
      - opencv-python
      - torch_optimizer==0.1.0
      - "--editable=git+https://github.com/jacobgil/pytorch-grad-cam#egg=grad-cam"

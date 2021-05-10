@@ -103,7 +103,7 @@ dataset:
 ### Metrics
 | Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss    | pod     | tss    |
 |--------------------------------|------------|---------------------|---------|---------|---------|--------|---------|--------|
-| models\multiclass\metrics.yaml | 0.42677    | 0.45713             | 0.27127 | 0.35547 | 0.57323 | 0.2357 | 0.42677 | 0.2357 |
+| models/multiclass/metrics.yaml | 0.42677    | 0.45713             | 0.27127 | 0.35547 | 0.57323 | 0.2357 | 0.42677 | 0.2357 |
 
 ### Confusion matrix
 ![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')

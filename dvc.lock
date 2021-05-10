@@ -63,7 +63,7 @@ stages:
     deps:
     - path: config/experiment/binary.yaml
       md5: 939b8a7c696a6036e1aeeff3364c13c1
-      size: 61
+      size: 58
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -75,10 +75,10 @@ stages:
       size: 3633
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/tasks/test.py
-      md5: e6b52f4bd6de4376e21088a7f195524f
-      size: 6355
+      md5: 88f9a59e7981de604b1ed0ff163fd64c
+      size: 7153
     params:
       config/config.yaml:
         gpus: 1
@@ -94,10 +94,10 @@ stages:
     outs:
     - path: models/binary/metrics.yaml
       md5: 8338197163dc2f6a577045db94dff2b5
-      size: 245
+      size: 236
     - path: models/binary/test_plots/
-      md5: 7a95bf1e396c078b294d905a1547e2e7.dir
-      size: 813339
+      md5: 7f051d42213325232e44f33665b7f88b.dir
+      size: 847539
       nfiles: 3
   generate-report@binary:
     cmd: printf "# Model report\n" > models/binary/report.md && printf "## Training\n"
@@ -124,16 +124,16 @@ stages:
     deps:
     - path: models/binary/config.yaml
       md5: 1a3604eaed083c5b7b32c32fae023309
-      size: 416
+      size: 392
     - path: models/binary/metrics.yaml
       md5: 8338197163dc2f6a577045db94dff2b5
-      size: 245
+      size: 236
     - path: models/binary/model_summary.txt
       md5: 978717ff182a8abda1a95baef1a7b554
-      size: 1831
+      size: 1783
     - path: models/binary/test_plots/
-      md5: 7a95bf1e396c078b294d905a1547e2e7.dir
-      size: 813339
+      md5: 7f051d42213325232e44f33665b7f88b.dir
+      size: 847539
       nfiles: 3
     - path: models/binary/train_plots/
       md5: 05ac4a43c043f18712aac9a69d35cb52.dir
@@ -141,8 +141,8 @@ stages:
       nfiles: 2
     outs:
     - path: models/binary/report.md
-      md5: 5872a793070724d510fc34f2b4b6c604
-      size: 3518
+      md5: 4222da4ca5ba55cdbe92cccf3761fbea
+      size: 3431
   train@multiclass:
     cmd: python -m solarnet.main train +experiment=multiclass
     deps:
@@ -196,7 +196,7 @@ stages:
     deps:
     - path: config/experiment/multiclass.yaml
       md5: 002b003ae6fca6d8b3b3732c667fbfc1
-      size: 220
+      size: 208
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -208,10 +208,10 @@ stages:
       size: 3633
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/tasks/test.py
-      md5: e6b52f4bd6de4376e21088a7f195524f
-      size: 6355
+      md5: 88f9a59e7981de604b1ed0ff163fd64c
+      size: 7153
     params:
       config/config.yaml:
         gpus: 1
@@ -227,10 +227,10 @@ stages:
     outs:
     - path: models/multiclass/metrics.yaml
       md5: d7886b8859af665dcc42e260b8ac22f1
-      size: 221
+      size: 213
     - path: models/multiclass/test_plots/
-      md5: df6ac61cd94d9424c9f6ca276f0006da.dir
-      size: 810040
+      md5: 6ebbe90664c6ad211da68bb28bc99ecc.dir
+      size: 878258
       nfiles: 2
   generate-report@multiclass:
     cmd: printf "# Model report\n" > models/multiclass/report.md && printf "## Training\n"
@@ -256,16 +256,16 @@ stages:
     deps:
     - path: models/multiclass/config.yaml
       md5: db8330cb3cdd7c2c57cd7890aadf654b
-      size: 454
+      size: 428
     - path: models/multiclass/metrics.yaml
       md5: d7886b8859af665dcc42e260b8ac22f1
-      size: 221
+      size: 213
     - path: models/multiclass/model_summary.txt
       md5: 51ab05082e75238f920a9437aa8efbe7
-      size: 1809
+      size: 1762
     - path: models/multiclass/test_plots/
-      md5: df6ac61cd94d9424c9f6ca276f0006da.dir
-      size: 810040
+      md5: 6ebbe90664c6ad211da68bb28bc99ecc.dir
+      size: 878258
       nfiles: 2
     - path: models/multiclass/train_plots/
       md5: a69dc8bfb72ed8ac77a4eccd5c449c48.dir
@@ -273,8 +273,8 @@ stages:
       nfiles: 2
     outs:
     - path: models/multiclass/report.md
-      md5: 7bbcd63a374752e42d4970be6a588468
-      size: 3444
+      md5: 429464699a49910093e909eb9a065f05
+      size: 3356
   train@regression:
     cmd: python -m solarnet.main train +experiment=regression
     deps:
@@ -328,7 +328,7 @@ stages:
     deps:
     - path: config/experiment/regression.yaml
       md5: e0a2b69e4f4c731b8967a9053e28dad9
-      size: 113
+      size: 106
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
@@ -337,13 +337,13 @@ stages:
       size: 321999
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+      size: 1776
     - path: solarnet/models/cnn_regression.py
       md5: e82c034188e4e34f06d4c0fd83cc09f3
-      size: 3028
+      size: 2944
     - path: solarnet/tasks/test.py
-      md5: e6b52f4bd6de4376e21088a7f195524f
-      size: 6355
+      md5: 88f9a59e7981de604b1ed0ff163fd64c
+      size: 7153
     params:
       config/config.yaml:
         gpus: 1
@@ -358,11 +358,11 @@ stages:
           patience: 12
     outs:
     - path: models/regression/metrics.yaml
-      md5: 8cd8c5777efc16664af025cacd237b7d
-      size: 58
+      md5: 2fef192ddd2c5a43c29ab46f3ce0d63a
+      size: 54
     - path: models/regression/test_plots/
-      md5: 9831ca1f79a67f47cf38dc36e4bfb1af.dir
-      size: 830812
+      md5: f143297f5db973318e3390481847565e.dir
+      size: 827226
       nfiles: 2
   generate-report@regression:
     cmd: printf "# Model report\n" > models/regression/report.md && printf "## Training\n"
@@ -387,16 +387,16 @@ stages:
     deps:
     - path: models/regression/config.yaml
       md5: 61d0368ab5997554d02de3f7acbc3069
-      size: 361
+      size: 340
     - path: models/regression/metrics.yaml
-      md5: 8cd8c5777efc16664af025cacd237b7d
-      size: 58
+      md5: 2fef192ddd2c5a43c29ab46f3ce0d63a
+      size: 54
     - path: models/regression/model_summary.txt
       md5: 62ab02cfe8d9a07c728765f49baaa541
-      size: 1724
+      size: 1681
     - path: models/regression/test_plots/
-      md5: 9831ca1f79a67f47cf38dc36e4bfb1af.dir
-      size: 830812
+      md5: f143297f5db973318e3390481847565e.dir
+      size: 827226
       nfiles: 2
     - path: models/regression/train_plots/
       md5: d4cd6fcc352508ec535780a7950bc5ea.dir
@@ -404,29 +404,29 @@ stages:
       nfiles: 1
     outs:
     - path: models/regression/report.md
-      md5: c882208c3a447d7bac2ec95b40b0836d
-      size: 2943
+      md5: 0acf1542b72a39fbc051556705f2d554
+      size: 2864
   test@binary_sdodataset:
     cmd: python -m solarnet.main test +experiment=binary_sdodataset
     deps:
     - path: config/experiment/binary_sdodataset.yaml
-      md5: 3f1e40f1f1f6ca2f5e625f7996d4008e
-      size: 143
+      md5: a2abc668908eb7e9b55974135d2647dc
+      size: 207
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/binary_sdodataset/model.ckpt
-      md5: 213c3dd5e817c3513b64d2f9155c1382
-      size: 326996
+      md5: c1ca246ef112b97d8c0a59ef38d6b5cc
+      size: 327124
     - path: solarnet/models/cnn_classification.py
-      md5: ae503c50e236766b345d3403e4102d34
-      size: 3199
+      md5: c1b30dbc240f693544944daa7989722e
+      size: 3633
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
       size: 1776
     - path: solarnet/tasks/test.py
-      md5: 2aec85f75a53bd4e5fba44a2f7928573
-      size: 5628
+      md5: 88f9a59e7981de604b1ed0ff163fd64c
+      size: 7153
     params:
       config/config.yaml:
         gpus: 1
@@ -440,33 +440,31 @@ stages:
           learning_rate: 0.005
           patience: 12
     outs:
-    - path: models/binary_sdodataset/confusion_matrix.png
-      md5: 46e955e4edc5aab8bb8ae1417d92a772
-      size: 22090
     - path: models/binary_sdodataset/metrics.yaml
-      md5: c7c6dbcba1c9cfacb82767817ab8cc4a
-      size: 212
-    - path: models/binary_sdodataset/test_samples.png
-      md5: cf77093d1a1006302304557f55c8695b
-      size: 431985
+      md5: 19fe8c52348a86d4dfe23ce128b68449
+      size: 239
+    - path: models/binary_sdodataset/test_plots/
+      md5: 907ced6466680c86c84caed1aaccb26f.dir
+      size: 546054
+      nfiles: 3
   train@binary_sdodataset:
     cmd: python -m solarnet.main train +experiment=binary_sdodataset
     deps:
     - path: config/experiment/binary_sdodataset.yaml
-      md5: 3f1e40f1f1f6ca2f5e625f7996d4008e
-      size: 143
+      md5: a2abc668908eb7e9b55974135d2647dc
+      size: 207
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: solarnet/models/cnn_classification.py
-      md5: ae503c50e236766b345d3403e4102d34
-      size: 3199
+      md5: c1b30dbc240f693544944daa7989722e
+      size: 3633
     - path: solarnet/models/cnn_module.py
       md5: ead31bd3b8f3e956b9630234c1e6b693
       size: 1776
     - path: solarnet/tasks/train.py
-      md5: 05894cb899be21c19105ff28a8306879
-      size: 3436
+      md5: 6b0b09adfd1467c291e73232fa66869c
+      size: 4014
     params:
       config/config.yaml:
         gpus: 1
@@ -482,20 +480,21 @@ stages:
           patience: 12
     outs:
     - path: models/binary_sdodataset/config.yaml
-      md5: 220b55374388344a14fb09fe548ec7f1
-      size: 369
-    - path: models/binary_sdodataset/history.png
-      md5: e3f48599f537c7f0d6b93ff9050de371
-      size: 41440
+      md5: f9f5b73b072596b0fe33ace1bcc7f744
+      size: 373
     - path: models/binary_sdodataset/metadata.yaml
-      md5: 5f1183814a0bf69ada2c2a573a5a97c7
+      md5: 18698a00fe9beef38bee2c4ff30be902
       size: 348
     - path: models/binary_sdodataset/model.ckpt
-      md5: 213c3dd5e817c3513b64d2f9155c1382
-      size: 326996
+      md5: c1ca246ef112b97d8c0a59ef38d6b5cc
+      size: 327124
     - path: models/binary_sdodataset/model_summary.txt
-      md5: f4659c7295d32e213ae8135fc795071c
-      size: 1702
+      md5: bdba2aafa02c1809ec0ef9fb6d855fd5
+      size: 1852
+    - path: models/binary_sdodataset/train_plots/
+      md5: 474045816fe16aeb427e2871bc7c9ce6.dir
+      size: 85188
+      nfiles: 2
   generate-report@binary_sdodataset:
     cmd: printf "# Model report\n" > models/binary_sdodataset/report.md && printf
       "## Training\n" >> models/binary_sdodataset/report.md && printf "### Parameters\n"
@@ -505,37 +504,40 @@ stages:
       architecture\n" >> models/binary_sdodataset/report.md && printf '```\n' >> models/binary_sdodataset/report.md
       && cat models/binary_sdodataset/model_summary.txt >> models/binary_sdodataset/report.md
       && printf '```\n' >> models/binary_sdodataset/report.md && printf "### Loss
-      curve\n" >> models/binary_sdodataset/report.md && printf "![Loss curve](history.png
-      'Loss curve')\n\n" >> models/binary_sdodataset/report.md && printf "### Metadata\n"
-      >> models/binary_sdodataset/report.md && printf '```yaml\n' >> models/binary_sdodataset/report.md
+      curve\n" >> models/binary_sdodataset/report.md && printf "![Loss curve](train_plots/loss_curve.png
+      'Loss curve')\n\n" >> models/binary_sdodataset/report.md && printf "### Accuracy
+      curve\n" >> models/binary_sdodataset/report.md && printf "![Accuracy curve](train_plots/accuracy_curve.png
+      'Accuracy curve')\n\n" >> models/binary_sdodataset/report.md && printf "###
+      Metadata\n" >> models/binary_sdodataset/report.md && printf '```yaml\n' >> models/binary_sdodataset/report.md
       && cat models/binary_sdodataset/metadata.yaml >> models/binary_sdodataset/report.md
       && printf '```\n' >> models/binary_sdodataset/report.md && printf "## Test\n"
       >> models/binary_sdodataset/report.md && printf "### Metrics\n" >> models/binary_sdodataset/report.md
       && dvc metrics show --show-md models/binary_sdodataset/metrics.yaml >> models/binary_sdodataset/report.md
       && printf "### Confusion matrix\n" >> models/binary_sdodataset/report.md &&
-      printf "![Confusion matrix](confusion_matrix.png 'Confusion matrix')\n\n" >>
-      models/binary_sdodataset/report.md && printf "### Test samples\n" >> models/binary_sdodataset/report.md
-      && printf "![Test samples](test_samples.png 'Test samples')\n\n" >> models/binary_sdodataset/report.md
+      printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/binary_sdodataset/report.md && printf "### ROC Curve\n" >> models/binary_sdodataset/report.md
+      && printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/binary_sdodataset/report.md
+      && printf "### Test samples\n" >> models/binary_sdodataset/report.md && printf
+      "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/binary_sdodataset/report.md
     deps:
     - path: models/binary_sdodataset/config.yaml
-      md5: 220b55374388344a14fb09fe548ec7f1
-      size: 369
-    - path: models/binary_sdodataset/confusion_matrix.png
-      md5: 46e955e4edc5aab8bb8ae1417d92a772
-      size: 22090
-    - path: models/binary_sdodataset/history.png
-      md5: e3f48599f537c7f0d6b93ff9050de371
-      size: 41440
+      md5: f9f5b73b072596b0fe33ace1bcc7f744
+      size: 373
     - path: models/binary_sdodataset/metrics.yaml
-      md5: c7c6dbcba1c9cfacb82767817ab8cc4a
-      size: 212
+      md5: 19fe8c52348a86d4dfe23ce128b68449
+      size: 239
     - path: models/binary_sdodataset/model_summary.txt
-      md5: f4659c7295d32e213ae8135fc795071c
-      size: 1702
-    - path: models/binary_sdodataset/test_samples.png
-      md5: cf77093d1a1006302304557f55c8695b
-      size: 431985
+      md5: bdba2aafa02c1809ec0ef9fb6d855fd5
+      size: 1852
+    - path: models/binary_sdodataset/test_plots/
+      md5: 907ced6466680c86c84caed1aaccb26f.dir
+      size: 546054
+      nfiles: 3
+    - path: models/binary_sdodataset/train_plots/
+      md5: 474045816fe16aeb427e2871bc7c9ce6.dir
+      size: 85188
+      nfiles: 2
     outs:
     - path: models/binary_sdodataset/report.md
-      md5: 199e245bd310a92edd1dc0441be13bf5
-      size: 3161
+      md5: 96299a933233906912498f1ecf9f0133
+      size: 3538

@@ -102,7 +102,7 @@ dataset:
 ### Metrics
 | Path                       | accuracy   | auroc   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
 |----------------------------|------------|---------|---------------------|---------|---------|---------|---------|---------|---------|
-| models\binary\metrics.yaml | 0.78833    | 0.86527 | 0.77607             | 0.70305 | 0.77817 | 0.18738 | 0.55653 | 0.83908 | 0.55215 |
+| models/binary/metrics.yaml | 0.78833    | 0.86527 | 0.77607             | 0.70305 | 0.77817 | 0.18738 | 0.55653 | 0.83908 | 0.55215 |
 
 ### Confusion matrix
 ![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')

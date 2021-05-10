@@ -1,6 +1,6 @@
 data:
   name: sdo-dataset
-  channel: 211
+  channel: 171
   size: 256
   targets:
     classes:
@@ -8,11 +8,11 @@ data:
     - '>=C': '>= 1e-6'
   path: /data1/data/sdo-dataset
 model:
-  activation: relu6
+  activation: leakyrelu
 trainer:
   epochs: 20
   batch_size: 128
-  learning_rate: 0.005
+  learning_rate: 0.001
   patience: 12
 name: Binary classification model on SDO-Dataset
 path: models/binary_sdodataset

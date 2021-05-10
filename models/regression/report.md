@@ -91,7 +91,7 @@ dataset:
 ### Metrics
 | Path                           | mae   | mse   |
 |--------------------------------|-------|-------|
-| models\regression\metrics.yaml | 2e-05 | 0.0   |
+| models/regression/metrics.yaml | 2e-05 | 0.0   |
 
 ### Regression line
 ![Regression line](test_plots/regression_line.png 'Regression line')
