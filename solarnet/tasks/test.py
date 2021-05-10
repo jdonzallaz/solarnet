@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import pytorch_lightning as pl
 import torch
@@ -34,6 +34,7 @@ def test(parameters: dict, verbose: bool = False):
 
     regression = parameters['data']['targets'] == "regression"
     labels = None if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
+    n_class = 1 if regression else len(parameters['data']['targets']['classes'])
     parameters["gpus"] = min(1, parameters["gpus"])
 
     # Tracking
@@ -90,6 +91,7 @@ def test(parameters: dict, verbose: bool = False):
         parameters,
         transform=datamodule.transform,
         nb_sample=nb_image_grid,
+        classes=None if regression else list(range(n_class)),
     )
     y, y_pred, y_proba = predict(model, dataloader, regression, return_proba=True)
     images, _ = map(list, zip(*dataset_image))
@@ -111,10 +113,9 @@ def test(parameters: dict, verbose: bool = False):
         confusion_matrix_path = Path(plot_path / "confusion_matrix.png")
         plot_confusion_matrix(y, y_pred, labels, save_path=confusion_matrix_path)
         # Roc curve
-        n_class = len(parameters['data']['targets']['classes'])
         if n_class <= 2:
             roc_curve_path = Path(plot_path / "roc_curve.png")
-            plot_roc_curve(y, y_proba, n_class=n_class, save_path=roc_curve_path, figsize=(7,5))
+            plot_roc_curve(y, y_proba, n_class=n_class, save_path=roc_curve_path, figsize=(7, 5))
 
         if tracking:
             tracking.log_artifact(confusion_matrix_path, "metrics/test/confusion_matrix")
@@ -128,13 +129,28 @@ def get_random_test_samples_dataloader(
     parameters: dict,
     nb_sample: int = 10,
     transform: Optional[Callable] = None,
+    classes: Optional[List[int]] = None,
 ) -> (Dataset, DataLoader):
     """ Return a random set of test samples """
 
     dataset_test_image = dataset_from_config(parameters, "test", transforms.Lambda(lambda x: x[0]))
     dataset_test_tensors = dataset_from_config(parameters, "test", transform)
 
-    subset_indices = [random.randrange(len(dataset_test_image)) for _ in range(nb_sample)]
+    if classes is not None:
+        y = dataset_test_image.y()
+        y = torch.tensor(y)
+
+        # Find number of sample to choose for each class ((nb_sample / len(classes) +/- 1)
+        split = (torch.arange(nb_sample + len(classes) - 1, nb_sample - 1, -1) // len(classes)).tolist()
+        subset_indices = []
+        for i, class_ in enumerate(classes):
+            # Indices in the dataset corresponding to this class
+            indices_for_class = torch.where(y == class_)[0]
+            # Add random indices corresponding to this class
+            subset_indices += indices_for_class[torch.randint(len(indices_for_class), (split[i],))].tolist()
+    else:
+        subset_indices = [random.randrange(len(dataset_test_image)) for _ in range(nb_sample)]
+
     subset_images = Subset(dataset_test_image, subset_indices)
     subset_tensors = Subset(dataset_test_tensors, subset_indices)
     dataloader_tensors = DataLoader(subset_tensors, batch_size=nb_sample, num_workers=0, shuffle=False)
