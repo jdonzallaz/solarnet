@@ -8,6 +8,7 @@ import seaborn
 import seaborn as sns
 import torch
 from sklearn.metrics import confusion_matrix
+from torchmetrics.functional import auroc, roc
 
 
 def plot_confusion_matrix(
@@ -81,9 +82,10 @@ def plot_image_grid(
     images: list,
     y: List[Union[int, float]],
     y_pred: Optional[List[Union[int, float]]] = None,
+    y_proba: Optional[List[List[float]]] = None,
     labels: List[str] = None,
     columns: int = 5,
-    width: int = 20,
+    width: int = 22,
     height: int = 6,
     max_images: int = 10,
     label_font_size: int = 14,
@@ -96,6 +98,7 @@ def plot_image_grid(
     :param images: list of image (format supported by plt.imshow())
     :param y: list of labels (int) or values (float for regression)
     :param y_pred: list of predictions (int) or values (float for regression)
+    :param y_proba: list of probabilities (float) for predictions
     :param labels: list of string labels
     :param columns: number of images to show in a row
     :param width: width of the figure
@@ -118,8 +121,12 @@ def plot_image_grid(
     height = max(height, int(len(images) / columns) * height)
 
     plt.figure(figsize=(width, height))
-    plt.subplots_adjust(wspace=0.05)
-    plt.subplots_adjust(hspace=0.2)
+    # plt.subplots_adjust(wspace=0.05)
+    # plt.subplots_adjust(hspace=0.2)
+
+    if y_proba is not None and not is_regression:
+        # Take probability of y_pred
+        y_proba = [p[y_pred[i]] for i, p in enumerate(y_proba)]
 
     for i, image in enumerate(images):
         plt.subplot(int(len(images) / columns + 1), columns, i + 1)
@@ -140,6 +147,8 @@ def plot_image_grid(
             else:
                 title = f"y_true: {pretty_label(y[i])} / y_pred: {pretty_label(y_pred[i])}"
                 color = colors["red"]
+            if y_proba is not None:
+                title += f" ({y_proba[i]:.2f})"
         plt.title(title, fontsize=label_font_size, color=color, wrap=True)
 
     if save_path is None:
@@ -148,49 +157,53 @@ def plot_image_grid(
         plt.savefig(save_path, bbox_inches="tight")
 
 
-def plot_loss_curve(
+def plot_train_val_curve(
     metrics: Dict[str, List[Dict[str, Union[float, int]]]],
+    metric: str,
+    key_suffix: str = "",
     y_lim=None,
     step_name: str = "Steps",
     smooth_factor=0.0,
     save_path: Path = None,
 ):
     """
-    Plot the loss curve of training and validation.
-    The metrics dict should have keys "train_loss" and "val_loss", each with a list as value. Lists should have "value"
-     and step key. The step could be an arbitrary step, a batch number or an epoch and is used to align training
-     and validation curves.
+    Plot the "metric" curve of training and validation.
+    The metrics dict should have keys "train_{metric}{key_suffix}" and "val_{metric}{key_suffix}",
+     each with a list as value. Lists should have "value" and step key. The step could be an arbitrary step,
+     a batch number or an epoch and is used to align training and validation curves.
 
     :param metrics: A dict of train/val metrics, with list of values per step.
-    :param save_path: optional path where the figure will be saved.
+    :param metric: A string for the name of the metric. Also used as key in the metrics dict.
+    :param key_suffix: A suffix for the key in the metrics dict. E.g. "_epoch" or "_batch".
     :param y_lim: An optional array (2 entries) to specify y-axis limits. Default to [0, 1].
     :param step_name: The name to give to the step axis on the plot. Default to "Steps".
     :param smooth_factor: A factor for smoothing the plot in [0, 1]. Default to 0 (no smoothing).
+    :param save_path: optional path where the figure will be saved.
     """
 
     if y_lim is None:
         y_lim = [0, 1]
 
-    train_loss = metrics["train_loss"]
-    train_loss = {k: [dic[k] for dic in train_loss] for k in train_loss[0]}
-    train_loss_steps = train_loss["step"]
-    train_loss_values = smooth_curve(train_loss["value"], smooth_factor)
+    train_metric = metrics[f"train_{metric}{key_suffix}"]
+    train_metric = {k: [dic[k] for dic in train_metric] for k in train_metric[0]}
+    train_metric_steps = train_metric["step"]
+    train_metric_values = smooth_curve(train_metric["value"], smooth_factor)
 
-    val_loss = metrics["val_loss"]
-    val_loss = {k: [dic[k] for dic in val_loss] for k in val_loss[0]}
-    val_loss_steps = val_loss["step"]
-    val_loss_values = smooth_curve(val_loss["value"], smooth_factor)
+    val_metric = metrics[f"val_{metric}{key_suffix}"]
+    val_metric = {k: [dic[k] for dic in val_metric] for k in val_metric[0]}
+    val_metric_steps = val_metric["step"]
+    val_metric_values = smooth_curve(val_metric["value"], smooth_factor)
 
     plt.ioff()
 
     fig = plt.figure(figsize=(8, 6))
 
-    plt.plot(train_loss_steps, train_loss_values, "dodgerblue", label="Training loss")
-    plt.plot(val_loss_steps, val_loss_values, "g", label="Validation loss")  # g is for "solid green line"
+    plt.plot(train_metric_steps, train_metric_values, "dodgerblue", label=f"Training {metric}")
+    plt.plot(val_metric_steps, val_metric_values, "g", label=f"Validation {metric}")  # g is for "solid green line"
 
-    plt.title("Training and validation loss")
+    plt.title(f"Training and validation {metric}")
     plt.xlabel(step_name)
-    plt.ylabel("Loss")
+    plt.ylabel(metric.capitalize())
     plt.gca().set_ylim(y_lim)
     plt.grid(alpha=0.75)
     plt.legend()
@@ -231,6 +244,16 @@ def plot_regression_line(
     save_path: Path = None,
     figsize: tuple = (10, 8),
 ):
+    """
+    Plot a regression line which shows regression prediction against true values in a scatter plot.
+
+    :param y_true: The true values
+    :param y_pred: The prediction (real values / float)
+    :param lim: The limit of the axis
+    :param save_path: optional path where the figure will be saved.
+    :param figsize: size of the figure
+    """
+
     plt.figure(figsize=figsize)
 
     if not isinstance(y_true, list):
@@ -268,3 +291,84 @@ def plot_regression_line(
         plt.show()
     else:
         plt.savefig(save_path, bbox_inches='tight')
+
+
+def plot_roc_curve(
+    y: Union[list, torch.Tensor],
+    y_proba: Union[list, torch.Tensor],
+    n_class: int = 2,
+    save_path: Path = None,
+    figsize: tuple = (10, 8),
+):
+    """
+    Print a roc curve with auroc value.
+
+    :param y_true: true values
+    :param y_proba: probabilities of predicted values
+    :param n_class: number of classes
+    :param figsize: size of the figure
+    :param save_path: optional path where the figure will be saved
+    """
+
+    if isinstance(y, list):
+        y = torch.tensor(y)
+    if isinstance(y_proba, list):
+        y_proba = torch.tensor(y_proba)
+
+    plt.figure(figsize=figsize)
+
+    fpr, tpr, _ = roc(y_proba, y, num_classes=n_class)
+    auroc_value = auroc(y_proba, y, num_classes=n_class)
+
+    if isinstance(fpr, list) and len(fpr) == 2:
+        # Take only positive class for multi-class with 2 class (equivalent to binary case)
+        fpr = fpr[1]
+        tpr = tpr[1]
+    if isinstance(fpr, list) and len(fpr) > 2:
+        raise ValueError("ROC curve not implemented for multiclass")
+
+    plt.plot(fpr, tpr, label="ROC curve")
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.plot([], [], ' ', label=f"AUROC = {auroc_value:.3f}")
+    plt.xlim([-0.005, 1.005])
+    plt.ylim([-0.005, 1.005])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.legend(loc=4)
+    plt.grid(alpha=0.75)
+
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path)
+
+
+def plot_histogram(
+    hist: torch.Tensor,
+    min: float = 0.0,
+    max: float = 1.0,
+    save_path: Path = None,
+    figsize: tuple = (10, 8),
+):
+    """
+    Print an histogram of values.
+
+    :param hist: histogram of values
+    :param min: minimum of values appearing in histogram
+    :param max: maximum of values appearing in histogram
+    :param figsize: size of the figure
+    :param save_path: optional path where the figure will be saved
+    """
+
+    plt.figure(figsize=figsize)
+
+    n_bins = len(hist)
+    bins = torch.linspace(min, max, n_bins)
+    plt.bar(bins, hist, width=max / n_bins * 0.5)
+    plt.ylabel('Number of values in each bin')
+    plt.grid(alpha=0.75)
+
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path)

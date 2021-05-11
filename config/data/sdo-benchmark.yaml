@@ -1,0 +1,10 @@
+name: sdo-benchmark
+validation_size: 0.1
+channel: 211
+size: 256
+targets:
+  classes:
+    - Quiet: "< 1e-6"
+    - ">=C": ">= 1e-6"
+time_steps: [ 3 ]
+path: data/sdo-benchmark

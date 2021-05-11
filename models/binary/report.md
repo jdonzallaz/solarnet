@@ -3,6 +3,7 @@
 ### Parameters
 ```yaml
 data:
+  name: sdo-benchmark
   validation_size: 0.1
   channel: 211
   size: 256
@@ -12,6 +13,7 @@ data:
     - '>=C': '>= 1e-6'
   time_steps:
   - 3
+  path: data/sdo-benchmark
 model:
   activation: relu6
 trainer:
@@ -63,27 +65,34 @@ CNNClassification(
     )
   )
   (loss_fn): CrossEntropyLoss()
+  (train_accuracy): Accuracy()
+  (val_accuracy): Accuracy()
   (test_metrics): MetricCollection(
     (Accuracy): Accuracy()
     (F1): F1()
     (Recall): Recall()
     (StatScores): StatScores()
+    (AUROC): AUROC()
   )
 )
 ================================================================================
 Total parameters: 24594
 ```
 ### Loss curve
-![Loss curve](history.png 'Loss curve')
+![Loss curve](train_plots/loss_curve.png 'Loss curve')
+
+### Accuracy curve
+![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')
 
 ### Metadata
 ```yaml
-machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 44.13s
+machine: eifrpoeisc45 | Windows 10.0.19041 | 4 cores @ 2592.00Mhz | RAM 16 GB | 1x Quadro M2000M
+training_time: 279.53s
 model_size: 321kB
-early_stopping_epoch: 12
-model_checkpoint_step: 765
-tracking_id: SOLN-55
+early_stopping_epoch: 13
+model_checkpoint_step: 442
+model_checkpoint_epoch: 7
+tracking_id: SOLN-123
 dataset:
   training_set_size: 7446
   validation_set_size: 827
@@ -91,13 +100,16 @@ dataset:
 ```
 ## Test
 ### Metrics
-| Path                       | accuracy   | balanced_accuracy   | csi    | f1      | far     | hss     | pod     | tss     |
-|----------------------------|------------|---------------------|--------|---------|---------|---------|---------|---------|
-| models/binary/metrics.yaml | 0.79863    | 0.77961             | 0.7224 | 0.78527 | 0.19649 | 0.57191 | 0.87739 | 0.55921 |
+| Path                       | accuracy   | auroc   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
+|----------------------------|------------|---------|---------------------|---------|---------|---------|---------|---------|---------|
+| models/binary/metrics.yaml | 0.78833    | 0.86527 | 0.77607             | 0.70305 | 0.77817 | 0.18738 | 0.55653 | 0.83908 | 0.55215 |
 
 ### Confusion matrix
-![Confusion matrix](confusion_matrix.png 'Confusion matrix')
+![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')
+
+### ROC Curve
+![ROC Curve](test_plots/roc_curve.png 'ROC Curve')
 
 ### Test samples
-![Test samples](test_samples.png 'Test samples')
+![Test samples](test_plots/test_samples.png 'Test samples')
 

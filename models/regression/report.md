@@ -3,12 +3,14 @@
 ### Parameters
 ```yaml
 data:
+  name: sdo-benchmark
   validation_size: 0.1
   channel: 211
   size: 256
   targets: regression
   time_steps:
   - 3
+  path: data/sdo-benchmark
 model:
   activation: relu6
 trainer:
@@ -69,16 +71,17 @@ CNNRegression(
 Total parameters: 24577
 ```
 ### Loss curve
-![Loss curve](history.png 'Loss curve')
+![Loss curve](train_plots/loss_curve.png 'Loss curve')
 
 ### Metadata
 ```yaml
-machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 38.49s
-model_size: 322kB
-early_stopping_epoch: 10
-model_checkpoint_step: 618
-tracking_id: SOLN-66
+machine: eifrpoeisc45 | Windows 10.0.19041 | 4 cores @ 2592.00Mhz | RAM 16 GB | 1x Quadro M2000M
+training_time: 171.83s
+model_size: 321kB
+early_stopping_epoch: 8
+model_checkpoint_step: 147
+model_checkpoint_epoch: 2
+tracking_id: SOLN-121
 dataset:
   training_set_size: 7446
   validation_set_size: 827
@@ -88,11 +91,11 @@ dataset:
 ### Metrics
 | Path                           | mae   | mse   |
 |--------------------------------|-------|-------|
-| models/regression/metrics.yaml | 1e-05 | 0.0   |
+| models/regression/metrics.yaml | 2e-05 | 0.0   |
 
 ### Regression line
-![Regression line](regression_line.png 'Regression line')
+![Regression line](test_plots/regression_line.png 'Regression line')
 
 ### Test samples
-![Test samples](test_samples.png 'Test samples')
+![Test samples](test_plots/test_samples.png 'Test samples')
 

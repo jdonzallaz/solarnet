@@ -11,22 +11,25 @@ stages:
   train:
     foreach:
       binary:
-        experiment: binary_classification
+        experiment: binary
         path: binary
         model: cnn_classification
       multiclass:
-        experiment: multiclass_classification
+        experiment: multiclass
         path: multiclass
         model: cnn_classification
       regression:
         experiment: regression
         path: regression
         model: cnn_regression
+      binary_sdodataset:
+        experiment: binary_sdodataset
+        path: binary_sdodataset
+        model: cnn_classification
     do:
       cmd: python -m solarnet.main train +experiment=${item.experiment}
       params:
         - config/config.yaml:
-            - data
             - model
             - trainer
             - name
@@ -45,20 +48,20 @@ stages:
             cache: false
         - models/${item.path}/metadata.yaml:
             cache: false
-        - models/${item.path}/history.png: # TODO: Fix not visible data
-            cache: false
         - models/${item.path}/model_summary.txt:
+            cache: false
+        - models/${item.path}/train_plots/:
             cache: false
 
   test:
     foreach:
       binary:
-        experiment: binary_classification
+        experiment: binary
         path: binary
         model: cnn_classification
         plot: confusion_matrix
       multiclass:
-        experiment: multiclass_classification
+        experiment: multiclass
         path: multiclass
         model: cnn_classification
         plot: confusion_matrix
@@ -67,11 +70,15 @@ stages:
         path: regression
         model: cnn_regression
         plot: regression_line
+      binary_sdodataset:
+        experiment: binary_sdodataset
+        path: binary_sdodataset
+        model: cnn_classification
+        plot: confusion_matrix
     do:
       cmd: python -m solarnet.main test +experiment=${item.experiment}
       params:
         - config/config.yaml:
-            - data
             - model
             - trainer
             - seed
@@ -88,9 +95,7 @@ stages:
         - models/${item.path}/metrics.yaml:
             cache: false
       outs:
-        - models/${item.path}/test_samples.png:
-            cache: false
-        - models/${item.path}/${item.plot}.png:
+        - models/${item.path}/test_plots/:
             cache: false
 
   generate-report:
@@ -98,18 +103,41 @@ stages:
       binary:
         report: "models/binary/report.md"
         path: binary
-        plot_name: confusion_matrix
-        plot_title: "Confusion matrix"
+        train_plots_cmd: >-
+          printf "### Accuracy curve\n" >> models/binary/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/binary/report.md
+        test_plots_cmd: >-
+          printf "### Confusion matrix\n" >> models/binary/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/binary/report.md &&
+          printf "### ROC Curve\n" >> models/binary/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/binary/report.md
       multiclass:
         report: "models/multiclass/report.md"
         path: multiclass
-        plot_name: confusion_matrix
-        plot_title: "Confusion matrix"
+        train_plots_cmd: >-
+          printf "### Accuracy curve\n" >> models/multiclass/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/multiclass/report.md
+        test_plots_cmd: >-
+          printf "### Confusion matrix\n" >> models/multiclass/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/multiclass/report.md
       regression:
         report: "models/regression/report.md"
         path: regression
-        plot_name: regression_line
-        plot_title: "Regression line"
+        train_plots_cmd: true
+        test_plots_cmd: >-
+          printf "### Regression line\n" >> models/regression/report.md &&
+          printf "![Regression line](test_plots/regression_line.png 'Regression line')\n\n" >> models/regression/report.md
+      binary_sdodataset:
+        report: "models/binary_sdodataset/report.md"
+        path: binary_sdodataset
+        train_plots_cmd: >-
+          printf "### Accuracy curve\n" >> models/binary_sdodataset/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/binary_sdodataset/report.md
+        test_plots_cmd: >-
+          printf "### Confusion matrix\n" >> models/binary_sdodataset/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/binary_sdodataset/report.md &&
+          printf "### ROC Curve\n" >> models/binary_sdodataset/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/binary_sdodataset/report.md
     do:
       cmd: >-
         printf "# Model report\n" > ${item.report} &&
@@ -123,7 +151,8 @@ stages:
         cat models/${item.path}/model_summary.txt >> ${item.report} &&
         printf '```\n' >> ${item.report} &&
         printf "### Loss curve\n" >> ${item.report} &&
-        printf "![Loss curve](history.png 'Loss curve')\n\n" >> ${item.report} &&
+        printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> ${item.report} &&
+        ${item.train_plots_cmd} &&
         printf "### Metadata\n" >> ${item.report} &&
         printf '```yaml\n' >> ${item.report} &&
         cat models/${item.path}/metadata.yaml >> ${item.report} &&
@@ -131,17 +160,15 @@ stages:
         printf "## Test\n" >> ${item.report} &&
         printf "### Metrics\n" >> ${item.report} &&
         dvc metrics show --show-md models/${item.path}/metrics.yaml >> ${item.report} &&
-        printf "### ${item.plot_title}\n" >> ${item.report} &&
-        printf "![${item.plot_title}](${item.plot_name}.png '${item.plot_title}')\n\n" >> ${item.report} &&
+        ${item.test_plots_cmd} &&
         printf "### Test samples\n" >> ${item.report} &&
-        printf "![Test samples](test_samples.png 'Test samples')\n\n" >> ${item.report}
+        printf "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >> ${item.report}
       deps:
         - models/${item.path}/config.yaml
-        - models/${item.path}/${item.plot_name}.png
-        - models/${item.path}/history.png
         - models/${item.path}/metrics.yaml
         - models/${item.path}/model_summary.txt
-        - models/${item.path}/test_samples.png
+        - models/${item.path}/test_plots/
+        - models/${item.path}/train_plots/
       outs:
         - ${item.report}:
             cache: false

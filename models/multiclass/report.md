@@ -3,6 +3,7 @@
 ### Parameters
 ```yaml
 data:
+  name: sdo-benchmark
   validation_size: 0.1
   channel: 211
   size: 256
@@ -14,6 +15,7 @@ data:
     - X: '>= 1e-4'
   time_steps:
   - 3
+  path: data/sdo-benchmark
 model:
   activation: relu6
 trainer:
@@ -65,6 +67,8 @@ CNNClassification(
     )
   )
   (loss_fn): CrossEntropyLoss()
+  (train_accuracy): Accuracy()
+  (val_accuracy): Accuracy()
   (test_metrics): MetricCollection(
     (Accuracy): Accuracy()
     (F1): F1()
@@ -76,16 +80,20 @@ CNNClassification(
 Total parameters: 24628
 ```
 ### Loss curve
-![Loss curve](history.png 'Loss curve')
+![Loss curve](train_plots/loss_curve.png 'Loss curve')
+
+### Accuracy curve
+![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')
 
 ### Metadata
 ```yaml
-machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 59.74s
+machine: eifrpoeisc45 | Windows 10.0.19041 | 4 cores @ 2592.00Mhz | RAM 16 GB | 1x Quadro M2000M
+training_time: 233.99s
 model_size: 322kB
-early_stopping_epoch: 18
-model_checkpoint_step: 1119
-tracking_id: SOLN-63
+early_stopping_epoch: 11
+model_checkpoint_step: 353
+model_checkpoint_epoch: 5
+tracking_id: SOLN-125
 dataset:
   training_set_size: 7446
   validation_set_size: 827
@@ -93,13 +101,13 @@ dataset:
 ```
 ## Test
 ### Metrics
-| Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss     | pod     | tss     |
-|--------------------------------|------------|---------------------|---------|---------|---------|---------|---------|---------|
-| models/multiclass/metrics.yaml | 0.52174    | 0.41866             | 0.35294 | 0.38985 | 0.47826 | 0.36232 | 0.52174 | 0.36232 |
+| Path                           | accuracy   | balanced_accuracy   | csi     | f1      | far     | hss    | pod     | tss    |
+|--------------------------------|------------|---------------------|---------|---------|---------|--------|---------|--------|
+| models/multiclass/metrics.yaml | 0.42677    | 0.45713             | 0.27127 | 0.35547 | 0.57323 | 0.2357 | 0.42677 | 0.2357 |
 
 ### Confusion matrix
-![Confusion matrix](confusion_matrix.png 'Confusion matrix')
+![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')
 
 ### Test samples
-![Test samples](test_samples.png 'Test samples')
+![Test samples](test_plots/test_samples.png 'Test samples')
 

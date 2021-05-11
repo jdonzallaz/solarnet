@@ -1,30 +1,16 @@
 import logging
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from sunpy.net import Fido, attrs as a
-from torchvision.transforms import transforms
 
-from solarnet.data.sdo_dataset import SDODataset
 from solarnet.utils.dict import print_dict
 from solarnet.utils.physics import class_to_flux
 from solarnet.utils.target import flux_to_class_builder
+from solarnet.utils.yaml import write_yaml
 
 logger = logging.getLogger(__name__)
-
-
-def test_dataset(parameters: dict):
-    csv = Path("sdo-dataset.csv")
-    root = Path("E:/data/sdodataset")
-
-    ds = SDODataset(csv, root, transform=transforms.Compose([
-        transforms.Resize(128),
-        transforms.Normalize(mean=[0.5], std=[0.5]),
-    ]))
-
-    print('len', len(ds))
-    print(ds[0][0].shape, ds[0][0].min(), ds[0][0].max(), ds[0][0].mean(), ds[0][0].std())
 
 
 def make_dataset(parameters: dict):
@@ -34,6 +20,9 @@ def make_dataset(parameters: dict):
     csv_path = destination / parameters["filename"]
     dataset_path = Path(parameters["dataset_path"])
     relative_paths = parameters["relative_paths"]
+
+    # Write config
+    write_yaml(destination / "sdo-dataset-config.yaml", parameters)
 
     channel = parameters["channel"]
 
@@ -50,8 +39,8 @@ def make_dataset(parameters: dict):
     print_dict(splits)
     year_to_split_dict = {year: split for split, years in splits.items() for year in years}
 
-    first_known_datetime = pd.Timestamp("2018/01/01T00:00:00")
-    last_known_datetime = pd.Timestamp("2018/01/31T23:59:59")
+    first_known_datetime = pd.Timestamp("2010/05/13T00:00:00")
+    last_known_datetime = pd.Timestamp("2018/12/31T23:59:59")
 
     datetime_start = first_known_datetime
     datetime_end = last_known_datetime
@@ -79,7 +68,7 @@ def make_dataset(parameters: dict):
             images_paths, all_found = find_paths(
                 dataset_path, interval.left, time_steps, channel, search_image_time_range, relative_paths)
         except FileNotFoundError as e:
-            print("1 path not found", interval.left)
+            # print("1 path not found", interval.left)
             continue
         peak_flux = find_flare_peak_flux(df, interval.left, interval.right)
 
@@ -196,7 +185,62 @@ def find_flare_peak_flux(df: pd.DataFrame, start, end) -> float:
     return max(map(class_to_flux, flux_values))
 
 
-def get_flares(datetime_start, datetime_end):
+def get_flares_cache_filename(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
+    """
+    Return a corretly formatted filename for a parquet flares cache file, with dates (range) for reference.
+    """
+
+    return f"hek_flares_{datetime_start.isoformat().replace(':', '-')}_" \
+           f"{datetime_end.isoformat().replace(':', '-')}.parquet"
+
+
+def get_flares_from_cache(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp) -> Optional[pd.DataFrame]:
+    """
+    Check in the cache for data in the given dates range. Return None if nothing is found.
+    """
+
+    folder = Path.home() / ".solarnet" / "hek"
+    filename = get_flares_cache_filename(datetime_start, datetime_end)
+    path = folder / filename
+
+    if not path.exists():
+        return None
+
+    logger.info("Loading flares from cache")
+
+    try:
+        df = pd.read_parquet(path)
+    except:
+        logger.warning("Error while loading flares cache")
+        return None
+
+    return df
+
+
+def write_flares_to_cache(df: pd.DataFrame, datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
+    """
+    Write the given dataframe to a .parquet file for caching. Uses the given dates range for reference.
+    The cache is in the .solarnet/hek/ folder of the user home directory.
+    """
+
+    folder = Path.home() / ".solarnet" / "hek"
+    folder.mkdir(parents=True, exist_ok=True)
+    filename = get_flares_cache_filename(datetime_start, datetime_end)
+    path = folder / filename
+
+    logger.info("Writing flares to cache")
+
+    try:
+        df.to_parquet(path)
+    except:
+        logger.warning("Error while writing flares to cache")
+
+
+def get_flares(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp):
+    df = get_flares_from_cache(datetime_start, datetime_end)
+    if df is not None:
+        return df
+
     observatory = "GOES"
     instrument = "GOES"
     from_name = "SWPC"
@@ -228,5 +272,8 @@ def get_flares(datetime_start, datetime_end):
     # Index by event_peaktime column and parse date
     df = df.astype({"event_peaktime": "datetime64[ns]"})
     df = df.set_index("event_peaktime")
+    df = df.sort_index()
+
+    write_flares_to_cache(df, datetime_start, datetime_end)
 
     return df

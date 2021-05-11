@@ -1,5 +1,6 @@
 import logging
 import os
+from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
@@ -7,8 +8,9 @@ import hydra
 import typer
 from omegaconf import OmegaConf
 
-from solarnet.tasks.dataset import make_dataset, test_dataset
+from solarnet.tasks.dataset import make_dataset
 from solarnet.tasks.download_dataset import download_dataset
+from solarnet.tasks.stats_dataset import stats_dataset
 from solarnet.tasks.upload import upload_model
 from solarnet.utils.log import init_log, set_log_level
 from solarnet.utils.yaml import load_yaml
@@ -78,15 +80,27 @@ def dataset_command(
     make_dataset(params)
 
 
-@app.command('data')
-def data_command(
+class Split(str, Enum):
+    train = "train"
+    val = "val"
+    test = "test"
+
+
+@app.command('data-stats')
+def data_stats_command(
+    split: Split = Split.train,
+    n_bins: int = 100,
+    hist_path: Optional[Path] = None,
+    transform: bool = typer.Option(False, "--transform", "-t"),
+    parameters_overrides: Optional[List[str]] = typer.Argument(None),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     if verbose: set_log_level(logging.INFO)
 
-    params = load_yaml(Path('config') / 'dataset.yaml')
+    config = read_config(parameters_overrides)
+    logger.info(f"Params: {config}")
 
-    test_dataset(params)
+    stats_dataset(config, split.value, n_bins, hist_path, transform)
 
 
 @app.command('upload')

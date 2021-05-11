@@ -1,7 +1,7 @@
 # Choose destination for the dataset file(s). Default to current dir.
-destination: E:/data/sdodataset
+destination: /data1/data/sdo-dataset
 filename: sdo-dataset.csv
-dataset_path: E:/data/sdodataset
+dataset_path: /data1/data/sdo-dataset
 # Whether to write the path as relative (from dataset root) or absolute (using dataset_path) in the csv file
 relative_paths: true
 
@@ -31,15 +31,15 @@ splits:
   train:
     - 2010
     - 2011
-    - 2014
+    - 2012
     - 2015
     - 2016
+    - 2017
+    - 2018
   val:
     - 2013
-    - 2018
   test:
-    - 2012
-    - 2017
+    - 2014
 # Whether to put splits in separate files. Otherwise, a column in the csv will specify the split
 splits-separate-files: true
 
@@ -49,11 +49,8 @@ flare-time-range: 12h
 # Choose type of targets between regression and classification
 # With classification, the classes must be defined as a list of key (name of the class) - value (comparison) which are
 # evaluated in the defined order to map the peak flux to the classes.
-# target: regression  # to define a regression (example)
-target: # to define a classification
-  classes:
-    - Quiet: "< 1e-7"
-    - B: "< 1e-6"
-    - C: "< 1e-5"
-    - M: "< 1e-4"
-    - X: ">= 1e-4"
+target: regression  # to define a regression
+# target: # to define a classification (example)
+#   classes:
+#     - Quiet: "< 1e-6"
+#     - ">=C": ">= 1e-6"
