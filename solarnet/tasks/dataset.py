@@ -1,9 +1,11 @@
 import logging
+import shutil
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union
 
 import pandas as pd
 from sunpy.net import Fido, attrs as a
+from tqdm import tqdm
 
 from solarnet.utils.dict import print_dict
 from solarnet.utils.physics import class_to_flux
@@ -17,9 +19,11 @@ def make_dataset(parameters: dict):
     print_dict(parameters)
 
     destination = Path(parameters["destination"])
+    destination.mkdir(parents=True, exist_ok=True)
     csv_path = destination / parameters["filename"]
     dataset_path = Path(parameters["dataset_path"])
     relative_paths = parameters["relative_paths"]
+    copy = parameters["copy"]
 
     # Write config
     write_yaml(destination / "sdo-dataset-config.yaml", parameters)
@@ -63,6 +67,8 @@ def make_dataset(parameters: dict):
         freq=time_offset
     )
 
+    logger.info("Searching corresponding image files in the dataset...")
+
     for interval in intervals:
         try:
             images_paths, all_found = find_paths(
@@ -97,9 +103,25 @@ def make_dataset(parameters: dict):
             df_split = df[df['split'] == split]
             split_csv_path = csv_path.parent / f"{csv_path.stem}-{split}{csv_path.suffix}"
             df_split.to_csv(split_csv_path, index=False)
-        return
+    else:
+        df.to_csv(csv_path, index=False)
 
-    df.to_csv(csv_path, index=False)
+    if copy:
+        paths = (path for sample in samples for path in sample["images_paths"])  # Generator of paths
+        n_files = len(samples) * len(time_steps)
+        copy_data(paths, dataset_path, destination, n_files)
+
+
+def copy_data(paths: Iterable[str], dataset_path: Path, destination: Path, n_files: int):
+    logger.info("Copy files to destination")
+    count = 0
+    for i in tqdm(paths, disable=logging.root.level > logging.INFO, total=n_files):
+        from_ = dataset_path / i
+        to_ = destination / i
+        to_.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(from_, to_)
+        count += 1
+    logger.info(f"Copied {count} files to {destination}")
 
 
 def time_ranges_generator(datetime: pd.Timestamp, range: int = 6, unit: str = "min"):

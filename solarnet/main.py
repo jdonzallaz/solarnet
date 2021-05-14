@@ -71,11 +71,12 @@ def download_command(
 
 @app.command('dataset')
 def dataset_command(
+    config_file: Path = typer.Argument(Path('config') / 'dataset.yaml'),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     if verbose: set_log_level(logging.INFO)
 
-    params = load_yaml(Path('config') / 'dataset.yaml')
+    params = load_yaml(config_file)
 
     make_dataset(params)
 

@@ -123,6 +123,7 @@ class SDODatasetDataModule(pl.LightningDataModule):
     def __init__(
         self,
         dataset_path: Path,
+        csv_filename_prefix: str = "sdo-dataset",
         target_transform: Optional[Callable] = None,
         batch_size: int = 32,
         num_workers: int = 0,
@@ -135,6 +136,8 @@ class SDODatasetDataModule(pl.LightningDataModule):
             sdo-dataset-train.csv, sdo-dataset-val.csv, sdo-dataset-test.csv
 
         :param dataset_path: Path to the dataset folder (with metadata files in it)
+        :param csv_filename_prefix: Filename prefix of the csv files. [-train,-val,-test] will be appended to it to find
+                                    the csv files.
         :param target_transform: Optional transform for the targets
         :param batch_size: batch size for the dataloader
         :param num_workers: num_workers for the dataloaders. Changing it is not advised on Windows.
@@ -144,6 +147,7 @@ class SDODatasetDataModule(pl.LightningDataModule):
 
         super().__init__()
         self.dataset_path = dataset_path
+        self.csv_filename_prefix = csv_filename_prefix
         self.target_transform = target_transform
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -169,13 +173,13 @@ class SDODatasetDataModule(pl.LightningDataModule):
     def setup(self, stage: Optional[str] = None):
         if stage == 'fit' or stage is None:
             self.dataset_train = SDODataset(
-                self.dataset_path / "sdo-dataset-train.csv",
+                self.dataset_path / f"{self.csv_filename_prefix}-train.csv",
                 None,
                 transform=self.transform,
                 target_transform=self.target_transform
             )
             self.dataset_val = SDODataset(
-                self.dataset_path / "sdo-dataset-val.csv",
+                self.dataset_path / f"{self.csv_filename_prefix}-val.csv",
                 None,
                 transform=self.transform,
                 target_transform=self.target_transform
@@ -184,7 +188,7 @@ class SDODatasetDataModule(pl.LightningDataModule):
 
         if stage == 'test' or stage is None:
             self.dataset_test = SDODataset(
-                self.dataset_path / "sdo-dataset-test.csv",
+                self.dataset_path / f"{self.csv_filename_prefix}-test.csv",
                 None,
                 transform=self.transform,
                 target_transform=self.target_transform

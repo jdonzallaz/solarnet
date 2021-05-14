@@ -1,15 +1,15 @@
 # Choose destination for the dataset file(s). Default to current dir.
-destination: /data1/data/sdo-dataset
+destination: data/sdo-dataset-cls-171-12h
+# Base filename for the metadata files. If splits-separate-files is true, the split's name will be appended to the
+# filename. E.g.: sdo-dataset-train.csv
 filename: sdo-dataset.csv
+# Original path where the full dataset is stored
 dataset_path: /data1/data/sdo-dataset
 # Whether to write the path as relative (from dataset root) or absolute (using dataset_path) in the csv file
 relative_paths: true
 
 # Choose whether files (images) are copied to the destination folder.
-copy: false  # TODO: add support
-
-# Choose an image size (if images are copied to another folder) to be resized or null for no resize.
-resize: null  # TODO: add support
+copy: true
 
 # Choose channel among: 94, 131, 171, 193, 211, 304, 335, 1600, 1700, 4500.
 channel: 171
