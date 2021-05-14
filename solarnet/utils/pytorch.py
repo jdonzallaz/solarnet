@@ -1,4 +1,3 @@
-import time
 from pathlib import Path
 from typing import Union
 
@@ -6,6 +5,7 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 
+from solarnet.utils.callbacks import TimerCallback
 from solarnet.utils.hardware import machine_summary
 
 
@@ -22,7 +22,7 @@ def pytorch_model_summary(model: nn.Module, path: Path, filename: str = 'model_s
 def get_training_summary(
     model_file: Path,
     tracking_id: Union[str, int],
-    start_time: float,
+    timer_callback: TimerCallback,
     datamodule: pl.LightningDataModule,
     early_stop_callback: pl.callbacks.EarlyStopping,
     checkpoint_callback: pl.callbacks.ModelCheckpoint,
@@ -34,7 +34,7 @@ def get_training_summary(
 
     return {
         "machine": machine_summary(),
-        "training_time": f"{time.perf_counter() - start_time:.2f}s",
+        "training_time": timer_callback.get_time_formatted(),
         "model_size": f"{model_size_kB}kB",
         "early_stopping_epoch": early_stop_callback.stopped_epoch,
         "model_checkpoint_step": model_checkpoint_step,

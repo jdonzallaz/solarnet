@@ -181,9 +181,6 @@ def plot_train_val_curve(
     :param save_path: optional path where the figure will be saved.
     """
 
-    if y_lim is None:
-        y_lim = [0, 1]
-
     train_metric = metrics[f"train_{metric}{key_suffix}"]
     train_metric = {k: [dic[k] for dic in train_metric] for k in train_metric[0]}
     train_metric_steps = train_metric["step"]
@@ -193,6 +190,21 @@ def plot_train_val_curve(
     val_metric = {k: [dic[k] for dic in val_metric] for k in val_metric[0]}
     val_metric_steps = val_metric["step"]
     val_metric_values = smooth_curve(val_metric["value"], smooth_factor)
+
+    # Compute min and max value for y-axis limits
+    if y_lim is None:
+        min_value = min(min(train_metric["value"]), min(val_metric["value"]))
+        max_value = max(max(train_metric["value"]), max(val_metric["value"]))
+        # Add margin around plot
+        margin = (max_value - min_value) / 5  # 20%
+        min_value -= margin
+        max_value += margin
+        y_lim = [min_value, max_value]
+        # Use up/down limit for known metrics (loss, accuracy)
+        if metric == "loss":
+            y_lim = [0, max_value]
+        elif metric == "accuracy":
+            y_lim = [min_value, 1]
 
     plt.ioff()
 
