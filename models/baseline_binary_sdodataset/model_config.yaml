@@ -1,0 +1,20 @@
+model: ImageClassification
+backbone: simple-cnn
+n_channel: 1
+output_size: 2
+hparams:
+  n_channel: 1
+  n_class: 2
+  learning_rate: 0.001
+  class_weight:
+  - 0.5
+  - 7
+  backbone: simple-cnn
+  backbone_output_size: 0
+  n_hidden: 16
+  dropout: 0.2
+  lr_scheduler: true
+  lr_scheduler_warmup_steps: 100
+  lr_scheduler_total_steps: 380
+  activation: leakyrelu
+  pooling: 2

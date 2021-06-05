@@ -81,13 +81,13 @@ def flux_to_class_builder(class_list: List[dict], return_names: bool = False) ->
     return flux_to_class
 
 
-def compute_class_weight(dataset: BaseDataset):
+def compute_class_weight(dataset: BaseDataset) -> List[float]:
     """
     Compute the class_weight of all the classes in the dataset. The dataset must implements the "y" property method to
     retrieve all the targets, that's why the parameter is a BaseDataset.
 
     :param dataset: The dataset from which to compute the classweight. Must implement the y property method.
-    :return: A tensor of weights for each class
+    :return: A list of weights for each class
     """
 
     if isinstance(dataset, BaseDataset):
@@ -101,6 +101,6 @@ def compute_class_weight(dataset: BaseDataset):
         raise AttributeError("dataset must be a BaseDataset or a Subset of a BaseDataset.")
 
     cw = class_weight.compute_class_weight('balanced', classes=np.unique(y), y=y)
-    cw = torch.tensor(cw, dtype=torch.float)
+    cw = cw.tolist()
 
     return cw

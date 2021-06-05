@@ -18,7 +18,7 @@ from solarnet.utils.yaml import load_yaml
 init_log()
 
 from solarnet.tasks.test import test
-from solarnet.tasks.train import train
+from solarnet.tasks.train import train_standard, train_ssl, finetune
 
 set_log_level(logging.WARNING)
 logger = logging.getLogger()
@@ -33,25 +33,33 @@ def read_config(parameters_overrides: Optional[List[str]]) -> dict:
     return OmegaConf.to_container(config, resolve=True)
 
 
-@app.command('train')
+@app.command("train")
 def train_command(
     parameters_overrides: Optional[List[str]] = typer.Argument(None),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
     config = read_config(parameters_overrides)
     logger.info(f"Params: {config}")
 
-    train(config)
+    training_type = config["training_type"]
+    if training_type == "train":
+        train_standard(config)
+    elif training_type == "ssl":
+        train_ssl(config)
+    elif training_type == "finetune":
+        finetune(config)
 
 
-@app.command('test')
+@app.command("test")
 def test_command(
     parameters_overrides: Optional[List[str]] = typer.Argument(None),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
     config = read_config(parameters_overrides)
     logger.info(f"Params: {config}")
@@ -59,22 +67,24 @@ def test_command(
     test(config, verbose)
 
 
-@app.command('download')
+@app.command("download")
 def download_command(
     dataset: str = typer.Argument("sdo-benchmark"),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
     download_dataset(dataset)
 
 
-@app.command('dataset')
+@app.command("dataset")
 def dataset_command(
-    config_file: Path = typer.Argument(Path('config') / 'dataset.yaml'),
+    config_file: Path = typer.Argument(Path("config") / "dataset.yaml"),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
     params = load_yaml(config_file)
 
@@ -87,7 +97,7 @@ class Split(str, Enum):
     test = "test"
 
 
-@app.command('data-stats')
+@app.command("data-stats")
 def data_stats_command(
     split: Split = Split.train,
     n_bins: int = 100,
@@ -96,7 +106,8 @@ def data_stats_command(
     parameters_overrides: Optional[List[str]] = typer.Argument(None),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
     config = read_config(parameters_overrides)
     logger.info(f"Params: {config}")
@@ -104,20 +115,40 @@ def data_stats_command(
     stats_dataset(config, split.value, n_bins, hist_path, transform)
 
 
-@app.command('upload')
+@app.command("upload")
 def upload_command(
     path: Path,
+    name: str,
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
-    upload_model(path)
+    upload_model(path, name)
+
+
+@app.command("dag-graph")
+def dag_graph_command(
+    input: Path,
+    verbose: bool = typer.Option(False, "--verbose", "-v"),
+):
+    if verbose:
+        set_log_level(logging.INFO)
+
+    with open(input, "r", encoding="utf-8") as file:
+        print("```mermaid\ngraph TD;")
+        for line in file:
+            if "->" in line:
+                parts = line.strip().replace('"', "").replace("@", ":").replace(";", "").split(" ")
+                print(f"{parts[2]} --> {parts[0]}")
+        print("```")
 
 
 # Command to add options before the command (-v train ...)
 @app.callback()
 def main(verbose: bool = typer.Option(False, "--verbose", "-v")):
-    if verbose: set_log_level(logging.INFO)
+    if verbose:
+        set_log_level(logging.INFO)
 
 
 if __name__ == "__main__":

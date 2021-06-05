@@ -1,0 +1,22 @@
+model: ImageClassification
+backbone: simple-cnn
+n_channel: 1
+output_size: 4
+hparams:
+  n_channel: 1
+  n_class: 4
+  learning_rate: 0.005
+  class_weight:
+  - 0.42115384615384616
+  - 0.7265807962529274
+  - 4.279310344827586
+  - 64.1896551724138
+  backbone: simple-cnn
+  backbone_output_size: 0
+  n_hidden: 16
+  dropout: 0.2
+  lr_scheduler: true
+  lr_scheduler_warmup_steps: 100
+  lr_scheduler_total_steps: 1180
+  activation: relu6
+  pooling: 2

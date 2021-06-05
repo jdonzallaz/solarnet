@@ -8,45 +8,114 @@ stages:
           persist: true
           cache: false
 
+  prepare-data:
+    foreach:
+      cls:
+        config: dataset_cls.yaml
+        output: sdo-dataset-cls-211-24h
+      ssl:
+        config: dataset_ssl.yaml
+        output: sdo-dataset-ssl-bz-1h
+    do:
+      cmd:
+        - python -m solarnet.main dataset config/${item.config} -v
+        - touch data/${item.output}.placeholder
+      deps:
+        - config/${item.config}
+      outs:
+        - data/${item.output}.placeholder:
+            persist: true
+            cache: false
+
   train:
     foreach:
       binary:
-        experiment: binary
-        path: binary
-        model: cnn_classification
+        experiment: baseline_binary_sdobenchmark
+        path: baseline_binary_sdobenchmark
+        model: image_classification
+        dataset: sdo-benchmark
       multiclass:
-        experiment: multiclass
-        path: multiclass
-        model: cnn_classification
+        experiment: baseline_multiclass_sdobenchmark
+        path: baseline_multiclass_sdobenchmark
+        model: image_classification
+        dataset: sdo-benchmark
       regression:
-        experiment: regression
-        path: regression
-        model: cnn_regression
+        experiment: baseline_regression_sdobenchmark
+        path: baseline_regression_sdobenchmark
+        model: image_regression
+        dataset: sdo-benchmark
       binary_sdodataset:
-        experiment: binary_sdodataset
-        path: binary_sdodataset
-        model: cnn_classification
+        experiment: baseline_binary_sdodataset
+        path: baseline_binary_sdodataset
+        model: image_classification
+        dataset: sdo-dataset-cls-211-24h
+      ssl:
+        experiment: ssl
+        path: ssl_bz
+        model: simclr
+        dataset: sdo-dataset-ssl-bz-1h
     do:
-      cmd: python -m solarnet.main train +experiment=${item.experiment}
+      cmd: python -m solarnet.main train +experiment=${item.experiment} -v
       params:
         - config/config.yaml:
             - model
             - trainer
             - name
             - seed
-            - tracking
-            - gpus
+            - training_type
+            - path
       deps:
         - solarnet/tasks/train.py
-        - solarnet/models/cnn_module.py
         - solarnet/models/${item.model}.py
-        - data/sdo-benchmark.placeholder
+        - data/${item.dataset}.placeholder
         - config/experiment/${item.experiment}.yaml
       outs:
         - models/${item.path}/model.ckpt
+        - models/${item.path}/model.pt
         - models/${item.path}/config.yaml:
             cache: false
         - models/${item.path}/metadata.yaml:
+            cache: false
+        - models/${item.path}/model_config.yaml:
+            cache: false
+        - models/${item.path}/model_summary.txt:
+            cache: false
+        - models/${item.path}/train_plots/:
+            cache: false
+
+  finetune:
+    foreach:
+      ssl:
+        base: ssl_bz
+        experiment: ssl_ft_sdobenchmark
+        path: ssl_bz_ft_sdobenchmark
+        model: image_classification
+        dataset: sdo-benchmark
+    do:
+      cmd: python -m solarnet.main train +experiment=${item.experiment} -v
+      params:
+        - config/config.yaml:
+            - model
+            - trainer
+            - name
+            - seed
+            - training_type
+            - path
+      deps:
+        - solarnet/tasks/train.py
+        - solarnet/models/${item.model}.py
+        - config/experiment/${item.experiment}.yaml
+        - models/${item.base}/model.pt
+        - models/${item.base}/model_config.yaml
+        - data/${item.dataset}.placeholder
+      outs:
+        - models/${item.path}/model.ckpt
+        - models/${item.path}/model.pt
+        - models/${item.path}/config.yaml:
+            cache: false
+        - models/${item.path}/metadata.yaml:
+            cache: false
+        - models/${item.path}/model_config.yaml:
             cache: false
         - models/${item.path}/model_summary.txt:
             cache: false
@@ -56,24 +125,34 @@ stages:
   test:
     foreach:
       binary:
-        experiment: binary
-        path: binary
-        model: cnn_classification
+        experiment: baseline_binary_sdobenchmark
+        path: baseline_binary_sdobenchmark
+        model: image_classification
+        dataset: sdo-benchmark
         plot: confusion_matrix
       multiclass:
-        experiment: multiclass
-        path: multiclass
-        model: cnn_classification
+        experiment: baseline_multiclass_sdobenchmark
+        path: baseline_multiclass_sdobenchmark
+        model: image_classification
+        dataset: sdo-benchmark
         plot: confusion_matrix
       regression:
-        experiment: regression
-        path: regression
-        model: cnn_regression
+        experiment: baseline_regression_sdobenchmark
+        path: baseline_regression_sdobenchmark
+        model: image_regression
+        dataset: sdo-benchmark
         plot: regression_line
       binary_sdodataset:
-        experiment: binary_sdodataset
-        path: binary_sdodataset
-        model: cnn_classification
+        experiment: baseline_binary_sdodataset
+        path: baseline_binary_sdodataset
+        model: image_classification
+        dataset: sdo-dataset-cls-211-24h
+        plot: confusion_matrix
+      ssl_ft:
+        experiment: ssl_ft_sdobenchmark
+        path: ssl_bz_ft_sdobenchmark
+        model: image_classification
+        dataset: sdo-benchmark
         plot: confusion_matrix
     do:
       cmd: python -m solarnet.main test +experiment=${item.experiment}
@@ -82,13 +161,10 @@ stages:
             - model
             - trainer
             - seed
-            - tracking
-            - gpus
       deps:
         - solarnet/tasks/test.py
-        - solarnet/models/cnn_module.py
         - solarnet/models/${item.model}.py
-        - data/sdo-benchmark.placeholder
+        - data/${item.dataset}.placeholder
         - models/${item.path}/model.ckpt
         - config/experiment/${item.experiment}.yaml
       metrics:
@@ -101,43 +177,59 @@ stages:
   generate-report:
     foreach:
       binary:
-        report: "models/binary/report.md"
-        path: binary
+        report: "models/baseline_binary_sdobenchmark/report.md"
+        path: baseline_binary_sdobenchmark
         train_plots_cmd: >-
-          printf "### Accuracy curve\n" >> models/binary/report.md &&
-          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/binary/report.md
+          printf "### Accuracy curve\n" >> models/baseline_binary_sdobenchmark/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/baseline_binary_sdobenchmark/report.md
         test_plots_cmd: >-
-          printf "### Confusion matrix\n" >> models/binary/report.md &&
-          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/binary/report.md &&
-          printf "### ROC Curve\n" >> models/binary/report.md &&
-          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/binary/report.md
+          printf "### Confusion matrix\n" >> models/baseline_binary_sdobenchmark/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/baseline_binary_sdobenchmark/report.md &&
+          printf "### ROC Curve\n" >> models/baseline_binary_sdobenchmark/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/baseline_binary_sdobenchmark/report.md
+        precision: 4
       multiclass:
-        report: "models/multiclass/report.md"
-        path: multiclass
+        report: "models/baseline_multiclass_sdobenchmark/report.md"
+        path: baseline_multiclass_sdobenchmark
         train_plots_cmd: >-
-          printf "### Accuracy curve\n" >> models/multiclass/report.md &&
-          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/multiclass/report.md
+          printf "### Accuracy curve\n" >> models/baseline_multiclass_sdobenchmark/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/baseline_multiclass_sdobenchmark/report.md
         test_plots_cmd: >-
-          printf "### Confusion matrix\n" >> models/multiclass/report.md &&
-          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/multiclass/report.md
+          printf "### Confusion matrix\n" >> models/baseline_multiclass_sdobenchmark/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/baseline_multiclass_sdobenchmark/report.md
+        precision: 4
       regression:
-        report: "models/regression/report.md"
-        path: regression
+        report: "models/baseline_regression_sdobenchmark/report.md"
+        path: baseline_regression_sdobenchmark
         train_plots_cmd: true
         test_plots_cmd: >-
-          printf "### Regression line\n" >> models/regression/report.md &&
-          printf "![Regression line](test_plots/regression_line.png 'Regression line')\n\n" >> models/regression/report.md
+          printf "### Regression line\n" >> models/baseline_regression_sdobenchmark/report.md &&
+          printf "![Regression line](test_plots/regression_line.png 'Regression line')\n\n" >> models/baseline_regression_sdobenchmark/report.md
+        precision: 10
       binary_sdodataset:
-        report: "models/binary_sdodataset/report.md"
-        path: binary_sdodataset
+        report: "models/baseline_binary_sdodataset/report.md"
+        path: baseline_binary_sdodataset
         train_plots_cmd: >-
-          printf "### Accuracy curve\n" >> models/binary_sdodataset/report.md &&
-          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/binary_sdodataset/report.md
+          printf "### Accuracy curve\n" >> models/baseline_binary_sdodataset/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/baseline_binary_sdodataset/report.md
         test_plots_cmd: >-
-          printf "### Confusion matrix\n" >> models/binary_sdodataset/report.md &&
-          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/binary_sdodataset/report.md &&
-          printf "### ROC Curve\n" >> models/binary_sdodataset/report.md &&
-          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/binary_sdodataset/report.md
+          printf "### Confusion matrix\n" >> models/baseline_binary_sdodataset/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/baseline_binary_sdodataset/report.md &&
+          printf "### ROC Curve\n" >> models/baseline_binary_sdodataset/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/baseline_binary_sdodataset/report.md
+        precision: 4
+      ssl_bz_ft_sdobenchmark:
+        report: "models/ssl_bz_ft_sdobenchmark/report.md"
+        path: ssl_bz_ft_sdobenchmark
+        train_plots_cmd: >-
+          printf "### Accuracy curve\n" >> models/ssl_bz_ft_sdobenchmark/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+        test_plots_cmd: >-
+          printf "### Confusion matrix\n" >> models/ssl_bz_ft_sdobenchmark/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/ssl_bz_ft_sdobenchmark/report.md &&
+          printf "### ROC Curve\n" >> models/ssl_bz_ft_sdobenchmark/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+        precision: 4
     do:
       cmd: >-
         printf "# Model report\n" > ${item.report} &&
@@ -159,12 +251,13 @@ stages:
         printf '```\n' >> ${item.report} &&
         printf "## Test\n" >> ${item.report} &&
         printf "### Metrics\n" >> ${item.report} &&
-        dvc metrics show --show-md models/${item.path}/metrics.yaml >> ${item.report} &&
+        dvc metrics show --show-md models/${item.path}/metrics.yaml --precision ${item.precision} >> ${item.report} &&
         ${item.test_plots_cmd} &&
         printf "### Test samples\n" >> ${item.report} &&
         printf "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >> ${item.report}
       deps:
         - models/${item.path}/config.yaml
+        - models/${item.path}/metadata.yaml
         - models/${item.path}/metrics.yaml
         - models/${item.path}/model_summary.txt
         - models/${item.path}/test_plots/
@@ -172,3 +265,45 @@ stages:
       outs:
         - ${item.report}:
             cache: false
+
+  generate-report-ssl:
+    foreach:
+      ssl_bz:
+        report: "models/ssl_bz/report.md"
+        path: ssl_bz
+    do:
+      cmd: >-
+        printf "# Model report\n" > ${item.report} &&
+        printf "## Training\n" >> ${item.report} &&
+        printf "### Parameters\n" >> ${item.report} &&
+        printf '```yaml\n' >> ${item.report} &&
+        cat models/${item.path}/config.yaml >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
+        printf "### Model architecture\n" >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
+        cat models/${item.path}/model_summary.txt >> ${item.report} &&
+        printf '```\n' >> ${item.report} &&
+        printf "### Loss curve\n" >> ${item.report} &&
+        printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> ${item.report} &&
+        printf "### Metadata\n" >> ${item.report} &&
+        printf '```yaml\n' >> ${item.report} &&
+        cat models/${item.path}/metadata.yaml >> ${item.report} &&
+        printf '```\n' >> ${item.report}
+      deps:
+        - models/${item.path}/config.yaml
+        - models/${item.path}/metadata.yaml
+        - models/${item.path}/model_summary.txt
+        - models/${item.path}/train_plots/
+      outs:
+        - ${item.report}:
+            cache: false
+
+  generate-pipeline-graph:
+    cmd:
+      - printf "# Pipeline\n" > models/pipeline.md
+      - dvc dag --dot > dot.dag && python -m solarnet.main dag-graph dot.dag >> models/pipeline.md
+      - rm dot.dag
+    outs:
+      - models/pipeline.md:
+          cache: false
+    always_changed: true

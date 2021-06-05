@@ -17,7 +17,7 @@ def objective_builder(model: str, metric: str = "f1"):
         parameters = load_yaml(config_path)
 
         # Suggest parameters
-        parameters["trainer"]["learning_rate"] = trial.suggest_float(
+        parameters["model"]["learning_rate"] = trial.suggest_float(
             "learning_rate", 1e-5, 6e-3, log=True
         )
         parameters["trainer"]["epochs"] = trial.suggest_int("epochs", 5, 30, 5)

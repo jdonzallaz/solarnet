@@ -1,7 +1,7 @@
 import logging
 import shutil
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 from sunpy.net import Fido, attrs as a
@@ -31,8 +31,9 @@ def make_dataset(parameters: dict):
     channel = parameters["channel"]
 
     time_steps = [pd.Timedelta(t) for t in parameters["time-steps"]]
-    flare_time_range = pd.Timedelta(parameters["flare-time-range"])
-    search_image_time_range = pd.Timedelta(parameters["search-image-time-range"])
+    flare_period = pd.Timedelta(parameters["flare-period"])
+    sample_interval = pd.Timedelta(parameters["sample-interval"])
+    search_image_period = pd.Timedelta(parameters["search-image-period"])
     target = parameters["target"]
     classification = "classes" in target
 
@@ -60,7 +61,7 @@ def make_dataset(parameters: dict):
     # Samples
     samples: List[Dict[str, Union[List[str], float, pd.Timestamp, bool]]] = []
 
-    time_offset = pd.DateOffset(seconds=flare_time_range.total_seconds())
+    time_offset = pd.DateOffset(seconds=sample_interval.total_seconds())
     intervals = pd.interval_range(
         datetime_start,  # + max(time_steps),
         datetime_end,
@@ -72,11 +73,11 @@ def make_dataset(parameters: dict):
     for interval in intervals:
         try:
             images_paths, all_found = find_paths(
-                dataset_path, interval.left, time_steps, channel, search_image_time_range, relative_paths)
+                dataset_path, interval.left, time_steps, channel, search_image_period, relative_paths)
         except FileNotFoundError as e:
             # print("1 path not found", interval.left)
             continue
-        peak_flux = find_flare_peak_flux(df, interval.left, interval.right)
+        peak_flux = find_flare_peak_flux(df, interval.left, interval.left + flare_period)
 
         sample_datetime: pd.Timestamp = interval.left
 
@@ -145,15 +146,27 @@ def time_ranges_generator(datetime: pd.Timestamp, range: int = 6, unit: str = "m
 
 
 def make_path(base_path, time, channel) -> Path:
+    """
+    Create path like:
+    HMI20100501_1736_bz.npz
+    AIA20180114_0242_0171.npz
+    """
+
     year = str(time.year)
     month = f"{time.month:02d}"
     day = f"{time.day:02d}"
     hours = f"{time.hour:02d}"
     minutes = f"{time.minute:02d}"
-    padded_channel = f"{channel:04d}"
+
+    if isinstance(channel, str) and channel.lower() in ["Bx", "By", "Bz"]:
+        instrument = "HMI"
+        filename_channel = channel.lower()
+    else:
+        instrument = "AIA"
+        filename_channel = f"{channel:04d}"
 
     return base_path / str(channel) / year / month / day / \
-           f"AIA{year}{month}{day}_{hours}{minutes}_{padded_channel}.npz"
+           f"{instrument}{year}{month}{day}_{hours}{minutes}_{filename_channel}.npz"
 
 
 def find_paths(
@@ -161,9 +174,9 @@ def find_paths(
     datetime: pd.Timestamp,
     time_steps: List[pd.Timedelta],
     channel: str,
-    search_time_range: pd.Timedelta,
+    search_period: pd.Timedelta,
     relative_paths: bool,
-) -> (List[Path], bool):
+) -> Tuple[List[Path], bool]:
     paths = []
     all_found = True
 
@@ -176,8 +189,8 @@ def find_paths(
         if not path.exists():
             all_found = False
 
-            datetime_bottom_search_range = datetime_before - search_time_range
-            datetime_top_search_range = datetime_before + search_time_range
+            datetime_bottom_search_range = datetime_before - search_period
+            datetime_top_search_range = datetime_before + search_period
             search_range = pd.Interval(datetime_bottom_search_range, datetime_top_search_range)
 
             gen = time_ranges_generator(datetime_before)

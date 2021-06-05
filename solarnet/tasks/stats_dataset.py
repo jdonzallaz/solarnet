@@ -36,6 +36,11 @@ def stats_dataset(
     print("Size:", len(dataset))
     print("Shape:", dataset[0][0].shape)
 
+    y = dataset.y()
+    print("First 10 targets:", y[:10])
+    print("Targets distribution:", np.unique(y, return_counts=True))
+    print("Resulting class-weight distribution:", compute_class_weight(dataset))
+
     logger.info("Computing mean, std")
     mean, std = dataset_mean_std(dataset)
     logger.info("Computing min, max")
@@ -45,11 +50,6 @@ def stats_dataset(
     print("STD:", std)
     print("Min:", min)
     print("Max:", max)
-
-    y = dataset.y()
-    print("First 10 targets:", y[:10])
-    print("Targets distribution:", np.unique(y, return_counts=True))
-    print("Resulting class-weight distribution:", compute_class_weight(dataset))
 
     # Histogram
     if hist_path is not None:

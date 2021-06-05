@@ -1,28 +1,52 @@
 import logging
 from pathlib import Path
-from typing import List, Optional, Union
 
-import pytorch_lightning as pl
+import torch
 from pytorch_lightning import LightningDataModule, LightningModule, seed_everything
-from pytorch_lightning.callbacks import (
-    Callback,
-    EarlyStopping,
-    LearningRateMonitor,
-    ModelCheckpoint,
-)
-from solarnet.utils.callbacks import InfoLogCallback, PlotTrainValCurveCallback, TimerCallback
+from pytorch_lightning.callbacks import BackboneFinetuning
+from torchvision.transforms import transforms
 
+from solarnet.callbacks import SSLOnlineEvaluator
 from solarnet.data.dataset_config import datamodule_from_config
-from solarnet.logging import InMemoryLogger
-from solarnet.logging.tracking import NeptuneNewTracking, Tracking
-from solarnet.models import model_from_config
-from solarnet.utils.pytorch import get_training_summary, pytorch_model_summary
-from solarnet.utils.yaml import write_yaml
+from solarnet.data.sdo_dataset import SDODatasetDataModule
+from solarnet.data.transforms import SDOSimCLRDataTransform, sdo_dataset_normalize
+from solarnet.models import ImageClassification, ImageRegression, SimCLR
+from solarnet.utils.dict import filter_dict_for_function_parameters
+from solarnet.utils.target import compute_class_weight, flux_to_class_builder
+from solarnet.utils.trainer import train
 
 logger = logging.getLogger(__name__)
 
 
-def train(parameters: dict):
+def model_from_config(parameters: dict, datamodule: LightningDataModule) -> LightningModule:
+    steps_per_epoch = len(datamodule.train_dataloader())
+    total_steps = parameters["trainer"]["epochs"] * steps_per_epoch
+
+    if parameters["data"]["name"] == "sdo-dataset":
+        class_weight = [0.5, 7]
+    else:
+        class_weight = compute_class_weight(datamodule.dataset_train)
+
+    regression = parameters["data"]["targets"] == "regression"
+    if regression:
+        model = ImageRegression(
+            n_channel=datamodule.size(0),
+            lr_scheduler_total_steps=total_steps,
+            **parameters["model"],
+        )
+    else:
+        model = ImageClassification(
+            n_channel=datamodule.size(0),
+            n_class=len(parameters["data"]["targets"]["classes"]),
+            class_weight=class_weight,
+            lr_scheduler_total_steps=total_steps,
+            **parameters["model"],
+        )
+
+    return model
+
+
+def train_standard(parameters: dict):
     seed_everything(parameters["seed"], workers=True)
 
     datamodule = datamodule_from_config(parameters)
@@ -30,88 +54,69 @@ def train(parameters: dict):
 
     model = model_from_config(parameters, datamodule)
 
-    _train(parameters, datamodule, model)
+    train(parameters, datamodule, model)
 
 
-def _train(
-    parameters: dict,
-    datamodule: LightningDataModule,
-    model: LightningModule,
-    callbacks: Optional[Union[List[Callback], Callback]] = None,
-):
-    model_path = Path(parameters["path"])
-    plot_path = Path(parameters["path"]) / "train_plots"
-    plot_path.mkdir(parents=True, exist_ok=True)
-    regression = parameters["data"]["targets"] == "regression"
-    n_class = 1 if regression else len(parameters["data"]["targets"]["classes"])
+def train_ssl(parameters: dict):
+    seed_everything(parameters["seed"], workers=True)
 
-    # Callbacks
-    timer_callback = TimerCallback()
-    early_stop_callback = EarlyStopping(
-        monitor="val_loss", min_delta=0.00, patience=parameters["trainer"]["patience"], verbose=True, mode="min"
+    base_resize = 512
+    transform = SDOSimCLRDataTransform(
+        parameters["data"]["size"],
+        do_online_transform=True,
+        transform_before=transforms.CenterCrop((base_resize // 2, base_resize - base_resize // 8)),
+        transform_after=sdo_dataset_normalize(parameters["data"]["channel"]),
     )
-    checkpoint_callback = ModelCheckpoint(
-        monitor="val_loss",
-        mode="min",
-        dirpath=str(model_path),
-        filename="model",
+
+    dm = SDODatasetDataModule(
+        Path(parameters["data"]["path"]),
+        transform=transform,
+        target_transform=flux_to_class_builder(parameters["data"]["targets"]["classes"]),
+        batch_size=parameters["trainer"]["batch_size"],
+        num_workers=parameters["system"]["workers"],
     )
-    callbacks = [] if callbacks is None else callbacks if isinstance(callbacks, list) else [callbacks]
-    callbacks += [
-        early_stop_callback,
-        checkpoint_callback,
-        InfoLogCallback(),
-        timer_callback,
-        PlotTrainValCurveCallback(plot_path, "loss"),
-        PlotTrainValCurveCallback(plot_path, "accuracy"),
-    ]
+    dm.setup()
 
-    # Logging
-    im_logger = InMemoryLogger()
-    pl_logger = [im_logger]
-
-    # Tracking
-    tracking: Tracking = NeptuneNewTracking(parameters=parameters, tags=[], disabled=not parameters["tracking"])
-    tracking_logger = tracking.get_callback("pytorch-lightning")
-    if tracking_logger is not None:
-        pl_logger.append(tracking_logger)
-        callbacks.append(LearningRateMonitor(logging_interval="step"))
-
-    trainer = pl.Trainer(
-        gpus=parameters["gpus"],
-        logger=pl_logger,
-        callbacks=callbacks,
+    model_params = filter_dict_for_function_parameters(parameters["model"], SimCLR.__init__)
+    model = SimCLR(
+        gpus=parameters["system"]["gpus"],
+        num_samples=dm.num_samples,
+        batch_size=dm.batch_size,
+        n_channel=dm.size(0),
         max_epochs=parameters["trainer"]["epochs"],
-        val_check_interval=0.5,
-        num_sanity_val_steps=0,
-        fast_dev_run=False,
-        log_every_n_steps=10,
-        flush_logs_every_n_steps=10,
-        accelerator=None if parameters["gpus"] in [None, 0, 1] else "ddp",
+        **model_params,
     )
 
-    trainer.fit(model, datamodule=datamodule)
+    online_params = filter_dict_for_function_parameters(parameters["ssl"]["online"], SSLOnlineEvaluator.__init__)
+    online_finetuner = SSLOnlineEvaluator(
+        z_dim=model.hidden_mlp,
+        num_classes=len(parameters["data"]["targets"]["classes"]),
+        loss_weight=torch.tensor([0.85, 1.15], dtype=float),
+        **online_params,
+    )
 
-    # Log actual config used for training
-    write_yaml(model_path / "config.yaml", parameters)
+    train(parameters, dm, model, callbacks=online_finetuner)
 
-    # Log model summary
-    pytorch_model_summary(model, model_path)
 
-    # Output tracking run id to continue logging in test step
-    run_id = tracking.get_id()
+def finetune(parameters: dict):
+    seed_everything(parameters["seed"], workers=True)
 
-    # Metadata
-    steps_per_epoch = len(datamodule.train_dataloader())
-    metadata = get_training_summary(
-        model_path / "model.ckpt",
-        run_id,
-        timer_callback,
-        datamodule,
-        early_stop_callback,
-        checkpoint_callback,
-        steps_per_epoch,
-        )
-    write_yaml(model_path / "metadata.yaml", metadata)
+    datamodule = datamodule_from_config(parameters)
+    datamodule.setup()
 
-    tracking.end()
+    total_steps = parameters["trainer"]["epochs"] * len(datamodule.train_dataloader())
+
+    model = ImageClassification.from_pretrained(
+        Path(parameters["finetune"]["base"]),
+        n_class=len(parameters["data"]["targets"]["classes"]),
+        class_weight=compute_class_weight(datamodule.dataset_train),
+        lr_scheduler_total_steps=total_steps,
+        **parameters["model"],
+        print_incompatible_keys=True,
+    )
+
+    callbacks = []
+    if parameters["finetune"]["backbone_unfreeze_epoch"] > 0:
+        callbacks.append(BackboneFinetuning(parameters["finetune"]["backbone_unfreeze_epoch"], verbose=True))
+
+    train(parameters, datamodule, model, callbacks=callbacks)

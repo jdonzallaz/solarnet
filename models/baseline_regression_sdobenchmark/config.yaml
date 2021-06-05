@@ -1,0 +1,30 @@
+data:
+  name: sdo-benchmark
+  validation_size: 0.1
+  channel: 211
+  size: 256
+  targets: regression
+  time_steps:
+  - 3
+  path: data/sdo-benchmark
+model:
+  backbone: simple-cnn
+  learning_rate: 0.005
+  activation: relu6
+  pooling: 2
+  dropout: 0.2
+  n_hidden: 16
+  lr_scheduler: true
+trainer:
+  epochs: 20
+  patience: 12
+  batch_size: 128
+name: Baseline regression model
+training_type: train
+tune_lr: false
+path: models/baseline_regression_sdobenchmark
+seed: 42
+tracking: true
+system:
+  gpus: 1
+  workers: 20

@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Tuple
 
 import pytorch_lightning as pl
 import torch
@@ -11,8 +11,8 @@ from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision.transforms import transforms
 
 from solarnet.data import datamodule_from_config, dataset_from_config
-from solarnet.logging.tracking import NeptuneNewTracking, Tracking
-from solarnet.models import CNNClassification, CNNRegression
+from solarnet.tracking import NeptuneNewTracking, Tracking
+from solarnet.models import ImageClassification, ImageRegression
 from solarnet.utils.metrics import stats_metrics
 from solarnet.utils.plots import plot_confusion_matrix, plot_image_grid, plot_regression_line, plot_roc_curve
 from solarnet.utils.scaling import log_min_max_inverse_scale
@@ -32,10 +32,10 @@ def test(parameters: dict, verbose: bool = False):
     metadata_path = model_path / "metadata.yaml"
     metadata = load_yaml(metadata_path) if metadata_path.exists() else None
 
-    regression = parameters['data']['targets'] == "regression"
-    labels = None if regression else [list(x.keys())[0] for x in parameters['data']['targets']['classes']]
-    n_class = 1 if regression else len(parameters['data']['targets']['classes'])
-    parameters["gpus"] = min(1, parameters["gpus"])
+    regression = parameters["data"]["targets"] == "regression"
+    labels = None if regression else [list(x.keys())[0] for x in parameters["data"]["targets"]["classes"]]
+    n_class = 1 if regression else len(parameters["data"]["targets"]["classes"])
+    parameters["system"]["gpus"] = min(1, parameters["system"]["gpus"])
 
     # Tracking
     tracking: Optional[Tracking] = None
@@ -44,15 +44,15 @@ def test(parameters: dict, verbose: bool = False):
         tracking = NeptuneNewTracking.resume(run_id)
 
     datamodule = datamodule_from_config(parameters)
-    datamodule.setup('test')
+    datamodule.setup("test")
     logger.info(f"Data format: {datamodule.size()}")
 
-    model_class = CNNRegression if regression else CNNClassification
+    model_class = ImageRegression if regression else ImageClassification
     model = model_class.load_from_checkpoint(str(model_path / "model.ckpt"))
     logger.info(f"Model: {model}")
 
     trainer = pl.Trainer(
-        gpus=parameters["gpus"],
+        gpus=parameters["system"]["gpus"],
         logger=None,
     )
 
@@ -62,8 +62,8 @@ def test(parameters: dict, verbose: bool = False):
 
     if regression:
         metrics = {
-            'mae': raw_metrics["test_mae"],
-            'mse': raw_metrics["test_mse"],
+            "mae": raw_metrics["test_mae"],
+            "mse": raw_metrics["test_mse"],
         }
     else:
         tp = raw_metrics.pop("test_tp")  # hits
@@ -71,13 +71,10 @@ def test(parameters: dict, verbose: bool = False):
         tn = raw_metrics.pop("test_tn")  # correct negative
         fn = raw_metrics.pop("test_fn")  # miss
 
-        metrics = {
-            "balanced_accuracy": raw_metrics.pop("test_recall"),
-            **stats_metrics(tp, fp, tn, fn)
-        }
+        metrics = {"balanced_accuracy": raw_metrics.pop("test_recall"), **stats_metrics(tp, fp, tn, fn)}
 
         for key, value in raw_metrics.items():
-            metrics[key[len("test_"):]] = value
+            metrics[key[len("test_") :]] = value
         metrics = dict(sorted(metrics.items()))
 
     write_yaml(model_path / "metrics.yaml", metrics)
@@ -95,9 +92,17 @@ def test(parameters: dict, verbose: bool = False):
     )
     y, y_pred, y_proba = predict(model, dataloader, regression, return_proba=True)
     images, _ = map(list, zip(*dataset_image))
-    plot_image_grid(images, y, y_pred, y_proba, labels=labels,
-                    save_path=Path(plot_path / "test_samples.png"),
-                    max_images=nb_image_grid)
+    plot_image_grid(
+        images,
+        y,
+        y_pred,
+        y_proba,
+        labels=labels,
+        save_path=Path(plot_path / "test_samples.png"),
+        max_images=nb_image_grid,
+    )
+    if tracking:
+        tracking.log_artifact(plot_path / "test_samples.png", "metrics/test/test_samples")
 
     # Confusion matrix or regression line
     y, y_pred, y_proba = predict(model, datamodule.test_dataloader(), regression, return_proba=True)
@@ -122,7 +127,8 @@ def test(parameters: dict, verbose: bool = False):
             if n_class <= 2:
                 tracking.log_artifact(roc_curve_path, "metrics/test/roc_curve")
 
-    if tracking: tracking.end()
+    if tracking:
+        tracking.end()
 
 
 def get_random_test_samples_dataloader(
@@ -130,10 +136,12 @@ def get_random_test_samples_dataloader(
     nb_sample: int = 10,
     transform: Optional[Callable] = None,
     classes: Optional[List[int]] = None,
-) -> (Dataset, DataLoader):
+) -> Tuple[Dataset, DataLoader]:
     """ Return a random set of test samples """
 
-    dataset_test_image = dataset_from_config(parameters, "test", transforms.Lambda(lambda x: x[0]))
+    dataset_test_image = dataset_from_config(
+        parameters, "test", transforms.Compose([transform, transforms.Normalize([-1], [2]), transforms.ToPILImage()])
+    )
     dataset_test_tensors = dataset_from_config(parameters, "test", transform)
 
     if classes is not None:

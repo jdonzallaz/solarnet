@@ -39,6 +39,9 @@ dvc repro
 
 Up-to-date results are available in `models/` folder.
 
-- [Binary classification model](models/binary/report.md)
-- [Multiclass classification model](models/multiclass/report.md)
-- [Regression model](models/regression/report.md)
+- [Binary classification model](models/baseline_binary_sdobenchmark/report.md)
+- [Multiclass classification model](models/baseline_multiclass_sdobenchmark/report.md)
+- [Regression model](models/baseline_regression_sdobenchmark/report.md)
+- [Binary classification model on full-disc images](models/baseline_regression_sdodataset/report.md)
+- [Self-supervised learning pre-trained model](models/ssl_bz/report.md)
+- [Self-supervised learning funetuned model on binary classification](models/ssl_bz_ft_sdobenchmark/report.md)

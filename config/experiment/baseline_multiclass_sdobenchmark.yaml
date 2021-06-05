@@ -1,0 +1,21 @@
+# @package _global_
+
+data:
+  targets:
+    classes:
+      - Quiet: "< 1e-6"
+      - C: "< 1e-5"
+      - M: "< 1e-4"
+      - X: ">= 1e-4"
+
+model:
+  backbone: simple-cnn
+  activation: relu6
+  pooling: 2
+  dropout: 0.2
+  n_hidden: 16
+  learning_rate: 5e-3
+  lr_scheduler: true
+
+name: Baseline multiclass classification model
+path: models/baseline_multiclass_sdobenchmark

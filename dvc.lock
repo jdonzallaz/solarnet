@@ -11,533 +11,1051 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
   train@binary:
-    cmd: python -m solarnet.main train +experiment=binary
+    cmd: python -m solarnet.main train +experiment=baseline_binary_sdobenchmark -v
     deps:
-    - path: config/experiment/binary.yaml
-      md5: 939b8a7c696a6036e1aeeff3364c13c1
-      size: 61
+    - path: config/experiment/baseline_binary_sdobenchmark.yaml
+      md5: da8693f65397c05ed47ade95db4a13d1
+      size: 157
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: solarnet/models/cnn_classification.py
-      md5: c1b30dbc240f693544944daa7989722e
-      size: 3633
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
     - path: solarnet/tasks/train.py
-      md5: 6b0b09adfd1467c291e73232fa66869c
-      size: 4014
+      md5: 4a87721711816dbca4972b460b60a649
+      size: 4346
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
+        training_type: train
     outs:
-    - path: models/binary/config.yaml
-      md5: 1a3604eaed083c5b7b32c32fae023309
-      size: 416
-    - path: models/binary/metadata.yaml
-      md5: ebf109c16130200b6789c1d2c9eab24a
-      size: 332
-    - path: models/binary/model.ckpt
-      md5: 18848b95483caa980762a7b52af3f21c
-      size: 321751
-    - path: models/binary/model_summary.txt
-      md5: 978717ff182a8abda1a95baef1a7b554
-      size: 1831
-    - path: models/binary/train_plots/
-      md5: 05ac4a43c043f18712aac9a69d35cb52.dir
-      size: 90529
+    - path: models/baseline_binary_sdobenchmark/config.yaml
+      md5: c68bfece4152d5165bc70ea3d333ba62
+      size: 561
+    - path: models/baseline_binary_sdobenchmark/metadata.yaml
+      md5: c8721349264ac9d190dd7429b46e67b6
+      size: 347
+    - path: models/baseline_binary_sdobenchmark/model.ckpt
+      md5: 484d76e74b6ae4e10c5bcd2bd0acd44a
+      size: 323100
+    - path: models/baseline_binary_sdobenchmark/model.pt
+      md5: 00050efafebcb77cf8de69645f4d7312
+      size: 111879
+    - path: models/baseline_binary_sdobenchmark/model_config.yaml
+      md5: e552643054dc84b48b4e7278821fef38
+      size: 397
+    - path: models/baseline_binary_sdobenchmark/model_summary.txt
+      md5: d0146dfb1aaf7670ba3144848ed70d4e
+      size: 2203
+    - path: models/baseline_binary_sdobenchmark/train_plots/
+      md5: 7205493191a1e650b9a6252f55aa054c.dir
+      size: 83962
       nfiles: 2
   test@binary:
-    cmd: python -m solarnet.main test +experiment=binary
+    cmd: python -m solarnet.main test +experiment=baseline_binary_sdobenchmark
     deps:
-    - path: config/experiment/binary.yaml
-      md5: 939b8a7c696a6036e1aeeff3364c13c1
-      size: 58
+    - path: config/experiment/baseline_binary_sdobenchmark.yaml
+      md5: da8693f65397c05ed47ade95db4a13d1
+      size: 157
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: models/binary/model.ckpt
-      md5: 18848b95483caa980762a7b52af3f21c
-      size: 321751
-    - path: solarnet/models/cnn_classification.py
-      md5: c1b30dbc240f693544944daa7989722e
-      size: 3633
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+    - path: models/baseline_binary_sdobenchmark/model.ckpt
+      md5: 484d76e74b6ae4e10c5bcd2bd0acd44a
+      size: 323100
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
     - path: solarnet/tasks/test.py
-      md5: 88f9a59e7981de604b1ed0ff163fd64c
-      size: 7153
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
     outs:
-    - path: models/binary/metrics.yaml
-      md5: 8338197163dc2f6a577045db94dff2b5
-      size: 236
-    - path: models/binary/test_plots/
-      md5: 7f051d42213325232e44f33665b7f88b.dir
-      size: 847539
+    - path: models/baseline_binary_sdobenchmark/metrics.yaml
+      md5: dad9340a331b4b382ae223d9a5f01f59
+      size: 207
+    - path: models/baseline_binary_sdobenchmark/test_plots/
+      md5: e756f946433ea9b76f6570817f6c3ea1.dir
+      size: 846144
       nfiles: 3
   generate-report@binary:
-    cmd: printf "# Model report\n" > models/binary/report.md && printf "## Training\n"
-      >> models/binary/report.md && printf "### Parameters\n" >> models/binary/report.md
-      && printf '```yaml\n' >> models/binary/report.md && cat models/binary/config.yaml
-      >> models/binary/report.md && printf '```\n' >> models/binary/report.md && printf
-      "### Model architecture\n" >> models/binary/report.md && printf '```\n' >> models/binary/report.md
-      && cat models/binary/model_summary.txt >> models/binary/report.md && printf
-      '```\n' >> models/binary/report.md && printf "### Loss curve\n" >> models/binary/report.md
-      && printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/binary/report.md
-      && printf "### Accuracy curve\n" >> models/binary/report.md && printf "![Accuracy
-      curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/binary/report.md
-      && printf "### Metadata\n" >> models/binary/report.md && printf '```yaml\n'
-      >> models/binary/report.md && cat models/binary/metadata.yaml >> models/binary/report.md
-      && printf '```\n' >> models/binary/report.md && printf "## Test\n" >> models/binary/report.md
-      && printf "### Metrics\n" >> models/binary/report.md && dvc metrics show --show-md
-      models/binary/metrics.yaml >> models/binary/report.md && printf "### Confusion
-      matrix\n" >> models/binary/report.md && printf "![Confusion matrix](test_plots/confusion_matrix.png
-      'Confusion matrix')\n\n" >> models/binary/report.md && printf "### ROC Curve\n"
-      >> models/binary/report.md && printf "![ROC Curve](test_plots/roc_curve.png
-      'ROC Curve')\n\n" >> models/binary/report.md && printf "### Test samples\n"
-      >> models/binary/report.md && printf "![Test samples](test_plots/test_samples.png
-      'Test samples')\n\n" >> models/binary/report.md
+    cmd: printf "# Model report\n" > models/baseline_binary_sdobenchmark/report.md
+      && printf "## Training\n" >> models/baseline_binary_sdobenchmark/report.md &&
+      printf "### Parameters\n" >> models/baseline_binary_sdobenchmark/report.md &&
+      printf '```yaml\n' >> models/baseline_binary_sdobenchmark/report.md && cat models/baseline_binary_sdobenchmark/config.yaml
+      >> models/baseline_binary_sdobenchmark/report.md && printf '```\n' >> models/baseline_binary_sdobenchmark/report.md
+      && printf "### Model architecture\n" >> models/baseline_binary_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_binary_sdobenchmark/report.md && cat models/baseline_binary_sdobenchmark/model_summary.txt
+      >> models/baseline_binary_sdobenchmark/report.md && printf '```\n' >> models/baseline_binary_sdobenchmark/report.md
+      && printf "### Loss curve\n" >> models/baseline_binary_sdobenchmark/report.md
+      && printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/baseline_binary_sdobenchmark/report.md
+      && printf "### Accuracy curve\n" >> models/baseline_binary_sdobenchmark/report.md
+      && printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n"
+      >> models/baseline_binary_sdobenchmark/report.md && printf "### Metadata\n"
+      >> models/baseline_binary_sdobenchmark/report.md && printf '```yaml\n' >> models/baseline_binary_sdobenchmark/report.md
+      && cat models/baseline_binary_sdobenchmark/metadata.yaml >> models/baseline_binary_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_binary_sdobenchmark/report.md && printf
+      "## Test\n" >> models/baseline_binary_sdobenchmark/report.md && printf "###
+      Metrics\n" >> models/baseline_binary_sdobenchmark/report.md && dvc metrics show
+      --show-md models/baseline_binary_sdobenchmark/metrics.yaml --precision 4 >>
+      models/baseline_binary_sdobenchmark/report.md && printf "### Confusion matrix\n"
+      >> models/baseline_binary_sdobenchmark/report.md && printf "![Confusion matrix](test_plots/confusion_matrix.png
+      'Confusion matrix')\n\n" >> models/baseline_binary_sdobenchmark/report.md &&
+      printf "### ROC Curve\n" >> models/baseline_binary_sdobenchmark/report.md &&
+      printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/baseline_binary_sdobenchmark/report.md
+      && printf "### Test samples\n" >> models/baseline_binary_sdobenchmark/report.md
+      && printf "![Test samples](test_plots/test_samples.png 'Test samples')\n\n"
+      >> models/baseline_binary_sdobenchmark/report.md
     deps:
-    - path: models/binary/config.yaml
-      md5: 1a3604eaed083c5b7b32c32fae023309
-      size: 392
-    - path: models/binary/metrics.yaml
-      md5: 8338197163dc2f6a577045db94dff2b5
-      size: 236
-    - path: models/binary/model_summary.txt
-      md5: 978717ff182a8abda1a95baef1a7b554
-      size: 1783
-    - path: models/binary/test_plots/
-      md5: 7f051d42213325232e44f33665b7f88b.dir
-      size: 847539
+    - path: models/baseline_binary_sdobenchmark/config.yaml
+      md5: c68bfece4152d5165bc70ea3d333ba62
+      size: 561
+    - path: models/baseline_binary_sdobenchmark/metadata.yaml
+      md5: c8721349264ac9d190dd7429b46e67b6
+      size: 347
+    - path: models/baseline_binary_sdobenchmark/metrics.yaml
+      md5: dad9340a331b4b382ae223d9a5f01f59
+      size: 207
+    - path: models/baseline_binary_sdobenchmark/model_summary.txt
+      md5: d0146dfb1aaf7670ba3144848ed70d4e
+      size: 2203
+    - path: models/baseline_binary_sdobenchmark/test_plots/
+      md5: e756f946433ea9b76f6570817f6c3ea1.dir
+      size: 846144
       nfiles: 3
-    - path: models/binary/train_plots/
-      md5: 05ac4a43c043f18712aac9a69d35cb52.dir
-      size: 90529
+    - path: models/baseline_binary_sdobenchmark/train_plots/
+      md5: 7205493191a1e650b9a6252f55aa054c.dir
+      size: 83962
       nfiles: 2
     outs:
-    - path: models/binary/report.md
-      md5: 4222da4ca5ba55cdbe92cccf3761fbea
-      size: 3431
+    - path: models/baseline_binary_sdobenchmark/report.md
+      md5: 3a4073467ada8bb8dd5f77228cdfae29
+      size: 4061
   train@multiclass:
-    cmd: python -m solarnet.main train +experiment=multiclass
+    cmd: python -m solarnet.main train +experiment=baseline_multiclass_sdobenchmark
+      -v
     deps:
-    - path: config/experiment/multiclass.yaml
-      md5: 002b003ae6fca6d8b3b3732c667fbfc1
-      size: 220
+    - path: config/experiment/baseline_multiclass_sdobenchmark.yaml
+      md5: dcb32ec6d45498b4c6d6993bf6b76c5b
+      size: 367
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: solarnet/models/cnn_classification.py
-      md5: c1b30dbc240f693544944daa7989722e
-      size: 3633
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
     - path: solarnet/tasks/train.py
-      md5: 6b0b09adfd1467c291e73232fa66869c
-      size: 4014
+      md5: 4a87721711816dbca4972b460b60a649
+      size: 4346
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
+        training_type: train
     outs:
-    - path: models/multiclass/config.yaml
-      md5: db8330cb3cdd7c2c57cd7890aadf654b
-      size: 454
-    - path: models/multiclass/metadata.yaml
-      md5: d46e1992618ef44cc2612928797ccc82
-      size: 332
-    - path: models/multiclass/model.ckpt
-      md5: e3fbe93276ae2399d26c1c5970b40a5a
-      size: 322071
-    - path: models/multiclass/model_summary.txt
-      md5: 51ab05082e75238f920a9437aa8efbe7
-      size: 1809
-    - path: models/multiclass/train_plots/
-      md5: a69dc8bfb72ed8ac77a4eccd5c449c48.dir
-      size: 103320
+    - path: models/baseline_multiclass_sdobenchmark/config.yaml
+      md5: b7fcc9381d7f431b83201cf33f1a4c32
+      size: 597
+    - path: models/baseline_multiclass_sdobenchmark/metadata.yaml
+      md5: 0e7ae07d9cb6b6ee576f096164f9d4cb
+      size: 347
+    - path: models/baseline_multiclass_sdobenchmark/model.ckpt
+      md5: 5f52e14438fe44869fdc36900c65e41e
+      size: 323484
+    - path: models/baseline_multiclass_sdobenchmark/model.pt
+      md5: ff255a196b859b2bc64d2dc6514665c2
+      size: 112007
+    - path: models/baseline_multiclass_sdobenchmark/model_config.yaml
+      md5: a4eefdb7f8e162424d9645fcdc139d7f
+      size: 441
+    - path: models/baseline_multiclass_sdobenchmark/model_summary.txt
+      md5: d8565d498db11fd75699041ec0b88675
+      size: 2203
+    - path: models/baseline_multiclass_sdobenchmark/train_plots/
+      md5: 5d3cb0d303df03b688c03019e1411d1f.dir
+      size: 84575
       nfiles: 2
   test@multiclass:
-    cmd: python -m solarnet.main test +experiment=multiclass
+    cmd: python -m solarnet.main test +experiment=baseline_multiclass_sdobenchmark
     deps:
-    - path: config/experiment/multiclass.yaml
-      md5: 002b003ae6fca6d8b3b3732c667fbfc1
-      size: 208
+    - path: config/experiment/baseline_multiclass_sdobenchmark.yaml
+      md5: dcb32ec6d45498b4c6d6993bf6b76c5b
+      size: 367
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: models/multiclass/model.ckpt
-      md5: e3fbe93276ae2399d26c1c5970b40a5a
-      size: 322071
-    - path: solarnet/models/cnn_classification.py
-      md5: c1b30dbc240f693544944daa7989722e
-      size: 3633
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+    - path: models/baseline_multiclass_sdobenchmark/model.ckpt
+      md5: 5f52e14438fe44869fdc36900c65e41e
+      size: 323484
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
     - path: solarnet/tasks/test.py
-      md5: 88f9a59e7981de604b1ed0ff163fd64c
-      size: 7153
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
     outs:
-    - path: models/multiclass/metrics.yaml
-      md5: d7886b8859af665dcc42e260b8ac22f1
-      size: 213
-    - path: models/multiclass/test_plots/
-      md5: 6ebbe90664c6ad211da68bb28bc99ecc.dir
-      size: 878258
+    - path: models/baseline_multiclass_sdobenchmark/metrics.yaml
+      md5: eb485e2323c56abc95412a67854566ec
+      size: 212
+    - path: models/baseline_multiclass_sdobenchmark/test_plots/
+      md5: a41412f58e73bfd724a0f7caa30dd7d6.dir
+      size: 875425
       nfiles: 2
   generate-report@multiclass:
-    cmd: printf "# Model report\n" > models/multiclass/report.md && printf "## Training\n"
-      >> models/multiclass/report.md && printf "### Parameters\n" >> models/multiclass/report.md
-      && printf '```yaml\n' >> models/multiclass/report.md && cat models/multiclass/config.yaml
-      >> models/multiclass/report.md && printf '```\n' >> models/multiclass/report.md
-      && printf "### Model architecture\n" >> models/multiclass/report.md && printf
-      '```\n' >> models/multiclass/report.md && cat models/multiclass/model_summary.txt
-      >> models/multiclass/report.md && printf '```\n' >> models/multiclass/report.md
-      && printf "### Loss curve\n" >> models/multiclass/report.md && printf "![Loss
-      curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/multiclass/report.md
-      && printf "### Accuracy curve\n" >> models/multiclass/report.md && printf "![Accuracy
-      curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/multiclass/report.md
-      && printf "### Metadata\n" >> models/multiclass/report.md && printf '```yaml\n'
-      >> models/multiclass/report.md && cat models/multiclass/metadata.yaml >> models/multiclass/report.md
-      && printf '```\n' >> models/multiclass/report.md && printf "## Test\n" >> models/multiclass/report.md
-      && printf "### Metrics\n" >> models/multiclass/report.md && dvc metrics show
-      --show-md models/multiclass/metrics.yaml >> models/multiclass/report.md && printf
-      "### Confusion matrix\n" >> models/multiclass/report.md && printf "![Confusion
-      matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/multiclass/report.md
-      && printf "### Test samples\n" >> models/multiclass/report.md && printf "![Test
-      samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/multiclass/report.md
+    cmd: printf "# Model report\n" > models/baseline_multiclass_sdobenchmark/report.md
+      && printf "## Training\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf "### Parameters\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf '```yaml\n' >> models/baseline_multiclass_sdobenchmark/report.md &&
+      cat models/baseline_multiclass_sdobenchmark/config.yaml >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_multiclass_sdobenchmark/report.md && printf
+      "### Model architecture\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_multiclass_sdobenchmark/report.md && cat
+      models/baseline_multiclass_sdobenchmark/model_summary.txt >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_multiclass_sdobenchmark/report.md && printf
+      "### Loss curve\n" >> models/baseline_multiclass_sdobenchmark/report.md && printf
+      "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf "### Accuracy curve\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n"
+      >> models/baseline_multiclass_sdobenchmark/report.md && printf "### Metadata\n"
+      >> models/baseline_multiclass_sdobenchmark/report.md && printf '```yaml\n' >>
+      models/baseline_multiclass_sdobenchmark/report.md && cat models/baseline_multiclass_sdobenchmark/metadata.yaml
+      >> models/baseline_multiclass_sdobenchmark/report.md && printf '```\n' >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf "## Test\n" >> models/baseline_multiclass_sdobenchmark/report.md &&
+      printf "### Metrics\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && dvc metrics show --show-md models/baseline_multiclass_sdobenchmark/metrics.yaml
+      --precision 4 >> models/baseline_multiclass_sdobenchmark/report.md && printf
+      "### Confusion matrix\n" >> models/baseline_multiclass_sdobenchmark/report.md
+      && printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/baseline_multiclass_sdobenchmark/report.md && printf "### Test samples\n"
+      >> models/baseline_multiclass_sdobenchmark/report.md && printf "![Test samples](test_plots/test_samples.png
+      'Test samples')\n\n" >> models/baseline_multiclass_sdobenchmark/report.md
     deps:
-    - path: models/multiclass/config.yaml
-      md5: db8330cb3cdd7c2c57cd7890aadf654b
-      size: 428
-    - path: models/multiclass/metrics.yaml
-      md5: d7886b8859af665dcc42e260b8ac22f1
-      size: 213
-    - path: models/multiclass/model_summary.txt
-      md5: 51ab05082e75238f920a9437aa8efbe7
-      size: 1762
-    - path: models/multiclass/test_plots/
-      md5: 6ebbe90664c6ad211da68bb28bc99ecc.dir
-      size: 878258
+    - path: models/baseline_multiclass_sdobenchmark/config.yaml
+      md5: b7fcc9381d7f431b83201cf33f1a4c32
+      size: 597
+    - path: models/baseline_multiclass_sdobenchmark/metadata.yaml
+      md5: 0e7ae07d9cb6b6ee576f096164f9d4cb
+      size: 347
+    - path: models/baseline_multiclass_sdobenchmark/metrics.yaml
+      md5: eb485e2323c56abc95412a67854566ec
+      size: 212
+    - path: models/baseline_multiclass_sdobenchmark/model_summary.txt
+      md5: d8565d498db11fd75699041ec0b88675
+      size: 2203
+    - path: models/baseline_multiclass_sdobenchmark/test_plots/
+      md5: a41412f58e73bfd724a0f7caa30dd7d6.dir
+      size: 875425
       nfiles: 2
-    - path: models/multiclass/train_plots/
-      md5: a69dc8bfb72ed8ac77a4eccd5c449c48.dir
-      size: 103320
+    - path: models/baseline_multiclass_sdobenchmark/train_plots/
+      md5: 5d3cb0d303df03b688c03019e1411d1f.dir
+      size: 84575
       nfiles: 2
     outs:
-    - path: models/multiclass/report.md
-      md5: 429464699a49910093e909eb9a065f05
-      size: 3356
+    - path: models/baseline_multiclass_sdobenchmark/report.md
+      md5: 33652c50c711b3ae92c25536b332f507
+      size: 4046
   train@regression:
-    cmd: python -m solarnet.main train +experiment=regression
+    cmd: python -m solarnet.main train +experiment=baseline_regression_sdobenchmark
+      -v
     deps:
-    - path: config/experiment/regression.yaml
-      md5: e0a2b69e4f4c731b8967a9053e28dad9
-      size: 113
+    - path: config/experiment/baseline_regression_sdobenchmark.yaml
+      md5: d6248738101fd678a6730302d5655c81
+      size: 265
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1830
-    - path: solarnet/models/cnn_regression.py
-      md5: e82c034188e4e34f06d4c0fd83cc09f3
-      size: 3028
+    - path: solarnet/models/image_regression.py
+      md5: dad292ffee3776aa325b828256f7e570
+      size: 4137
     - path: solarnet/tasks/train.py
-      md5: 6b0b09adfd1467c291e73232fa66869c
-      size: 4014
+      md5: 4a87721711816dbca4972b460b60a649
+      size: 4346
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
+        training_type: train
     outs:
-    - path: models/regression/config.yaml
-      md5: 61d0368ab5997554d02de3f7acbc3069
-      size: 361
-    - path: models/regression/metadata.yaml
-      md5: acd926b399f9c9ed99dc613f8330934c
-      size: 331
-    - path: models/regression/model.ckpt
-      md5: 64af0398fada15a0709b229e34c29c98
-      size: 321999
-    - path: models/regression/model_summary.txt
-      md5: 62ab02cfe8d9a07c728765f49baaa541
-      size: 1724
-    - path: models/regression/train_plots/
-      md5: d4cd6fcc352508ec535780a7950bc5ea.dir
-      size: 38072
+    - path: models/baseline_regression_sdobenchmark/config.yaml
+      md5: 159b05b1c86e27d20ea02f481723bb32
+      size: 509
+    - path: models/baseline_regression_sdobenchmark/metadata.yaml
+      md5: 109d107bd79ed4a4549365901873419a
+      size: 347
+    - path: models/baseline_regression_sdobenchmark/model.ckpt
+      md5: d7db0a73bda90d797b4f7e8ef8ca8845
+      size: 322387
+    - path: models/baseline_regression_sdobenchmark/model.pt
+      md5: bb3512343a9663a92c40eb9c44c5df87
+      size: 111357
+    - path: models/baseline_regression_sdobenchmark/model_config.yaml
+      md5: 0220ecc4fff92dfc2b7ca1501067f25e
+      size: 333
+    - path: models/baseline_regression_sdobenchmark/model_summary.txt
+      md5: 6b75d3281f7630eb00c80d17bc9436e4
+      size: 2121
+    - path: models/baseline_regression_sdobenchmark/train_plots/
+      md5: 392fda8a26c3cce2ab091ddea741423e.dir
+      size: 42109
       nfiles: 1
   test@regression:
-    cmd: python -m solarnet.main test +experiment=regression
+    cmd: python -m solarnet.main test +experiment=baseline_regression_sdobenchmark
     deps:
-    - path: config/experiment/regression.yaml
-      md5: e0a2b69e4f4c731b8967a9053e28dad9
-      size: 106
+    - path: config/experiment/baseline_regression_sdobenchmark.yaml
+      md5: d6248738101fd678a6730302d5655c81
+      size: 265
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: models/regression/model.ckpt
-      md5: 64af0398fada15a0709b229e34c29c98
-      size: 321999
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
-    - path: solarnet/models/cnn_regression.py
-      md5: e82c034188e4e34f06d4c0fd83cc09f3
-      size: 2944
+    - path: models/baseline_regression_sdobenchmark/model.ckpt
+      md5: d7db0a73bda90d797b4f7e8ef8ca8845
+      size: 322387
+    - path: solarnet/models/image_regression.py
+      md5: dad292ffee3776aa325b828256f7e570
+      size: 4137
     - path: solarnet/tasks/test.py
-      md5: 88f9a59e7981de604b1ed0ff163fd64c
-      size: 7153
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
     outs:
-    - path: models/regression/metrics.yaml
-      md5: 2fef192ddd2c5a43c29ab46f3ce0d63a
-      size: 54
-    - path: models/regression/test_plots/
-      md5: f143297f5db973318e3390481847565e.dir
-      size: 827226
+    - path: models/baseline_regression_sdobenchmark/metrics.yaml
+      md5: 6e37b9fe6155a2a441a8c04177ee88f2
+      size: 56
+    - path: models/baseline_regression_sdobenchmark/test_plots/
+      md5: 8c6f5d238ee169e9248c09eca0548af9.dir
+      size: 827260
       nfiles: 2
   generate-report@regression:
-    cmd: printf "# Model report\n" > models/regression/report.md && printf "## Training\n"
-      >> models/regression/report.md && printf "### Parameters\n" >> models/regression/report.md
-      && printf '```yaml\n' >> models/regression/report.md && cat models/regression/config.yaml
-      >> models/regression/report.md && printf '```\n' >> models/regression/report.md
-      && printf "### Model architecture\n" >> models/regression/report.md && printf
-      '```\n' >> models/regression/report.md && cat models/regression/model_summary.txt
-      >> models/regression/report.md && printf '```\n' >> models/regression/report.md
-      && printf "### Loss curve\n" >> models/regression/report.md && printf "![Loss
-      curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/regression/report.md
-      && true && printf "### Metadata\n" >> models/regression/report.md && printf
-      '```yaml\n' >> models/regression/report.md && cat models/regression/metadata.yaml
-      >> models/regression/report.md && printf '```\n' >> models/regression/report.md
-      && printf "## Test\n" >> models/regression/report.md && printf "### Metrics\n"
-      >> models/regression/report.md && dvc metrics show --show-md models/regression/metrics.yaml
-      >> models/regression/report.md && printf "### Regression line\n" >> models/regression/report.md
-      && printf "![Regression line](test_plots/regression_line.png 'Regression line')\n\n"
-      >> models/regression/report.md && printf "### Test samples\n" >> models/regression/report.md
+    cmd: printf "# Model report\n" > models/baseline_regression_sdobenchmark/report.md
+      && printf "## Training\n" >> models/baseline_regression_sdobenchmark/report.md
+      && printf "### Parameters\n" >> models/baseline_regression_sdobenchmark/report.md
+      && printf '```yaml\n' >> models/baseline_regression_sdobenchmark/report.md &&
+      cat models/baseline_regression_sdobenchmark/config.yaml >> models/baseline_regression_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_regression_sdobenchmark/report.md && printf
+      "### Model architecture\n" >> models/baseline_regression_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_regression_sdobenchmark/report.md && cat
+      models/baseline_regression_sdobenchmark/model_summary.txt >> models/baseline_regression_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_regression_sdobenchmark/report.md && printf
+      "### Loss curve\n" >> models/baseline_regression_sdobenchmark/report.md && printf
+      "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/baseline_regression_sdobenchmark/report.md
+      && true && printf "### Metadata\n" >> models/baseline_regression_sdobenchmark/report.md
+      && printf '```yaml\n' >> models/baseline_regression_sdobenchmark/report.md &&
+      cat models/baseline_regression_sdobenchmark/metadata.yaml >> models/baseline_regression_sdobenchmark/report.md
+      && printf '```\n' >> models/baseline_regression_sdobenchmark/report.md && printf
+      "## Test\n" >> models/baseline_regression_sdobenchmark/report.md && printf "###
+      Metrics\n" >> models/baseline_regression_sdobenchmark/report.md && dvc metrics
+      show --show-md models/baseline_regression_sdobenchmark/metrics.yaml --precision
+      10 >> models/baseline_regression_sdobenchmark/report.md && printf "### Regression
+      line\n" >> models/baseline_regression_sdobenchmark/report.md && printf "![Regression
+      line](test_plots/regression_line.png 'Regression line')\n\n" >> models/baseline_regression_sdobenchmark/report.md
+      && printf "### Test samples\n" >> models/baseline_regression_sdobenchmark/report.md
       && printf "![Test samples](test_plots/test_samples.png 'Test samples')\n\n"
-      >> models/regression/report.md
+      >> models/baseline_regression_sdobenchmark/report.md
     deps:
-    - path: models/regression/config.yaml
-      md5: 61d0368ab5997554d02de3f7acbc3069
-      size: 340
-    - path: models/regression/metrics.yaml
-      md5: 2fef192ddd2c5a43c29ab46f3ce0d63a
-      size: 54
-    - path: models/regression/model_summary.txt
-      md5: 62ab02cfe8d9a07c728765f49baaa541
-      size: 1681
-    - path: models/regression/test_plots/
-      md5: f143297f5db973318e3390481847565e.dir
-      size: 827226
+    - path: models/baseline_regression_sdobenchmark/config.yaml
+      md5: 159b05b1c86e27d20ea02f481723bb32
+      size: 509
+    - path: models/baseline_regression_sdobenchmark/metadata.yaml
+      md5: 109d107bd79ed4a4549365901873419a
+      size: 347
+    - path: models/baseline_regression_sdobenchmark/metrics.yaml
+      md5: 6e37b9fe6155a2a441a8c04177ee88f2
+      size: 56
+    - path: models/baseline_regression_sdobenchmark/model_summary.txt
+      md5: 6b75d3281f7630eb00c80d17bc9436e4
+      size: 2121
+    - path: models/baseline_regression_sdobenchmark/test_plots/
+      md5: 8c6f5d238ee169e9248c09eca0548af9.dir
+      size: 827260
       nfiles: 2
-    - path: models/regression/train_plots/
-      md5: d4cd6fcc352508ec535780a7950bc5ea.dir
-      size: 38072
+    - path: models/baseline_regression_sdobenchmark/train_plots/
+      md5: 392fda8a26c3cce2ab091ddea741423e.dir
+      size: 42109
       nfiles: 1
     outs:
-    - path: models/regression/report.md
-      md5: 0acf1542b72a39fbc051556705f2d554
-      size: 2864
+    - path: models/baseline_regression_sdobenchmark/report.md
+      md5: 87ccbe3f6884d46be6fff5f5a5298e37
+      size: 3590
   test@binary_sdodataset:
-    cmd: python -m solarnet.main test +experiment=binary_sdodataset
+    cmd: python -m solarnet.main test +experiment=baseline_binary_sdodataset
     deps:
-    - path: config/experiment/binary_sdodataset.yaml
-      md5: a2abc668908eb7e9b55974135d2647dc
-      size: 207
-    - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
-    - path: models/binary_sdodataset/model.ckpt
-      md5: c1ca246ef112b97d8c0a59ef38d6b5cc
-      size: 327124
-    - path: solarnet/models/cnn_classification.py
-      md5: c1b30dbc240f693544944daa7989722e
-      size: 3633
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
+    - path: config/experiment/baseline_binary_sdodataset.yaml
+      md5: 52a7bb3a803e2829167c5638e5656fc8
+      size: 420
+    - path: data/sdo-dataset-cls-211-24h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: models/baseline_binary_sdodataset/model.ckpt
+      md5: 285fedfb992ba8e5a894be4300d73f0f
+      size: 323036
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
     - path: solarnet/tasks/test.py
-      md5: 88f9a59e7981de604b1ed0ff163fd64c
-      size: 7153
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
+          backbone: simple-cnn
+          learning_rate: 0.005
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
     outs:
-    - path: models/binary_sdodataset/metrics.yaml
-      md5: 19fe8c52348a86d4dfe23ce128b68449
-      size: 239
-    - path: models/binary_sdodataset/test_plots/
-      md5: 907ced6466680c86c84caed1aaccb26f.dir
-      size: 546054
+    - path: models/baseline_binary_sdodataset/metrics.yaml
+      md5: 74b3c016d59b52255a64e7cc5b539687
+      size: 199
+    - path: models/baseline_binary_sdodataset/test_plots/
+      md5: f8548d6a45b79c0344e552a761b86098.dir
+      size: 741731
       nfiles: 3
   train@binary_sdodataset:
-    cmd: python -m solarnet.main train +experiment=binary_sdodataset
+    cmd: python -m solarnet.main train +experiment=baseline_binary_sdodataset -v
     deps:
-    - path: config/experiment/binary_sdodataset.yaml
-      md5: a2abc668908eb7e9b55974135d2647dc
-      size: 207
+    - path: config/experiment/baseline_binary_sdodataset.yaml
+      md5: 52a7bb3a803e2829167c5638e5656fc8
+      size: 420
+    - path: data/sdo-dataset-cls-211-24h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
+    - path: solarnet/tasks/train.py
+      md5: 4a87721711816dbca4972b460b60a649
+      size: 4346
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/baseline_binary_sdodataset/config.yaml
+      md5: 749cb6de571fd0d4bf6f43453a2de964
+      size: 534
+    - path: models/baseline_binary_sdodataset/metadata.yaml
+      md5: 92c29acc3b7f16384a67df525053b3c7
+      size: 348
+    - path: models/baseline_binary_sdodataset/model.ckpt
+      md5: 285fedfb992ba8e5a894be4300d73f0f
+      size: 323036
+    - path: models/baseline_binary_sdodataset/model.pt
+      md5: 6032b201c36fd6046abc6a625713c05e
+      size: 111879
+    - path: models/baseline_binary_sdodataset/model_config.yaml
+      md5: 7fe2cb8f7e3d37874d28831e34eb7578
+      size: 368
+    - path: models/baseline_binary_sdodataset/model_summary.txt
+      md5: 76230023788b0c9864e34ed4f74a3342
+      size: 2272
+    - path: models/baseline_binary_sdodataset/train_plots/
+      md5: 67790f1283c270bdeebc037a18144bb4.dir
+      size: 66794
+      nfiles: 2
+  generate-report@binary_sdodataset:
+    cmd: printf "# Model report\n" > models/baseline_binary_sdodataset/report.md &&
+      printf "## Training\n" >> models/baseline_binary_sdodataset/report.md && printf
+      "### Parameters\n" >> models/baseline_binary_sdodataset/report.md && printf
+      '```yaml\n' >> models/baseline_binary_sdodataset/report.md && cat models/baseline_binary_sdodataset/config.yaml
+      >> models/baseline_binary_sdodataset/report.md && printf '```\n' >> models/baseline_binary_sdodataset/report.md
+      && printf "### Model architecture\n" >> models/baseline_binary_sdodataset/report.md
+      && printf '```\n' >> models/baseline_binary_sdodataset/report.md && cat models/baseline_binary_sdodataset/model_summary.txt
+      >> models/baseline_binary_sdodataset/report.md && printf '```\n' >> models/baseline_binary_sdodataset/report.md
+      && printf "### Loss curve\n" >> models/baseline_binary_sdodataset/report.md
+      && printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/baseline_binary_sdodataset/report.md
+      && printf "### Accuracy curve\n" >> models/baseline_binary_sdodataset/report.md
+      && printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n"
+      >> models/baseline_binary_sdodataset/report.md && printf "### Metadata\n" >>
+      models/baseline_binary_sdodataset/report.md && printf '```yaml\n' >> models/baseline_binary_sdodataset/report.md
+      && cat models/baseline_binary_sdodataset/metadata.yaml >> models/baseline_binary_sdodataset/report.md
+      && printf '```\n' >> models/baseline_binary_sdodataset/report.md && printf "##
+      Test\n" >> models/baseline_binary_sdodataset/report.md && printf "### Metrics\n"
+      >> models/baseline_binary_sdodataset/report.md && dvc metrics show --show-md
+      models/baseline_binary_sdodataset/metrics.yaml --precision 4 >> models/baseline_binary_sdodataset/report.md
+      && printf "### Confusion matrix\n" >> models/baseline_binary_sdodataset/report.md
+      && printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/baseline_binary_sdodataset/report.md && printf "### ROC Curve\n" >>
+      models/baseline_binary_sdodataset/report.md && printf "![ROC Curve](test_plots/roc_curve.png
+      'ROC Curve')\n\n" >> models/baseline_binary_sdodataset/report.md && printf "###
+      Test samples\n" >> models/baseline_binary_sdodataset/report.md && printf "![Test
+      samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/baseline_binary_sdodataset/report.md
+    deps:
+    - path: models/baseline_binary_sdodataset/config.yaml
+      md5: 749cb6de571fd0d4bf6f43453a2de964
+      size: 534
+    - path: models/baseline_binary_sdodataset/metadata.yaml
+      md5: 92c29acc3b7f16384a67df525053b3c7
+      size: 348
+    - path: models/baseline_binary_sdodataset/metrics.yaml
+      md5: 74b3c016d59b52255a64e7cc5b539687
+      size: 199
+    - path: models/baseline_binary_sdodataset/model_summary.txt
+      md5: 76230023788b0c9864e34ed4f74a3342
+      size: 2272
+    - path: models/baseline_binary_sdodataset/test_plots/
+      md5: f8548d6a45b79c0344e552a761b86098.dir
+      size: 741731
+      nfiles: 3
+    - path: models/baseline_binary_sdodataset/train_plots/
+      md5: 67790f1283c270bdeebc037a18144bb4.dir
+      size: 66794
+      nfiles: 2
+    outs:
+    - path: models/baseline_binary_sdodataset/report.md
+      md5: 7a1a441d9436975af060b4c96aa73e26
+      size: 4098
+  ssl@ssl:
+    cmd: python -m solarnet.main train_ssl +experiment=ssl -v
+    deps:
+    - path: config/experiment/ssl.yaml
+      md5: 864262c7c610b074609c0a0e07b21578
+      size: 408
+    - path: solarnet/models/ssl.py
+      md5: 134726e12744d65de94d9413a9ea170a
+      size: 5066
+    - path: solarnet/tasks/train.py
+      md5: 1c9be29504bc26fd3bd61d1967a7a28e
+      size: 8732
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          activation: relu6
+          dropout: 0.5
+        name: Baseline binary classification model
+        path: models/binary
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+          learning_rate: 0.005
+          scheduler: '...'
+    outs:
+    - path: models/ssl/config.yaml
+      md5: 8156d88fe0c217d7382d11eb53847f1d
+      size: 441
+    - path: models/ssl/metadata.yaml
+      md5: 295bec88494aacd54e430c50decdb07e
+      size: 358
+    - path: models/ssl/model.ckpt
+      md5: 068899c0cc352068f158aec5535096fb
+      size: 360098431
+    - path: models/ssl/model_summary.txt
+      md5: 0c772704ed24e36f4338a67311f8e7c1
+      size: 12156
+    - path: models/ssl/train_plots/
+      md5: 2c2c35507ba7cf791c4cc73b1b0d3e5d.dir
+      size: 34330
+      nfiles: 1
+  ssl_ft@ssl_ft:
+    cmd: python -m solarnet.main finetune +experiment=ssl_ft -v
+    deps:
+    - path: config/experiment/ssl_ft.yaml
+      md5: 0b760112e2946ba54ba173e6266bc349
+      size: 219
+    - path: solarnet/tasks/train.py
+      md5: a39c39139ba2702b535b7cf1ed09d81a
+      size: 9837
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          activation: relu6
+          dropout: 0.5
+        name: Baseline binary classification model
+        path: models/binary
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+          learning_rate: 0.005
+          scheduler: '...'
+    outs:
+    - path: models/ssl_ft/config.yaml
+      md5: 1751596d07a205eed14e64b1854938a5
+      size: 465
+    - path: models/ssl_ft/metadata.yaml
+      md5: abd8652a96000a14b06ffea2d0b2bdc7
+      size: 351
+    - path: models/ssl_ft/model.ckpt
+      md5: 80294765cc1cc3173671ca2ddd24746f
+      size: 107458866
+    - path: models/ssl_ft/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_ft/train_plots/
+      md5: 97c098bdc7b3d5ae015b5a71a94e346c.dir
+      size: 78093
+      nfiles: 2
+  test@ssl_ft:
+    cmd: python -m solarnet.main test +experiment=ssl_ft_sdobenchmark
+    deps:
+    - path: config/experiment/ssl_ft_sdobenchmark.yaml
+      md5: 86e894675d96e6bea9a011ba240ccec8
+      size: 492
     - path: data/sdo-benchmark.placeholder
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
-    - path: solarnet/models/cnn_classification.py
-      md5: c1b30dbc240f693544944daa7989722e
-      size: 3633
-    - path: solarnet/models/cnn_module.py
-      md5: ead31bd3b8f3e956b9630234c1e6b693
-      size: 1776
-    - path: solarnet/tasks/train.py
-      md5: 6b0b09adfd1467c291e73232fa66869c
-      size: 4014
+    - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
+      md5: 97f2da57c980269f23aed01bbcc4cc50
+      size: 107459113
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
+    - path: solarnet/tasks/test.py
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
     params:
       config/config.yaml:
-        gpus: 1
         model:
-          activation: relu6
-        name: Baseline binary classification model
+          backbone: simple-cnn
+          learning_rate: 0.005
         seed: 42
-        tracking: true
         trainer:
           epochs: 20
-          batch_size: 128
-          learning_rate: 0.005
           patience: 12
+          batch_size: 128
     outs:
-    - path: models/binary_sdodataset/config.yaml
-      md5: f9f5b73b072596b0fe33ace1bcc7f744
-      size: 373
-    - path: models/binary_sdodataset/metadata.yaml
-      md5: 18698a00fe9beef38bee2c4ff30be902
-      size: 348
-    - path: models/binary_sdodataset/model.ckpt
-      md5: c1ca246ef112b97d8c0a59ef38d6b5cc
-      size: 327124
-    - path: models/binary_sdodataset/model_summary.txt
-      md5: bdba2aafa02c1809ec0ef9fb6d855fd5
-      size: 1852
-    - path: models/binary_sdodataset/train_plots/
-      md5: 474045816fe16aeb427e2871bc7c9ce6.dir
-      size: 85188
-      nfiles: 2
-  generate-report@binary_sdodataset:
-    cmd: printf "# Model report\n" > models/binary_sdodataset/report.md && printf
-      "## Training\n" >> models/binary_sdodataset/report.md && printf "### Parameters\n"
-      >> models/binary_sdodataset/report.md && printf '```yaml\n' >> models/binary_sdodataset/report.md
-      && cat models/binary_sdodataset/config.yaml >> models/binary_sdodataset/report.md
-      && printf '```\n' >> models/binary_sdodataset/report.md && printf "### Model
-      architecture\n" >> models/binary_sdodataset/report.md && printf '```\n' >> models/binary_sdodataset/report.md
-      && cat models/binary_sdodataset/model_summary.txt >> models/binary_sdodataset/report.md
-      && printf '```\n' >> models/binary_sdodataset/report.md && printf "### Loss
-      curve\n" >> models/binary_sdodataset/report.md && printf "![Loss curve](train_plots/loss_curve.png
-      'Loss curve')\n\n" >> models/binary_sdodataset/report.md && printf "### Accuracy
-      curve\n" >> models/binary_sdodataset/report.md && printf "![Accuracy curve](train_plots/accuracy_curve.png
-      'Accuracy curve')\n\n" >> models/binary_sdodataset/report.md && printf "###
-      Metadata\n" >> models/binary_sdodataset/report.md && printf '```yaml\n' >> models/binary_sdodataset/report.md
-      && cat models/binary_sdodataset/metadata.yaml >> models/binary_sdodataset/report.md
-      && printf '```\n' >> models/binary_sdodataset/report.md && printf "## Test\n"
-      >> models/binary_sdodataset/report.md && printf "### Metrics\n" >> models/binary_sdodataset/report.md
-      && dvc metrics show --show-md models/binary_sdodataset/metrics.yaml >> models/binary_sdodataset/report.md
-      && printf "### Confusion matrix\n" >> models/binary_sdodataset/report.md &&
-      printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
-      >> models/binary_sdodataset/report.md && printf "### ROC Curve\n" >> models/binary_sdodataset/report.md
-      && printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/binary_sdodataset/report.md
-      && printf "### Test samples\n" >> models/binary_sdodataset/report.md && printf
-      "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/binary_sdodataset/report.md
-    deps:
-    - path: models/binary_sdodataset/config.yaml
-      md5: f9f5b73b072596b0fe33ace1bcc7f744
-      size: 373
-    - path: models/binary_sdodataset/metrics.yaml
-      md5: 19fe8c52348a86d4dfe23ce128b68449
-      size: 239
-    - path: models/binary_sdodataset/model_summary.txt
-      md5: bdba2aafa02c1809ec0ef9fb6d855fd5
-      size: 1852
-    - path: models/binary_sdodataset/test_plots/
-      md5: 907ced6466680c86c84caed1aaccb26f.dir
-      size: 546054
+    - path: models/ssl_bz_ft_sdobenchmark/metrics.yaml
+      md5: 385f5e281c435976221470473735d634
+      size: 210
+    - path: models/ssl_bz_ft_sdobenchmark/test_plots/
+      md5: 81f43e09172d7cba1156fcf24a447d10.dir
+      size: 898781
       nfiles: 3
-    - path: models/binary_sdodataset/train_plots/
-      md5: 474045816fe16aeb427e2871bc7c9ce6.dir
-      size: 85188
+  finetune@ssl:
+    cmd: python -m solarnet.main train +experiment=ssl_ft_sdobenchmark -v
+    deps:
+    - path: config/experiment/ssl_ft_sdobenchmark.yaml
+      md5: 86e894675d96e6bea9a011ba240ccec8
+      size: 492
+    - path: data/sdo-benchmark.placeholder
+      md5: 03bc278e4376c8585af17fe4557b0337
+      size: 162
+    - path: models/ssl_bz/model.pt
+      md5: e660c2f0aa225d7c639fea5036ffb74e
+      size: 120927500
+    - path: models/ssl_bz/model_config.yaml
+      md5: eea5d592cddf931e23b00e9f61e5d24a
+      size: 452
+    - path: solarnet/models/image_classification.py
+      md5: 9c5008ddd4fe99c6d219754743350ca3
+      size: 4864
+    - path: solarnet/tasks/train.py
+      md5: 4a87721711816dbca4972b460b60a649
+      size: 4346
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_bz_ft_sdobenchmark/config.yaml
+      md5: d03f1258d2670a3efbe062c1b1e8aa55
+      size: 623
+    - path: models/ssl_bz_ft_sdobenchmark/metadata.yaml
+      md5: 9bb07fcd64d80a9b2b2efd8c804ee659
+      size: 352
+    - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
+      md5: 97f2da57c980269f23aed01bbcc4cc50
+      size: 107459113
+    - path: models/ssl_bz_ft_sdobenchmark/model.pt
+      md5: e391bcf202727c7c0e87933531e52b68
+      size: 98543223
+    - path: models/ssl_bz_ft_sdobenchmark/model_config.yaml
+      md5: 27edfc02cf47cc65bb71e68594f8abf3
+      size: 680
+    - path: models/ssl_bz_ft_sdobenchmark/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdobenchmark/train_plots/
+      md5: 26aac5ed79005fcfef73e1524e4c5dc6.dir
+      size: 80592
+      nfiles: 2
+  train@ssl:
+    cmd: python -m solarnet.main train +experiment=ssl -v
+    deps:
+    - path: config/experiment/ssl.yaml
+      md5: 4206e6fc454ddf7aee54ede18a3bf4e6
+      size: 577
+    - path: data/sdo-dataset-ssl-bz-1h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: solarnet/models/simclr.py
+      md5: 722f53b8ce2e6e5ef995af34e21bbf8b
+      size: 2678
+    - path: solarnet/tasks/train.py
+      md5: 4a87721711816dbca4972b460b60a649
+      size: 4346
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_bz/config.yaml
+      md5: 4eda36a0ff4eced86fc4bee8b9a8d327
+      size: 608
+    - path: models/ssl_bz/metadata.yaml
+      md5: b71a61f4b322d9c1b2093818eb495807
+      size: 361
+    - path: models/ssl_bz/model.ckpt
+      md5: c64a0521b1da61e1d96021e121977d66
+      size: 360098944
+    - path: models/ssl_bz/model.pt
+      md5: e660c2f0aa225d7c639fea5036ffb74e
+      size: 120927500
+    - path: models/ssl_bz/model_config.yaml
+      md5: eea5d592cddf931e23b00e9f61e5d24a
+      size: 452
+    - path: models/ssl_bz/model_summary.txt
+      md5: c1e5fe62d49c128e6ad38a28289cf576
+      size: 12157
+    - path: models/ssl_bz/train_plots/
+      md5: 8bc3da841f32ee0c888a9ce2b98ce66f.dir
+      size: 47958
+      nfiles: 1
+  train@ssl_171:
+    cmd: python -m solarnet.main train +experiment=ssl -v
+    deps:
+    - path: config/experiment/ssl.yaml
+      md5: 62adf210a92eca000793a7676c4f6735
+      size: 563
+    - path: data/sdo-benchmark.placeholder
+      md5: 03bc278e4376c8585af17fe4557b0337
+      size: 162
+    - path: solarnet/models/simclr.py
+      md5: fd2f67f37ac1e09d87e673cf0d0146ee
+      size: 2443
+    - path: solarnet/tasks/train.py
+      md5: 037156bfa4d5578f6ad58f8ca823280b
+      size: 3792
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          activation: relu6
+          pooling: 0
+          dropout: 0.5
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/binary
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_171/config.yaml
+      md5: 94acc9436818a28ee1f6d05ce8e9129d
+      size: 611
+    - path: models/ssl_171/metadata.yaml
+      md5: dca9e2d8f0e473f0e66fc6e30d0bfb7a
+      size: 361
+    - path: models/ssl_171/model.ckpt
+      md5: cd68ae3fccd30304fc25ab77787e0ca5
+      size: 360098943
+    - path: models/ssl_171/model.pt
+      md5: 2e632e75417ee2c845e8cee516fd5d68
+      size: 120927500
+    - path: models/ssl_171/model_config.yaml
+      md5: 317a5d53b40da53d1cd55015092b3462
+      size: 87
+    - path: models/ssl_171/model_summary.txt
+      md5: c1e5fe62d49c128e6ad38a28289cf576
+      size: 12157
+    - path: models/ssl_171/train_plots/
+      md5: 47022b71470ea7995d3074f802959a4a.dir
+      size: 48179
+      nfiles: 1
+  finetune@ssl_171:
+    cmd: python -m solarnet.main train +experiment=ssl_ft -v
+    deps:
+    - path: config/experiment/ssl_ft.yaml
+      md5: 31df7d6777303bc86dab9b6b314c34b0
+      size: 498
+    - path: models/ssl_171/model.pt
+      md5: 2e632e75417ee2c845e8cee516fd5d68
+      size: 120927500
+    - path: models/ssl_171/model_config.yaml
+      md5: 317a5d53b40da53d1cd55015092b3462
+      size: 87
+    - path: solarnet/models/image_classification.py
+      md5: 7f9ce597c861720b3f447f0ce1008847
+      size: 4352
+    - path: solarnet/tasks/train.py
+      md5: 037156bfa4d5578f6ad58f8ca823280b
+      size: 3792
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          activation: relu6
+          pooling: 0
+          dropout: 0.5
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/binary
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_ft_171/config.yaml
+      md5: dfb70e92e003ccc7a9210f4ab597b709
+      size: 637
+    - path: models/ssl_ft_171/metadata.yaml
+      md5: eb3f56dd8159193c6647d7a3bb4b65b1
+      size: 352
+    - path: models/ssl_ft_171/model.ckpt
+      md5: 2edf5d1623b2b714dbfb69f5a94785be
+      size: 107458930
+    - path: models/ssl_ft_171/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_ft_171/train_plots/
+      md5: c812ef469b278e1dafbe1105c4c06161.dir
+      size: 75003
+      nfiles: 2
+  test@ssl_ft_171:
+    cmd: python -m solarnet.main test +experiment=ssl_ft
+    deps:
+    - path: config/experiment/ssl_ft.yaml
+      md5: 31df7d6777303bc86dab9b6b314c34b0
+      size: 498
+    - path: data/sdo-benchmark.placeholder
+      md5: 03bc278e4376c8585af17fe4557b0337
+      size: 162
+    - path: models/ssl_ft_171/model.ckpt
+      md5: 2edf5d1623b2b714dbfb69f5a94785be
+      size: 107458930
+    - path: solarnet/models/cnn_module.py
+      md5: 08f17f739feeb6b969f80f6b2b249c88
+      size: 1825
+    - path: solarnet/models/image_classification.py
+      md5: 7f9ce597c861720b3f447f0ce1008847
+      size: 4352
+    - path: solarnet/tasks/test.py
+      md5: 5aafcf9f538e31473d3966efb0281b6c
+      size: 7520
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          activation: relu6
+          pooling: 0
+          dropout: 0.5
+          learning_rate: 0.005
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+    outs:
+    - path: models/ssl_ft_171/metrics.yaml
+      md5: dd81c25d6d48d451c9a00d5bdfb11735
+      size: 208
+    - path: models/ssl_ft_171/test_plots/
+      md5: c3109f1409e15c5eb3ab93499a557c2d.dir
+      size: 1083412
+      nfiles: 3
+  prepare-data@ssl:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_ssl.yaml -v
+    - touch data/sdo-dataset-ssl-bz-1h.placeholder
+    deps:
+    - path: config/dataset_ssl.yaml
+      md5: 9730b914f80c4e2af9cf547f41cb48f8
+      size: 2214
+    outs:
+    - path: data/sdo-dataset-ssl-bz-1h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls.yaml -v
+    - touch data/sdo-dataset-cls-211-24h.placeholder
+    deps:
+    - path: config/dataset_cls.yaml
+      md5: 3f32bd27203a908765a97a947e1bbd29
+      size: 2097
+    outs:
+    - path: data/sdo-dataset-cls-211-24h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  generate-report-ssl@ssl_bz:
+    cmd: printf "# Model report\n" > models/ssl_bz/report.md && printf "## Training\n"
+      >> models/ssl_bz/report.md && printf "### Parameters\n" >> models/ssl_bz/report.md
+      && printf '```yaml\n' >> models/ssl_bz/report.md && cat models/ssl_bz/config.yaml
+      >> models/ssl_bz/report.md && printf '```\n' >> models/ssl_bz/report.md && printf
+      "### Model architecture\n" >> models/ssl_bz/report.md && printf '```\n' >> models/ssl_bz/report.md
+      && cat models/ssl_bz/model_summary.txt >> models/ssl_bz/report.md && printf
+      '```\n' >> models/ssl_bz/report.md && printf "### Loss curve\n" >> models/ssl_bz/report.md
+      && printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/ssl_bz/report.md
+      && printf "### Metadata\n" >> models/ssl_bz/report.md && printf '```yaml\n'
+      >> models/ssl_bz/report.md && cat models/ssl_bz/metadata.yaml >> models/ssl_bz/report.md
+      && printf '```\n' >> models/ssl_bz/report.md
+    deps:
+    - path: models/ssl_bz/config.yaml
+      md5: 4eda36a0ff4eced86fc4bee8b9a8d327
+      size: 608
+    - path: models/ssl_bz/metadata.yaml
+      md5: b71a61f4b322d9c1b2093818eb495807
+      size: 361
+    - path: models/ssl_bz/model_summary.txt
+      md5: c1e5fe62d49c128e6ad38a28289cf576
+      size: 12157
+    - path: models/ssl_bz/train_plots/
+      md5: 8bc3da841f32ee0c888a9ce2b98ce66f.dir
+      size: 47958
+      nfiles: 1
+    outs:
+    - path: models/ssl_bz/report.md
+      md5: 62d52550baa384e3ed3793a7b2f34929
+      size: 13307
+  generate-report@ssl_bz_ft_sdobenchmark:
+    cmd: printf "# Model report\n" > models/ssl_bz_ft_sdobenchmark/report.md && printf
+      "## Training\n" >> models/ssl_bz_ft_sdobenchmark/report.md && printf "### Parameters\n"
+      >> models/ssl_bz_ft_sdobenchmark/report.md && printf '```yaml\n' >> models/ssl_bz_ft_sdobenchmark/report.md
+      && cat models/ssl_bz_ft_sdobenchmark/config.yaml >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf '```\n' >> models/ssl_bz_ft_sdobenchmark/report.md && printf "###
+      Model architecture\n" >> models/ssl_bz_ft_sdobenchmark/report.md && printf '```\n'
+      >> models/ssl_bz_ft_sdobenchmark/report.md && cat models/ssl_bz_ft_sdobenchmark/model_summary.txt
+      >> models/ssl_bz_ft_sdobenchmark/report.md && printf '```\n' >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "### Loss curve\n" >> models/ssl_bz_ft_sdobenchmark/report.md && printf
+      "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "### Accuracy curve\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n"
+      >> models/ssl_bz_ft_sdobenchmark/report.md && printf "### Metadata\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf '```yaml\n' >> models/ssl_bz_ft_sdobenchmark/report.md && cat models/ssl_bz_ft_sdobenchmark/metadata.yaml
+      >> models/ssl_bz_ft_sdobenchmark/report.md && printf '```\n' >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "## Test\n" >> models/ssl_bz_ft_sdobenchmark/report.md && printf "###
+      Metrics\n" >> models/ssl_bz_ft_sdobenchmark/report.md && dvc metrics show --show-md
+      models/ssl_bz_ft_sdobenchmark/metrics.yaml --precision 4 >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "### Confusion matrix\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/ssl_bz_ft_sdobenchmark/report.md && printf "### ROC Curve\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/ssl_bz_ft_sdobenchmark/report.md
+      && printf "### Test samples\n" >> models/ssl_bz_ft_sdobenchmark/report.md &&
+      printf "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >>
+      models/ssl_bz_ft_sdobenchmark/report.md
+    deps:
+    - path: models/ssl_bz_ft_sdobenchmark/config.yaml
+      md5: d03f1258d2670a3efbe062c1b1e8aa55
+      size: 623
+    - path: models/ssl_bz_ft_sdobenchmark/metadata.yaml
+      md5: 9bb07fcd64d80a9b2b2efd8c804ee659
+      size: 352
+    - path: models/ssl_bz_ft_sdobenchmark/metrics.yaml
+      md5: 385f5e281c435976221470473735d634
+      size: 210
+    - path: models/ssl_bz_ft_sdobenchmark/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdobenchmark/test_plots/
+      md5: 81f43e09172d7cba1156fcf24a447d10.dir
+      size: 898781
+      nfiles: 3
+    - path: models/ssl_bz_ft_sdobenchmark/train_plots/
+      md5: 26aac5ed79005fcfef73e1524e4c5dc6.dir
+      size: 80592
       nfiles: 2
     outs:
-    - path: models/binary_sdodataset/report.md
-      md5: 96299a933233906912498f1ecf9f0133
-      size: 3538
+    - path: models/ssl_bz_ft_sdobenchmark/report.md
+      md5: dacd63aedab49cf2433b2017666fe74e
+      size: 13937
+  generate-pipeline-graph:
+    cmd:
+    - printf "# Pipeline\n" > models/pipeline.md
+    - dvc dag --dot > dot.dag && python -m solarnet.main dag-graph dot.dag >> models/pipeline.md
+    - rm dot.dag
+    outs:
+    - path: models/pipeline.md
+      md5: e30681c9679587fe682caef13a57376d
+      size: 1194

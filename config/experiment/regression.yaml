@@ -1,7 +1,0 @@
-# @package _global_
-
-data:
-  targets: regression
-
-name: Baseline regression model
-path: models/regression

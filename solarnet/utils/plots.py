@@ -80,7 +80,7 @@ colors = {
 
 def plot_image_grid(
     images: list,
-    y: List[Union[int, float]],
+    y: List[Union[int, float]] = None,
     y_pred: Optional[List[Union[int, float]]] = None,
     y_proba: Optional[List[List[float]]] = None,
     labels: List[str] = None,
@@ -133,23 +133,24 @@ def plot_image_grid(
         plt.imshow(image)
         plt.axis("off")
 
-        if y_pred is None:
-            title = pretty_label(y[i])
-            color = colors["black"]
-        elif is_regression:
-            title = f"y_true: {pretty_label(y[i])}\ny_pred: {pretty_label(y_pred[i])}"
-            color = colors["black"]
-        else:
-            is_correct = y[i] == y_pred[i]
-            if is_correct:
-                title = f"y_true & y_pred: {pretty_label(y[i])}"
-                color = colors["green"]
+        if y is not None:
+            if y_pred is None:
+                title = pretty_label(y[i])
+                color = colors["black"]
+            elif is_regression:
+                title = f"y_true: {pretty_label(y[i])}\ny_pred: {pretty_label(y_pred[i])}"
+                color = colors["black"]
             else:
-                title = f"y_true: {pretty_label(y[i])} / y_pred: {pretty_label(y_pred[i])}"
-                color = colors["red"]
-            if y_proba is not None:
-                title += f" ({y_proba[i]:.2f})"
-        plt.title(title, fontsize=label_font_size, color=color, wrap=True)
+                is_correct = y[i] == y_pred[i]
+                if is_correct:
+                    title = f"y_true & y_pred: {pretty_label(y[i])}"
+                    color = colors["green"]
+                else:
+                    title = f"y_true: {pretty_label(y[i])} / y_pred: {pretty_label(y_pred[i])}"
+                    color = colors["red"]
+                if y_proba is not None:
+                    title += f" ({y_proba[i]:.2f})"
+            plt.title(title, fontsize=label_font_size, color=color, wrap=True)
 
     if save_path is None:
         plt.show()

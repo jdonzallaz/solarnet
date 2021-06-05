@@ -1,0 +1,10 @@
+# @package _global_
+
+model:
+  backbone: simple-cnn
+  activation: relu6
+  pooling: 2
+  dropout: 0.2
+  n_hidden: 16
+  learning_rate: 5e-3
+  lr_scheduler: true

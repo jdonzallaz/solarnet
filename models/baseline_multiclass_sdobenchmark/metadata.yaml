@@ -1,0 +1,11 @@
+machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
+training_time: 97.52s
+model_size: 323kB
+early_stopping_epoch: 0
+model_checkpoint_step: 944
+model_checkpoint_epoch: 16
+tracking_id: SOLN-329
+dataset:
+  training_set_size: 7446
+  validation_set_size: 827
+  test_set_size: 874

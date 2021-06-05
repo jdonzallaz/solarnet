@@ -1,0 +1,16 @@
+# @package _global_
+
+data:
+  targets: regression
+
+model:
+  backbone: simple-cnn
+  activation: relu6
+  pooling: 2
+  dropout: 0.2
+  n_hidden: 16
+  learning_rate: 5e-3
+  lr_scheduler: true
+
+name: Baseline regression model
+path: models/baseline_regression_sdobenchmark

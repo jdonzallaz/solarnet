@@ -1,0 +1,58 @@
+# Choose destination for the dataset file(s). Default to current dir.
+destination: data/sdo-dataset-cls-211-24h
+# Base filename for the metadata files. If splits-separate-files is true, the split's name will be appended to the
+# filename. E.g.: sdo-dataset-train.csv
+filename: sdo-dataset.csv
+# Original path where the full dataset is stored
+dataset_path: /data1/data/sdo-dataset
+# Whether to write the path as relative (from dataset root) or absolute (using dataset_path) in the csv file
+relative_paths: true
+
+# Choose whether files (images) are copied to the destination folder.
+copy: true
+
+# Choose channel among: 94, 131, 171, 193, 211, 304, 335, 1600, 1700, 4500.
+channel: 211
+
+# In which time span the target (peak flux) will be selected. Format supported by pandas.Timedelta.
+flare-period: 24h
+
+# A sample will be created every "sample-interval". This will often be the same as "flare-period",
+# but can be customized for special cases. Format supported by pandas.Timedelta.
+sample-interval: 24h
+
+# The different times before the flare to choose images. Format supported by pandas.Timedelta.
+time-steps:
+  - 0
+
+# The time range to search for an image if not found at the exact search time.
+# This is because there is not an image for each minute, and some images are missing.
+# A range of 15 minutes will search 15m before and after the original time.
+search-image-period: 20m
+
+# Set of splits with years to include in each
+splits:
+  train:
+    - 2010
+    - 2011
+    - 2013
+    - 2014
+    - 2015
+    - 2016
+    - 2018
+  val:
+    - 2012
+  test:
+    - 2017
+
+# Whether to put splits in separate files. Otherwise, a column in the csv will specify the split
+splits-separate-files: true
+
+# Choose type of targets between regression and classification
+# With classification, the classes must be defined as a list of key (name of the class) - value (comparison) which are
+# evaluated in the defined order to map the peak flux to the classes.
+target: regression  # to define a regression
+# target: # to define a classification (example)
+#   classes:
+#     - Quiet: "< 1e-6"
+#     - ">=C": ">= 1e-6"

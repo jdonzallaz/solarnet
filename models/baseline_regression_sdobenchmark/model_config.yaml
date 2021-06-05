@@ -1,0 +1,17 @@
+model: ImageRegression
+backbone: simple-cnn
+n_channel: 1
+output_size: 1
+hparams:
+  n_channel: 1
+  learning_rate: 0.005
+  backbone: simple-cnn
+  backbone_output_size: 0
+  n_hidden: 16
+  dropout: 0.2
+  loss_fn: mse
+  lr_scheduler: true
+  lr_scheduler_warmup_steps: 100
+  lr_scheduler_total_steps: 1180
+  activation: relu6
+  pooling: 2

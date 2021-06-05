@@ -1,0 +1,30 @@
+data:
+  name: sdo-dataset
+  channel: 211
+  size: 256
+  targets:
+    classes:
+    - Quiet: < 1e-6
+    - '>=C': '>= 1e-6'
+  path: data/sdo-dataset-cls-211-24h
+model:
+  backbone: simple-cnn
+  learning_rate: 0.001
+  activation: leakyrelu
+  pooling: 2
+  dropout: 0.2
+  n_hidden: 16
+  lr_scheduler: true
+trainer:
+  epochs: 20
+  patience: 12
+  batch_size: 128
+name: Binary classification model on SDO-Dataset
+training_type: train
+tune_lr: false
+path: models/baseline_binary_sdodataset
+seed: 42
+tracking: true
+system:
+  gpus: 1
+  workers: 20

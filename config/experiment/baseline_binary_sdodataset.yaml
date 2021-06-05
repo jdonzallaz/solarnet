@@ -1,0 +1,25 @@
+# @package _global_
+defaults:
+  - override /data: sdo-dataset
+
+data:
+  channel: 211
+  size: 256
+  path: data/sdo-dataset-cls-211-24h
+
+model:
+  backbone: simple-cnn
+  activation: leakyrelu
+  pooling: 2
+  dropout: 0.2
+  n_hidden: 16
+  learning_rate: 1e-3
+  lr_scheduler: true
+
+trainer:
+  epochs: 20
+  patience: 12
+  batch_size: 128
+
+name: Binary classification model on SDO-Dataset
+path: models/baseline_binary_sdodataset
