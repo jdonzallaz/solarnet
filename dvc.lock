@@ -10,8 +10,8 @@ stages:
       size: 117
     outs:
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
   train@binary:
     cmd: python -m solarnet.main train +experiment=baseline_binary_sdobenchmark -v
     deps:
@@ -19,8 +19,8 @@ stages:
       md5: da8693f65397c05ed47ade95db4a13d1
       size: 157
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: solarnet/models/image_classification.py
       md5: 17073e00d8b7a2ea9cc904debc89de86
       size: 4994
@@ -70,8 +70,8 @@ stages:
       md5: da8693f65397c05ed47ade95db4a13d1
       size: 157
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: models/baseline_binary_sdobenchmark/model.ckpt
       md5: a109c270c1eaae7babb431a0bd234e72
       size: 323100
@@ -160,8 +160,8 @@ stages:
       md5: dcb32ec6d45498b4c6d6993bf6b76c5b
       size: 367
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: solarnet/models/image_classification.py
       md5: 17073e00d8b7a2ea9cc904debc89de86
       size: 4994
@@ -211,8 +211,8 @@ stages:
       md5: dcb32ec6d45498b4c6d6993bf6b76c5b
       size: 367
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: models/baseline_multiclass_sdobenchmark/model.ckpt
       md5: 908b3e71d50a8b66426e73c3c83e4d34
       size: 323484
@@ -301,8 +301,8 @@ stages:
       md5: d6248738101fd678a6730302d5655c81
       size: 265
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: solarnet/models/image_regression.py
       md5: dad292ffee3776aa325b828256f7e570
       size: 4137
@@ -352,8 +352,8 @@ stages:
       md5: d6248738101fd678a6730302d5655c81
       size: 265
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: models/baseline_regression_sdobenchmark/model.ckpt
       md5: 931fb690414ac4f7182abd5e3b49a109
       size: 322387
@@ -1356,8 +1356,8 @@ stages:
       md5: 535f6321756ae2ab56d99423dee5a35f
       size: 498
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: models/ssl_bz_month/model.pt
       md5: ef04908b12949bedbfda4de6d00be406
       size: 120927500
@@ -1413,8 +1413,8 @@ stages:
       md5: 535f6321756ae2ab56d99423dee5a35f
       size: 498
     - path: data/sdo-benchmark.placeholder
-      md5: 03bc278e4376c8585af17fe4557b0337
-      size: 162
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
     - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
       md5: c39c4c02a632f8d46bc0e4824ef80422
       size: 107458784

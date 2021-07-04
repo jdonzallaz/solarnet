@@ -1,9 +1,11 @@
 boto3==1.17.49
 colorlog==5.0.1
+click==7.1.2  # Required because version 8 is incompatible with typer
 dvc[s3]==2.5.0
 hydra-core==1.1.0
 jupyter==1.0.0
 kaleido==0.2.1  # Needed for optuna
+lightning-bolts==0.3.4
 matplotlib==3.4.2
 neptune-client==0.9.19
 numpy==1.20.3

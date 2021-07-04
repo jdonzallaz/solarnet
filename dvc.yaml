@@ -3,8 +3,6 @@ stages:
     cmd:
       - python -m solarnet.main download sdo-benchmark data
       - touch data/sdo-benchmark.placeholder
-    deps:
-      - config/minio.yaml
     outs:
       - data/sdo-benchmark.placeholder:
           persist: true
