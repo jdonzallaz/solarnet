@@ -1,33 +1,32 @@
-boto3==1.17.87
+boto3==1.17.49
 colorlog==5.0.1
-dvc[s3]==2.3.0
+dvc[s3]==2.5.0
+hydra-core==1.1.0
 jupyter==1.0.0
 kaleido==0.2.1  # Needed for optuna
 matplotlib==3.4.2
-neptune-client==0.9.16
+neptune-client==0.9.19
 numpy==1.20.3
-optuna==2.7.0
+optuna==2.8.0
 pandas==1.2.4
 Pillow==8.2.0
 plotly==4.14.3  # Needed for optuna
 psutil==5.8.0  # Needed to log hardware consumption in neptune
 pyarrow==4.0.1
 pytest==6.2.4
-pytorch-lightning==1.3.4
-ruamel.yaml==0.17.7
+pytorch-lightning==1.3.8
+ruamel.yaml==0.17.10
 scikit-learn==0.24.2
 scipy==1.6.3
 seaborn==0.11.1
 sunpy[net]==2.1.5
 torch>=1.8.0+cu111
-torchmetrics==0.3.2
+torchmetrics==0.4.0
 torchvision>=0.9.0+cu111
 torch_optimizer==0.1.0
-tqdm==4.61.0
+tqdm==4.61.1
 typer==0.3.2
 git+https://github.com/jacobgil/pytorch-grad-cam
-# Revisit this once omegaconf > 2.0.6 and hydra-core > 1.0.6
-git+https://github.com/facebookresearch/hydra#egg=hydra-core
 
 -e .
 

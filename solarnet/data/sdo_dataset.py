@@ -176,12 +176,16 @@ class SDODatasetDataModule(pl.LightningDataModule):
             sample = self.dataset_train[0][0]
 
         if stage == "test" or stage is None:
-            self.dataset_test = SDODataset(
-                self.dataset_path / f"{self.csv_filename_prefix}-test.csv",
-                transform=self.transform,
-                target_transform=self.target_transform,
-            )
-            sample = self.dataset_test[0][0]
+            path = self.dataset_path / f"{self.csv_filename_prefix}-test.csv"
+            if path.exists():
+                self.dataset_test = SDODataset(
+                    path,
+                    transform=self.transform,
+                    target_transform=self.target_transform,
+                )
+                sample = self.dataset_test[0][0]
+            elif stage == "test":
+                raise RuntimeError("Cannot prepare stage=test of datamodule with no test dataset.")
 
         self.dims = tuple((sample[0] if isinstance(sample, tuple) else sample).shape)
 
@@ -205,4 +209,6 @@ class SDODatasetDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         if not self.has_setup_test:
             raise RuntimeError("The SDODatasetDataModule setup has not been called.")
+        if not hasattr(self, "dataset_test"):
+            raise RuntimeError("No test dataset in this datamodule.")
         return DataLoader(self.dataset_test, batch_size=self.batch_size, num_workers=self.num_workers)

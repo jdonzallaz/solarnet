@@ -4,9 +4,9 @@ n_channel: 1
 output_size: 2048
 hparams:
   gpus: 2
-  num_samples: 56139
+  num_samples: 35479
   batch_size: 768
-  dataset: ""
+  dataset: ''
   num_nodes: 1
   arch: resnet50
   hidden_mlp: 2048
@@ -14,10 +14,10 @@ hparams:
   warmup_epochs: 10
   max_epochs: 1000
   temperature: 0.1
-  first_conv: True
-  maxpool1: True
+  first_conv: true
+  maxpool1: true
   optimizer: adam
-  exclude_bn_bias: False
+  exclude_bn_bias: false
   start_lr: 0.0
   learning_rate: 0.001
   final_lr: 0.0

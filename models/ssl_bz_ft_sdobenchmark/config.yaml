@@ -31,5 +31,5 @@ system:
   gpus: 1
   workers: 20
 finetune:
-  base: models/ssl_bz
+  base: models/ssl_bz_month
   backbone_unfreeze_epoch: 50

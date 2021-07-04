@@ -18,5 +18,5 @@ seed: 42
 tracking: true
 
 system:
-  gpus: 0
-  workers: 0
+  gpus: 1
+  workers: 20

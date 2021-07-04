@@ -4,18 +4,15 @@
 ```yaml
 data:
   name: sdo-dataset
-  channel: Bz
+  channel: bz
   size: 128
   targets:
     classes:
     - Quiet: < 1e-6
     - '>=C': '>= 1e-6'
-  path: data/sdo-dataset-ssl-bz-1h-1
+  path: data/sdo-dataset-ssl-bz-1h-2010-2014
 model:
   backbone: resnet50
-  activation: relu6
-  pooling: 0
-  dropout: 0.5
   learning_rate: 0.001
   hidden_mlp: 2048
   feat_dim: 64
@@ -38,6 +35,8 @@ ssl:
   online:
     learning_rate: 1e-05
     n_hidden: 128
+tags:
+- ssl
 ```
 ### Model architecture
 ```
@@ -248,14 +247,27 @@ Total parameters: 30144938
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 81711.46s
+training_time: 56056.38s
 model_size: 360098kB
-early_stopping_epoch: 475
-model_checkpoint_step: 20424
-model_checkpoint_epoch: 276
-tracking_id: SOLN-284
-dataset:
-  training_set_size: 56139
-  validation_set_size: 8503
-  test_set_size: 8583
+early_stopping_epoch: 544
+model_checkpoint_step: 16215
+model_checkpoint_epoch: 345
+tracking_id: SOLN-365
+data:
+  class-balance:
+    train:
+      Quiet: 30904
+      '>=C': 4575
+    val:
+      Quiet: 3216
+      '>=C': 470
+  shape: (1, 128, 128)
+  tensor-data:
+    min: -1.0
+    max: 1.0
+    mean: -0.0004502999654505402
+    std: 0.039591457694768906
+  set-sizes:
+    train: 35479
+    val: 3686
 ```

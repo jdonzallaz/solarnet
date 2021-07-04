@@ -95,7 +95,7 @@ def train(
 
     # Tracking
     tracking: Tracking = NeptuneNewTracking(
-        parameters=parameters, tags=[], disabled=not parameters["tracking"] or parameters["tune_lr"]
+        parameters=parameters, tags=parameters.get("tags", []), disabled=not parameters["tracking"] or parameters["tune_lr"]
     )
     tracking_logger = tracking.get_callback("pytorch-lightning")
     if tracking_logger is not None:
@@ -154,14 +154,21 @@ def train(
     steps_per_epoch = len(datamodule.train_dataloader())
     metadata = get_training_summary(
         model_path / "model.ckpt",
+        parameters,
         run_id,
         timer_callback,
         datamodule,
         early_stop_callback,
         checkpoint_callback,
         steps_per_epoch,
+        save_path=plot_path,
     )
     write_yaml(model_path / "metadata.yaml", metadata)
+    tracking.log_property("metadata", metadata)
+    tracking.log_artifact(plot_path / "data-examples-train.png")
+    tracking.log_artifact(plot_path / "data-examples-val.png")
+    if (plot_path / "data-examples-test.png").exists():
+        tracking.log_artifact(plot_path / "data-examples-test.png")
 
     tracking.end()
 

@@ -70,12 +70,13 @@ def test_command(
 @app.command("download")
 def download_command(
     dataset: str = typer.Argument("sdo-benchmark"),
+    destination: Path = typer.Argument(Path("./")),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
 ):
     if verbose:
         set_log_level(logging.INFO)
 
-    download_dataset(dataset)
+    download_dataset(dataset, destination)
 
 
 @app.command("dataset")

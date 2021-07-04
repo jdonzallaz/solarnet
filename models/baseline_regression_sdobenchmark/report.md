@@ -91,16 +91,23 @@ Total parameters: 24609
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 92.65s
+training_time: 79.99s
 model_size: 322kB
 early_stopping_epoch: 0
 model_checkpoint_step: 708
 model_checkpoint_epoch: 12
-tracking_id: SOLN-328
-dataset:
-  training_set_size: 7446
-  validation_set_size: 827
-  test_set_size: 874
+tracking_id: SOLN-383
+data:
+  shape: (1, 256, 256)
+  tensor-data:
+    min: -0.7960784435272217
+    max: 0.8901960849761963
+    mean: -0.10380689054727554
+    std: 0.28518185019493103
+  set-sizes:
+    train: 7446
+    val: 827
+    test: 874
 ```
 ## Test
 ### Metrics

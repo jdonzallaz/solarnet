@@ -4,13 +4,13 @@
 ```yaml
 data:
   name: sdo-dataset
-  channel: 211
+  channel: bz
   size: 256
   targets:
     classes:
     - Quiet: < 1e-6
     - '>=C': '>= 1e-6'
-  path: data/sdo-dataset-cls-211-24h
+  path: data/sdo-dataset-cls-bz-24h-2015-2017
 model:
   backbone: simple-cnn
   learning_rate: 0.001
@@ -23,7 +23,7 @@ trainer:
   epochs: 20
   patience: 12
   batch_size: 128
-name: Binary classification model on SDO-Dataset
+name: Binary classification model on SDO-Dataset, Bz, split val on month, test on 2015-2017
 training_type: train
 tune_lr: false
 path: models/baseline_binary_sdodataset
@@ -32,6 +32,8 @@ tracking: true
 system:
   gpus: 1
   workers: 20
+tags:
+- sdo-dataset
 ```
 ### Model architecture
 ```
@@ -98,22 +100,39 @@ Total parameters: 24626
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 134.19s
+training_time: 102.80s
 model_size: 323kB
 early_stopping_epoch: 0
-model_checkpoint_step: 323
-model_checkpoint_epoch: 17
-tracking_id: SOLN-324
-dataset:
-  training_set_size: 2401
-  validation_set_size: 362
-  test_set_size: 364
+model_checkpoint_step: 192
+model_checkpoint_epoch: 16
+tracking_id: SOLN-386
+data:
+  class-balance:
+    train:
+      Quiet: 473
+      '>=C': 1043
+    val:
+      Quiet: 41
+      '>=C': 112
+    test:
+      Quiet: 647
+      '>=C': 441
+  shape: (1, 256, 448)
+  tensor-data:
+    min: -1.0
+    max: 1.0
+    mean: -0.00022344599710777402
+    std: 0.046560730785131454
+  set-sizes:
+    train: 1516
+    val: 153
+    test: 1088
 ```
 ## Test
 ### Metrics
-| Path                                           | accuracy   | balanced_accuracy   | csi    | f1     | far   | hss    | pod    | tss    |
-|------------------------------------------------|------------|---------------------|--------|--------|-------|--------|--------|--------|
-| models/baseline_binary_sdodataset/metrics.yaml | 0.5852     | 0.5886              | 0.2135 | 0.5234 | 0.75  | 0.1161 | 0.5942 | 0.1773 |
+| Path                                           | accuracy   | balanced_accuracy   | csi    | f1     | far    | hss    | pod    | tss    |
+|------------------------------------------------|------------|---------------------|--------|--------|--------|--------|--------|--------|
+| models/baseline_binary_sdodataset/metrics.yaml | 0.7022     | 0.6431              | 0.3106 | 0.6332 | 0.1657 | 0.3166 | 0.3311 | 0.2862 |
 
 ### Confusion matrix
 ![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')

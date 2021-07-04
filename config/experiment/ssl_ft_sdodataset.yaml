@@ -1,0 +1,36 @@
+# @package _global_
+defaults:
+  - override /data: sdo-dataset
+
+data:
+  channel: bz
+  size: 128
+  path: data/sdo-dataset-cls-bz-24h-2015-2017
+  targets:
+    classes:
+      - Quiet: "< 1e-6"
+      - ">=C": ">= 1e-6"
+
+model:
+  backbone: resnet50
+  n_hidden: 512
+  dropout: 0.5
+
+  learning_rate: 2e-5
+
+  lr_scheduler: false
+  lr_scheduler_warmup_steps: 50
+
+trainer:
+  epochs: 50
+  patience: 10
+  batch_size: 128
+
+finetune:
+  base: models/ssl_bz
+  backbone_unfreeze_epoch: 50
+
+name: Finetune SimCLR on SDO-Dataset
+tags: ["sdo-dataset"]
+training_type: finetune
+path: models/ssl_bz_ft_sdodataset

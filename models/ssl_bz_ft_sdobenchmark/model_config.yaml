@@ -7,8 +7,6 @@ hparams:
   n_class: 2
   learning_rate: 2e-05
   class_weight:
-  - 0.8430765703805594
-  - 1.228700300701637
   backbone: resnet50
   backbone_output_size: 0
   n_hidden: 512
@@ -17,7 +15,7 @@ hparams:
   lr_scheduler_warmup_steps: 50
   lr_scheduler_total_steps: 2900
   gpus: 2
-  num_samples: 56139
+  num_samples: 66599
   batch_size: 768
   dataset: ''
   num_nodes: 1

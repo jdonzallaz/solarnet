@@ -10,7 +10,7 @@ data:
     classes:
       - Quiet: "< 1e-6"
       - ">=C": ">= 1e-6"
-  path: data/sdo-dataset-ssl-bz-1h
+  path: data/sdo-dataset-ssl-bz-1h-2010-2014
 
 model:
   backbone: resnet50
@@ -31,6 +31,7 @@ ssl:
     n_hidden: 128
 
 name: Self-supervised learning (SimCLR) on SDO-Dataset
+tags: ["ssl"]
 training_type: ssl
 path: models/ssl_bz
 

@@ -1,0 +1,12 @@
+# @package _global_
+defaults:
+  - ssl_ft_sdodataset
+
+data:
+  path: data/sdo-dataset-cls-bz-24h-month
+
+finetune:
+  base: models/ssl_bz_month
+
+name: Finetune SimCLR on SDO-Dataset, split by month
+path: models/ssl_bz_ft_sdodataset_month

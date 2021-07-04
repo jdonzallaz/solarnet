@@ -35,7 +35,7 @@ system:
   gpus: 1
   workers: 20
 finetune:
-  base: models/ssl_bz
+  base: models/ssl_bz_month
   backbone_unfreeze_epoch: 50
 ```
 ### Model architecture
@@ -250,22 +250,39 @@ Total parameters: 24552898
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 577.98s
-model_size: 107459kB
+training_time: 549.99s
+model_size: 107458kB
 early_stopping_epoch: 0
 model_checkpoint_step: 2842
 model_checkpoint_epoch: 49
-tracking_id: SOLN-326
-dataset:
-  training_set_size: 7355
-  validation_set_size: 817
-  test_set_size: 865
+tracking_id: SOLN-385
+data:
+  class-balance:
+    train:
+      Quiet: 4362
+      '>=C': 2993
+    val:
+      Quiet: 474
+      '>=C': 343
+    test:
+      Quiet: 350
+      '>=C': 515
+  shape: (1, 128, 128)
+  tensor-data:
+    min: -1.0
+    max: 1.0
+    mean: 0.009875836782157421
+    std: 0.1774301379919052
+  set-sizes:
+    train: 7355
+    val: 817
+    test: 865
 ```
 ## Test
 ### Metrics
 | Path                                       | accuracy   | balanced_accuracy   | csi    | f1     | far    | hss    | pod    | tss    |
 |--------------------------------------------|------------|---------------------|--------|--------|--------|--------|--------|--------|
-| models/ssl_bz_ft_sdobenchmark/metrics.yaml | 0.8092     | 0.8064              | 0.7194 | 0.8037 | 0.1472 | 0.6075 | 0.8214 | 0.6128 |
+| models/ssl_bz_ft_sdobenchmark/metrics.yaml | 0.7896     | 0.8018              | 0.6762 | 0.7879 | 0.1101 | 0.5802 | 0.7379 | 0.6036 |
 
 ### Confusion matrix
 ![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')

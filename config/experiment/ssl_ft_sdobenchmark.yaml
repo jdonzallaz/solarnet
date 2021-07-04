@@ -24,7 +24,7 @@ trainer:
   batch_size: 128
 
 finetune:
-  base: models/ssl_bz
+  base: models/ssl_bz_month
   backbone_unfreeze_epoch: 50
 
 name: Finetune SimCLR on SDO-Benchmark

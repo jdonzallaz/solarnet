@@ -1,6 +1,7 @@
 import logging
 import shutil
 from pathlib import Path
+from time import strptime
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
@@ -37,12 +38,17 @@ def make_dataset(parameters: dict):
     target = parameters["target"]
     classification = "classes" in target
 
+    # Splits
     splits = parameters["splits"]
+    margin_between_splits = pd.Timedelta(parameters["margin-between-splits"])
     splits_separate_files = parameters["splits-separate-files"]
     if splits is None or len(splits) < 1:
         raise AttributeError("At least one split is required")
-    print_dict(splits)
-    year_to_split_dict = {year: split for split, years in splits.items() for year in years}
+    split_dict = {
+        strptime(part, "%b").tm_mon if isinstance(part, str) else part: split
+        for split, parts in splits.items()
+        for part in parts
+    }
 
     first_known_datetime = pd.Timestamp("2010/05/13T00:00:00")
     last_known_datetime = pd.Timestamp("2018/12/31T23:59:59")
@@ -62,32 +68,50 @@ def make_dataset(parameters: dict):
     samples: List[Dict[str, Union[List[str], float, pd.Timestamp, bool]]] = []
 
     time_offset = pd.DateOffset(seconds=sample_interval.total_seconds())
-    intervals = pd.interval_range(
-        datetime_start,  # + max(time_steps),
-        datetime_end,
-        freq=time_offset
-    )
+    intervals = pd.interval_range(datetime_start, datetime_end, freq=time_offset)
 
     logger.info("Searching corresponding image files in the dataset...")
 
+    old_split = None
+    split_date = None
+    old_split_date = None
     for interval in intervals:
         try:
             images_paths, all_found = find_paths(
-                dataset_path, interval.left, time_steps, channel, search_image_period, relative_paths)
+                dataset_path, interval.left, time_steps, channel, search_image_period, relative_paths
+            )
         except FileNotFoundError as e:
-            # print("1 path not found", interval.left)
             continue
         peak_flux = find_flare_peak_flux(df, interval.left, interval.left + flare_period)
 
         sample_datetime: pd.Timestamp = interval.left
 
-        samples.append({
-            "images_paths": images_paths,
-            "peak_flux": peak_flux,
-            "datetime": sample_datetime,
-            "all_found": all_found,
-            "split": year_to_split_dict.get(sample_datetime.year, None),
-        })
+        # Prepare the split: choose month or year + ignore samples in the "margin" between splits
+        split = split_dict.get(
+            sample_datetime.year,
+            split_dict.get(sample_datetime.month, None),
+        )
+
+        if split != old_split:
+            old_split_date = split_date
+        old_split = split
+        split_date = sample_datetime
+
+        if old_split_date is not None and split_date - margin_between_splits < old_split_date:
+            continue
+
+        if split is None:
+            continue
+
+        samples.append(
+            {
+                "images_paths": images_paths,
+                "peak_flux": peak_flux,
+                "datetime": sample_datetime,
+                "all_found": all_found,
+                "split": split,
+            }
+        )
 
     samples_ls = [[*i["images_paths"], i["peak_flux"], i["datetime"], i["all_found"], i["split"]] for i in samples]
 
@@ -101,7 +125,7 @@ def make_dataset(parameters: dict):
 
     if splits_separate_files:
         for split in splits:
-            df_split = df[df['split'] == split]
+            df_split = df[df["split"] == split]
             split_csv_path = csv_path.parent / f"{csv_path.stem}-{split}{csv_path.suffix}"
             df_split.to_csv(split_csv_path, index=False)
     else:
@@ -158,15 +182,21 @@ def make_path(base_path, time, channel) -> Path:
     hours = f"{time.hour:02d}"
     minutes = f"{time.minute:02d}"
 
-    if isinstance(channel, str) and channel.lower() in ["Bx", "By", "Bz"]:
+    if isinstance(channel, str) and channel.lower() in ["bx", "by", "bz"]:
         instrument = "HMI"
         filename_channel = channel.lower()
     else:
         instrument = "AIA"
         filename_channel = f"{channel:04d}"
 
-    return base_path / str(channel) / year / month / day / \
-           f"{instrument}{year}{month}{day}_{hours}{minutes}_{filename_channel}.npz"
+    return (
+        base_path
+        / str(channel)
+        / year
+        / month
+        / day
+        / f"{instrument}{year}{month}{day}_{hours}{minutes}_{filename_channel}.npz"
+    )
 
 
 def find_paths(
@@ -225,8 +255,10 @@ def get_flares_cache_filename(datetime_start: pd.Timestamp, datetime_end: pd.Tim
     Return a corretly formatted filename for a parquet flares cache file, with dates (range) for reference.
     """
 
-    return f"hek_flares_{datetime_start.isoformat().replace(':', '-')}_" \
-           f"{datetime_end.isoformat().replace(':', '-')}.parquet"
+    return (
+        f"hek_flares_{datetime_start.isoformat().replace(':', '-')}_"
+        f"{datetime_end.isoformat().replace(':', '-')}.parquet"
+    )
 
 
 def get_flares_from_cache(datetime_start: pd.Timestamp, datetime_end: pd.Timestamp) -> Optional[pd.DataFrame]:
@@ -245,7 +277,7 @@ def get_flares_from_cache(datetime_start: pd.Timestamp, datetime_end: pd.Timesta
 
     try:
         df = pd.read_parquet(path)
-    except:
+    except Exception:
         logger.warning("Error while loading flares cache")
         return None
 
@@ -267,7 +299,7 @@ def write_flares_to_cache(df: pd.DataFrame, datetime_start: pd.Timestamp, dateti
 
     try:
         df.to_parquet(path)
-    except:
+    except Exception:
         logger.warning("Error while writing flares to cache")
 
 

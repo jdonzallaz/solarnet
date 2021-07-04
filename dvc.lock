@@ -1,7 +1,9 @@
 schema: '2.0'
 stages:
   download-dataset:
-    cmd: python -m solarnet.main download sdo-benchmark-zip
+    cmd:
+    - python -m solarnet.main download sdo-benchmark data
+    - touch data/sdo-benchmark.placeholder
     deps:
     - path: config/minio.yaml
       md5: 2cf2c6bc04bcddb76df1d97aae80ba0a
@@ -20,11 +22,11 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
     - path: solarnet/tasks/train.py
-      md5: 4a87721711816dbca4972b460b60a649
-      size: 4346
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
     params:
       config/config.yaml:
         model:
@@ -43,13 +45,13 @@ stages:
       md5: c68bfece4152d5165bc70ea3d333ba62
       size: 561
     - path: models/baseline_binary_sdobenchmark/metadata.yaml
-      md5: c8721349264ac9d190dd7429b46e67b6
-      size: 347
+      md5: aa8db4c1f47ea3c1e6306d130560f7f2
+      size: 632
     - path: models/baseline_binary_sdobenchmark/model.ckpt
-      md5: 484d76e74b6ae4e10c5bcd2bd0acd44a
+      md5: a109c270c1eaae7babb431a0bd234e72
       size: 323100
     - path: models/baseline_binary_sdobenchmark/model.pt
-      md5: 00050efafebcb77cf8de69645f4d7312
+      md5: 246ae0db955279bc55b36fe54abddde2
       size: 111879
     - path: models/baseline_binary_sdobenchmark/model_config.yaml
       md5: e552643054dc84b48b4e7278821fef38
@@ -58,9 +60,9 @@ stages:
       md5: d0146dfb1aaf7670ba3144848ed70d4e
       size: 2203
     - path: models/baseline_binary_sdobenchmark/train_plots/
-      md5: 7205493191a1e650b9a6252f55aa054c.dir
-      size: 83962
-      nfiles: 2
+      md5: bb71506bc1b0e6777931a115ac8ffc4c.dir
+      size: 3965288
+      nfiles: 5
   test@binary:
     cmd: python -m solarnet.main test +experiment=baseline_binary_sdobenchmark
     deps:
@@ -71,11 +73,11 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline_binary_sdobenchmark/model.ckpt
-      md5: 484d76e74b6ae4e10c5bcd2bd0acd44a
+      md5: a109c270c1eaae7babb431a0bd234e72
       size: 323100
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
     - path: solarnet/tasks/test.py
       md5: 2455c6f3b3a858c022643bac054d015d
       size: 7371
@@ -94,8 +96,8 @@ stages:
       md5: dad9340a331b4b382ae223d9a5f01f59
       size: 207
     - path: models/baseline_binary_sdobenchmark/test_plots/
-      md5: e756f946433ea9b76f6570817f6c3ea1.dir
-      size: 846144
+      md5: 8df216f1c7bc6497f0c2da2da01e2d03.dir
+      size: 820335
       nfiles: 3
   generate-report@binary:
     cmd: printf "# Model report\n" > models/baseline_binary_sdobenchmark/report.md
@@ -130,8 +132,8 @@ stages:
       md5: c68bfece4152d5165bc70ea3d333ba62
       size: 561
     - path: models/baseline_binary_sdobenchmark/metadata.yaml
-      md5: c8721349264ac9d190dd7429b46e67b6
-      size: 347
+      md5: aa8db4c1f47ea3c1e6306d130560f7f2
+      size: 632
     - path: models/baseline_binary_sdobenchmark/metrics.yaml
       md5: dad9340a331b4b382ae223d9a5f01f59
       size: 207
@@ -139,17 +141,17 @@ stages:
       md5: d0146dfb1aaf7670ba3144848ed70d4e
       size: 2203
     - path: models/baseline_binary_sdobenchmark/test_plots/
-      md5: e756f946433ea9b76f6570817f6c3ea1.dir
-      size: 846144
+      md5: 8df216f1c7bc6497f0c2da2da01e2d03.dir
+      size: 820335
       nfiles: 3
     - path: models/baseline_binary_sdobenchmark/train_plots/
-      md5: 7205493191a1e650b9a6252f55aa054c.dir
-      size: 83962
-      nfiles: 2
+      md5: bb71506bc1b0e6777931a115ac8ffc4c.dir
+      size: 3965288
+      nfiles: 5
     outs:
     - path: models/baseline_binary_sdobenchmark/report.md
-      md5: 3a4073467ada8bb8dd5f77228cdfae29
-      size: 4061
+      md5: 7f0a09fa452cf59ebba6951be2678763
+      size: 4346
   train@multiclass:
     cmd: python -m solarnet.main train +experiment=baseline_multiclass_sdobenchmark
       -v
@@ -161,11 +163,11 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
     - path: solarnet/tasks/train.py
-      md5: 4a87721711816dbca4972b460b60a649
-      size: 4346
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
     params:
       config/config.yaml:
         model:
@@ -184,13 +186,13 @@ stages:
       md5: b7fcc9381d7f431b83201cf33f1a4c32
       size: 597
     - path: models/baseline_multiclass_sdobenchmark/metadata.yaml
-      md5: 0e7ae07d9cb6b6ee576f096164f9d4cb
-      size: 347
+      md5: 9757a2af7a12aae0b175813ad8881ace
+      size: 693
     - path: models/baseline_multiclass_sdobenchmark/model.ckpt
-      md5: 5f52e14438fe44869fdc36900c65e41e
+      md5: 908b3e71d50a8b66426e73c3c83e4d34
       size: 323484
     - path: models/baseline_multiclass_sdobenchmark/model.pt
-      md5: ff255a196b859b2bc64d2dc6514665c2
+      md5: 1d00d4e3e8a5a05cc6b0bda2fbedca7d
       size: 112007
     - path: models/baseline_multiclass_sdobenchmark/model_config.yaml
       md5: a4eefdb7f8e162424d9645fcdc139d7f
@@ -199,9 +201,9 @@ stages:
       md5: d8565d498db11fd75699041ec0b88675
       size: 2203
     - path: models/baseline_multiclass_sdobenchmark/train_plots/
-      md5: 5d3cb0d303df03b688c03019e1411d1f.dir
-      size: 84575
-      nfiles: 2
+      md5: 1abd28ebcb85ea2fcad7ccd133301233.dir
+      size: 3965901
+      nfiles: 5
   test@multiclass:
     cmd: python -m solarnet.main test +experiment=baseline_multiclass_sdobenchmark
     deps:
@@ -212,11 +214,11 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline_multiclass_sdobenchmark/model.ckpt
-      md5: 5f52e14438fe44869fdc36900c65e41e
+      md5: 908b3e71d50a8b66426e73c3c83e4d34
       size: 323484
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
     - path: solarnet/tasks/test.py
       md5: 2455c6f3b3a858c022643bac054d015d
       size: 7371
@@ -235,8 +237,8 @@ stages:
       md5: eb485e2323c56abc95412a67854566ec
       size: 212
     - path: models/baseline_multiclass_sdobenchmark/test_plots/
-      md5: a41412f58e73bfd724a0f7caa30dd7d6.dir
-      size: 875425
+      md5: 3b7d1fbd2efeb8d85ff584be93ae1a3d.dir
+      size: 849085
       nfiles: 2
   generate-report@multiclass:
     cmd: printf "# Model report\n" > models/baseline_multiclass_sdobenchmark/report.md
@@ -271,8 +273,8 @@ stages:
       md5: b7fcc9381d7f431b83201cf33f1a4c32
       size: 597
     - path: models/baseline_multiclass_sdobenchmark/metadata.yaml
-      md5: 0e7ae07d9cb6b6ee576f096164f9d4cb
-      size: 347
+      md5: 9757a2af7a12aae0b175813ad8881ace
+      size: 693
     - path: models/baseline_multiclass_sdobenchmark/metrics.yaml
       md5: eb485e2323c56abc95412a67854566ec
       size: 212
@@ -280,17 +282,17 @@ stages:
       md5: d8565d498db11fd75699041ec0b88675
       size: 2203
     - path: models/baseline_multiclass_sdobenchmark/test_plots/
-      md5: a41412f58e73bfd724a0f7caa30dd7d6.dir
-      size: 875425
+      md5: 3b7d1fbd2efeb8d85ff584be93ae1a3d.dir
+      size: 849085
       nfiles: 2
     - path: models/baseline_multiclass_sdobenchmark/train_plots/
-      md5: 5d3cb0d303df03b688c03019e1411d1f.dir
-      size: 84575
-      nfiles: 2
+      md5: 1abd28ebcb85ea2fcad7ccd133301233.dir
+      size: 3965901
+      nfiles: 5
     outs:
     - path: models/baseline_multiclass_sdobenchmark/report.md
-      md5: 33652c50c711b3ae92c25536b332f507
-      size: 4046
+      md5: 81af83babb4c036c891175e610d8b506
+      size: 4392
   train@regression:
     cmd: python -m solarnet.main train +experiment=baseline_regression_sdobenchmark
       -v
@@ -305,8 +307,8 @@ stages:
       md5: dad292ffee3776aa325b828256f7e570
       size: 4137
     - path: solarnet/tasks/train.py
-      md5: 4a87721711816dbca4972b460b60a649
-      size: 4346
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
     params:
       config/config.yaml:
         model:
@@ -325,13 +327,13 @@ stages:
       md5: 159b05b1c86e27d20ea02f481723bb32
       size: 509
     - path: models/baseline_regression_sdobenchmark/metadata.yaml
-      md5: 109d107bd79ed4a4549365901873419a
-      size: 347
+      md5: 0be7c28a6282373f32eff3e1fc24720a
+      size: 481
     - path: models/baseline_regression_sdobenchmark/model.ckpt
-      md5: d7db0a73bda90d797b4f7e8ef8ca8845
+      md5: 931fb690414ac4f7182abd5e3b49a109
       size: 322387
     - path: models/baseline_regression_sdobenchmark/model.pt
-      md5: bb3512343a9663a92c40eb9c44c5df87
+      md5: 312e7ff7da78279544e58d3f7d049469
       size: 111357
     - path: models/baseline_regression_sdobenchmark/model_config.yaml
       md5: 0220ecc4fff92dfc2b7ca1501067f25e
@@ -340,9 +342,9 @@ stages:
       md5: 6b75d3281f7630eb00c80d17bc9436e4
       size: 2121
     - path: models/baseline_regression_sdobenchmark/train_plots/
-      md5: 392fda8a26c3cce2ab091ddea741423e.dir
-      size: 42109
-      nfiles: 1
+      md5: 37db1002aa27faa3e7bc347e3f2b52fa.dir
+      size: 3923435
+      nfiles: 4
   test@regression:
     cmd: python -m solarnet.main test +experiment=baseline_regression_sdobenchmark
     deps:
@@ -353,7 +355,7 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/baseline_regression_sdobenchmark/model.ckpt
-      md5: d7db0a73bda90d797b4f7e8ef8ca8845
+      md5: 931fb690414ac4f7182abd5e3b49a109
       size: 322387
     - path: solarnet/models/image_regression.py
       md5: dad292ffee3776aa325b828256f7e570
@@ -376,8 +378,8 @@ stages:
       md5: 6e37b9fe6155a2a441a8c04177ee88f2
       size: 56
     - path: models/baseline_regression_sdobenchmark/test_plots/
-      md5: 8c6f5d238ee169e9248c09eca0548af9.dir
-      size: 827260
+      md5: 38d20b27a294eafb53b5e6f45ba90382.dir
+      size: 802411
       nfiles: 2
   generate-report@regression:
     cmd: printf "# Model report\n" > models/baseline_regression_sdobenchmark/report.md
@@ -410,8 +412,8 @@ stages:
       md5: 159b05b1c86e27d20ea02f481723bb32
       size: 509
     - path: models/baseline_regression_sdobenchmark/metadata.yaml
-      md5: 109d107bd79ed4a4549365901873419a
-      size: 347
+      md5: 0be7c28a6282373f32eff3e1fc24720a
+      size: 481
     - path: models/baseline_regression_sdobenchmark/metrics.yaml
       md5: 6e37b9fe6155a2a441a8c04177ee88f2
       size: 56
@@ -419,32 +421,32 @@ stages:
       md5: 6b75d3281f7630eb00c80d17bc9436e4
       size: 2121
     - path: models/baseline_regression_sdobenchmark/test_plots/
-      md5: 8c6f5d238ee169e9248c09eca0548af9.dir
-      size: 827260
+      md5: 38d20b27a294eafb53b5e6f45ba90382.dir
+      size: 802411
       nfiles: 2
     - path: models/baseline_regression_sdobenchmark/train_plots/
-      md5: 392fda8a26c3cce2ab091ddea741423e.dir
-      size: 42109
-      nfiles: 1
+      md5: 37db1002aa27faa3e7bc347e3f2b52fa.dir
+      size: 3923435
+      nfiles: 4
     outs:
     - path: models/baseline_regression_sdobenchmark/report.md
-      md5: 87ccbe3f6884d46be6fff5f5a5298e37
-      size: 3590
+      md5: ec6a275dae4447ffea8031c34b9d83b9
+      size: 3724
   test@binary_sdodataset:
     cmd: python -m solarnet.main test +experiment=baseline_binary_sdodataset
     deps:
     - path: config/experiment/baseline_binary_sdodataset.yaml
-      md5: 52a7bb3a803e2829167c5638e5656fc8
-      size: 420
-    - path: data/sdo-dataset-cls-211-24h.placeholder
+      md5: 942512f4fd21c2042b1769eb3091b149
+      size: 566
+    - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
       size: 0
     - path: models/baseline_binary_sdodataset/model.ckpt
-      md5: 285fedfb992ba8e5a894be4300d73f0f
+      md5: 198eed8070b6f22ee9b7fded29a6e287
       size: 323036
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
     - path: solarnet/tasks/test.py
       md5: 2455c6f3b3a858c022643bac054d015d
       size: 7371
@@ -460,27 +462,27 @@ stages:
           batch_size: 128
     outs:
     - path: models/baseline_binary_sdodataset/metrics.yaml
-      md5: 74b3c016d59b52255a64e7cc5b539687
-      size: 199
+      md5: 6dbccd1576f6f07e3c8f1112593412f0
+      size: 210
     - path: models/baseline_binary_sdodataset/test_plots/
-      md5: f8548d6a45b79c0344e552a761b86098.dir
-      size: 741731
+      md5: 552058ed367fe6c74a80ae2eb7856923.dir
+      size: 562228
       nfiles: 3
   train@binary_sdodataset:
     cmd: python -m solarnet.main train +experiment=baseline_binary_sdodataset -v
     deps:
     - path: config/experiment/baseline_binary_sdodataset.yaml
-      md5: 52a7bb3a803e2829167c5638e5656fc8
-      size: 420
-    - path: data/sdo-dataset-cls-211-24h.placeholder
+      md5: 942512f4fd21c2042b1769eb3091b149
+      size: 566
+    - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
       size: 0
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
     - path: solarnet/tasks/train.py
-      md5: 4a87721711816dbca4972b460b60a649
-      size: 4346
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
     params:
       config/config.yaml:
         model:
@@ -496,27 +498,27 @@ stages:
         training_type: train
     outs:
     - path: models/baseline_binary_sdodataset/config.yaml
-      md5: 749cb6de571fd0d4bf6f43453a2de964
-      size: 534
+      md5: ca072c74da3dea6ab4b7b1660971aecc
+      size: 605
     - path: models/baseline_binary_sdodataset/metadata.yaml
-      md5: 92c29acc3b7f16384a67df525053b3c7
-      size: 348
+      md5: aac79e93627cc68e4a1f869ba3ac2e44
+      size: 606
     - path: models/baseline_binary_sdodataset/model.ckpt
-      md5: 285fedfb992ba8e5a894be4300d73f0f
+      md5: 198eed8070b6f22ee9b7fded29a6e287
       size: 323036
     - path: models/baseline_binary_sdodataset/model.pt
-      md5: 6032b201c36fd6046abc6a625713c05e
+      md5: 9c110379276bfba573878efa4656a9e4
       size: 111879
     - path: models/baseline_binary_sdodataset/model_config.yaml
-      md5: 7fe2cb8f7e3d37874d28831e34eb7578
-      size: 368
+      md5: 5e4db48b0af99ce8ae18b0baefac2efe
+      size: 399
     - path: models/baseline_binary_sdodataset/model_summary.txt
       md5: 76230023788b0c9864e34ed4f74a3342
       size: 2272
     - path: models/baseline_binary_sdodataset/train_plots/
-      md5: 67790f1283c270bdeebc037a18144bb4.dir
-      size: 66794
-      nfiles: 2
+      md5: 19f7c7c0e62892d1ba1d7a81ebfc6e9d.dir
+      size: 1840971
+      nfiles: 5
   generate-report@binary_sdodataset:
     cmd: printf "# Model report\n" > models/baseline_binary_sdodataset/report.md &&
       printf "## Training\n" >> models/baseline_binary_sdodataset/report.md && printf
@@ -546,29 +548,29 @@ stages:
       samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/baseline_binary_sdodataset/report.md
     deps:
     - path: models/baseline_binary_sdodataset/config.yaml
-      md5: 749cb6de571fd0d4bf6f43453a2de964
-      size: 534
+      md5: ca072c74da3dea6ab4b7b1660971aecc
+      size: 605
     - path: models/baseline_binary_sdodataset/metadata.yaml
-      md5: 92c29acc3b7f16384a67df525053b3c7
-      size: 348
+      md5: aac79e93627cc68e4a1f869ba3ac2e44
+      size: 606
     - path: models/baseline_binary_sdodataset/metrics.yaml
-      md5: 74b3c016d59b52255a64e7cc5b539687
-      size: 199
+      md5: 6dbccd1576f6f07e3c8f1112593412f0
+      size: 210
     - path: models/baseline_binary_sdodataset/model_summary.txt
       md5: 76230023788b0c9864e34ed4f74a3342
       size: 2272
     - path: models/baseline_binary_sdodataset/test_plots/
-      md5: f8548d6a45b79c0344e552a761b86098.dir
-      size: 741731
+      md5: 552058ed367fe6c74a80ae2eb7856923.dir
+      size: 562228
       nfiles: 3
     - path: models/baseline_binary_sdodataset/train_plots/
-      md5: 67790f1283c270bdeebc037a18144bb4.dir
-      size: 66794
-      nfiles: 2
+      md5: 19f7c7c0e62892d1ba1d7a81ebfc6e9d.dir
+      size: 1840971
+      nfiles: 5
     outs:
     - path: models/baseline_binary_sdodataset/report.md
-      md5: 7a1a441d9436975af060b4c96aa73e26
-      size: 4098
+      md5: 90334c2d1d6e087149a8d33ad0d132a7
+      size: 4430
   ssl@ssl:
     cmd: python -m solarnet.main train_ssl +experiment=ssl -v
     deps:
@@ -664,11 +666,11 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
-      md5: 97f2da57c980269f23aed01bbcc4cc50
+      md5: 354a726b9aaf4396c26f51681640d064
       size: 107459113
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 000f834d6f4ed39d0e5b482b3af422b0
+      size: 5130
     - path: solarnet/tasks/test.py
       md5: 2455c6f3b3a858c022643bac054d015d
       size: 7371
@@ -684,11 +686,11 @@ stages:
           batch_size: 128
     outs:
     - path: models/ssl_bz_ft_sdobenchmark/metrics.yaml
-      md5: 385f5e281c435976221470473735d634
-      size: 210
+      md5: 3be07b41765df6823a8ad9a5dd319b97
+      size: 211
     - path: models/ssl_bz_ft_sdobenchmark/test_plots/
-      md5: 81f43e09172d7cba1156fcf24a447d10.dir
-      size: 898781
+      md5: ac8036f045c1cb491a7c26b68f7cdf21.dir
+      size: 883655
       nfiles: 3
   finetune@ssl:
     cmd: python -m solarnet.main train +experiment=ssl_ft_sdobenchmark -v
@@ -700,17 +702,17 @@ stages:
       md5: 03bc278e4376c8585af17fe4557b0337
       size: 162
     - path: models/ssl_bz/model.pt
-      md5: e660c2f0aa225d7c639fea5036ffb74e
+      md5: ef04908b12949bedbfda4de6d00be406
       size: 120927500
     - path: models/ssl_bz/model_config.yaml
-      md5: eea5d592cddf931e23b00e9f61e5d24a
+      md5: 901cdeaa9a5ab2ca8e5fce469fcb09b2
       size: 452
     - path: solarnet/models/image_classification.py
-      md5: 9c5008ddd4fe99c6d219754743350ca3
-      size: 4864
+      md5: 000f834d6f4ed39d0e5b482b3af422b0
+      size: 5130
     - path: solarnet/tasks/train.py
-      md5: 4a87721711816dbca4972b460b60a649
-      size: 4346
+      md5: 3583737b956e8096d271b4b737522005
+      size: 4347
     params:
       config/config.yaml:
         model:
@@ -729,39 +731,39 @@ stages:
       md5: d03f1258d2670a3efbe062c1b1e8aa55
       size: 623
     - path: models/ssl_bz_ft_sdobenchmark/metadata.yaml
-      md5: 9bb07fcd64d80a9b2b2efd8c804ee659
-      size: 352
+      md5: 88769cf994854be48f45e6cb68e1ae71
+      size: 606
     - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
-      md5: 97f2da57c980269f23aed01bbcc4cc50
+      md5: 354a726b9aaf4396c26f51681640d064
       size: 107459113
     - path: models/ssl_bz_ft_sdobenchmark/model.pt
-      md5: e391bcf202727c7c0e87933531e52b68
+      md5: b236c80ce67a346b048a77ca8b21eb0f
       size: 98543223
     - path: models/ssl_bz_ft_sdobenchmark/model_config.yaml
-      md5: 27edfc02cf47cc65bb71e68594f8abf3
+      md5: cdedf1699b8df5387b2bc318d879b02e
       size: 680
     - path: models/ssl_bz_ft_sdobenchmark/model_summary.txt
       md5: f9b44bd8cc02bd18e7a33a69714bbb2a
       size: 12027
     - path: models/ssl_bz_ft_sdobenchmark/train_plots/
-      md5: 26aac5ed79005fcfef73e1524e4c5dc6.dir
-      size: 80592
-      nfiles: 2
+      md5: 7a6d2a6c30fb7043ebfb5f1dab3c9518.dir
+      size: 4250682
+      nfiles: 5
   train@ssl:
     cmd: python -m solarnet.main train +experiment=ssl -v
     deps:
     - path: config/experiment/ssl.yaml
-      md5: 4206e6fc454ddf7aee54ede18a3bf4e6
-      size: 577
-    - path: data/sdo-dataset-ssl-bz-1h.placeholder
+      md5: 7a4c5c3ccee366e89bbf35fcd3c4f5a2
+      size: 601
+    - path: data/sdo-dataset-ssl-bz-1h-2010-2014.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
       size: 0
     - path: solarnet/models/simclr.py
       md5: 722f53b8ce2e6e5ef995af34e21bbf8b
       size: 2678
     - path: solarnet/tasks/train.py
-      md5: 4a87721711816dbca4972b460b60a649
-      size: 4346
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
     params:
       config/config.yaml:
         model:
@@ -777,27 +779,27 @@ stages:
         training_type: train
     outs:
     - path: models/ssl_bz/config.yaml
-      md5: 4eda36a0ff4eced86fc4bee8b9a8d327
-      size: 608
+      md5: f0ac2d698568eb94e2183e4d5f2d2cd1
+      size: 580
     - path: models/ssl_bz/metadata.yaml
-      md5: b71a61f4b322d9c1b2093818eb495807
-      size: 361
+      md5: 12b3b813b4ac6f56ef081fea52bf8cc0
+      size: 562
     - path: models/ssl_bz/model.ckpt
-      md5: c64a0521b1da61e1d96021e121977d66
-      size: 360098944
+      md5: 12b9b41287e1c852f4ece52464544b4b
+      size: 360098943
     - path: models/ssl_bz/model.pt
-      md5: e660c2f0aa225d7c639fea5036ffb74e
+      md5: e0ee5606237b554c7443a1a3020fa1b6
       size: 120927500
     - path: models/ssl_bz/model_config.yaml
-      md5: eea5d592cddf931e23b00e9f61e5d24a
+      md5: b61c0770e46e6c6e67b4f5c629941150
       size: 452
     - path: models/ssl_bz/model_summary.txt
       md5: c1e5fe62d49c128e6ad38a28289cf576
       size: 12157
     - path: models/ssl_bz/train_plots/
-      md5: 8bc3da841f32ee0c888a9ce2b98ce66f.dir
-      size: 47958
-      nfiles: 1
+      md5: b42ed3598739b1d97e82f10df0f386a6.dir
+      size: 2403083
+      nfiles: 3
   train@ssl_171:
     cmd: python -m solarnet.main train +experiment=ssl -v
     deps:
@@ -951,8 +953,8 @@ stages:
     - touch data/sdo-dataset-ssl-bz-1h.placeholder
     deps:
     - path: config/dataset_ssl.yaml
-      md5: 9730b914f80c4e2af9cf547f41cb48f8
-      size: 2214
+      md5: 4ab82bbc75738ff28aff7593bcf25a07
+      size: 2349
     outs:
     - path: data/sdo-dataset-ssl-bz-1h.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
@@ -963,8 +965,8 @@ stages:
     - touch data/sdo-dataset-cls-211-24h.placeholder
     deps:
     - path: config/dataset_cls.yaml
-      md5: 3f32bd27203a908765a97a947e1bbd29
-      size: 2097
+      md5: 1520fda60d30d8b4edc6563bdb8952c5
+      size: 2354
     outs:
     - path: data/sdo-dataset-cls-211-24h.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
@@ -983,22 +985,22 @@ stages:
       && printf '```\n' >> models/ssl_bz/report.md
     deps:
     - path: models/ssl_bz/config.yaml
-      md5: 4eda36a0ff4eced86fc4bee8b9a8d327
-      size: 608
+      md5: f0ac2d698568eb94e2183e4d5f2d2cd1
+      size: 580
     - path: models/ssl_bz/metadata.yaml
-      md5: b71a61f4b322d9c1b2093818eb495807
-      size: 361
+      md5: 12b3b813b4ac6f56ef081fea52bf8cc0
+      size: 562
     - path: models/ssl_bz/model_summary.txt
       md5: c1e5fe62d49c128e6ad38a28289cf576
       size: 12157
     - path: models/ssl_bz/train_plots/
-      md5: 8bc3da841f32ee0c888a9ce2b98ce66f.dir
-      size: 47958
-      nfiles: 1
+      md5: b42ed3598739b1d97e82f10df0f386a6.dir
+      size: 2403083
+      nfiles: 3
     outs:
     - path: models/ssl_bz/report.md
-      md5: 62d52550baa384e3ed3793a7b2f34929
-      size: 13307
+      md5: a26f92cf7727ac0f26aec563a75f3bac
+      size: 13480
   generate-report@ssl_bz_ft_sdobenchmark:
     cmd: printf "# Model report\n" > models/ssl_bz_ft_sdobenchmark/report.md && printf
       "## Training\n" >> models/ssl_bz_ft_sdobenchmark/report.md && printf "### Parameters\n"
@@ -1027,29 +1029,29 @@ stages:
       models/ssl_bz_ft_sdobenchmark/report.md
     deps:
     - path: models/ssl_bz_ft_sdobenchmark/config.yaml
-      md5: d03f1258d2670a3efbe062c1b1e8aa55
-      size: 623
+      md5: 639208cc9029540bff45d87fb3abfe7a
+      size: 629
     - path: models/ssl_bz_ft_sdobenchmark/metadata.yaml
-      md5: 9bb07fcd64d80a9b2b2efd8c804ee659
-      size: 352
+      md5: 57f802ceed06d48b1e05a19e82e22915
+      size: 606
     - path: models/ssl_bz_ft_sdobenchmark/metrics.yaml
-      md5: 385f5e281c435976221470473735d634
-      size: 210
+      md5: c23d31fe4531083d83184520eada458e
+      size: 209
     - path: models/ssl_bz_ft_sdobenchmark/model_summary.txt
       md5: f9b44bd8cc02bd18e7a33a69714bbb2a
       size: 12027
     - path: models/ssl_bz_ft_sdobenchmark/test_plots/
-      md5: 81f43e09172d7cba1156fcf24a447d10.dir
-      size: 898781
+      md5: 229870f4a4f1a63ab0121ce489857b8d.dir
+      size: 878124
       nfiles: 3
     - path: models/ssl_bz_ft_sdobenchmark/train_plots/
-      md5: 26aac5ed79005fcfef73e1524e4c5dc6.dir
-      size: 80592
-      nfiles: 2
+      md5: 1c1826c47e416329b2e64baf9c2d17a3.dir
+      size: 4249585
+      nfiles: 5
     outs:
     - path: models/ssl_bz_ft_sdobenchmark/report.md
-      md5: dacd63aedab49cf2433b2017666fe74e
-      size: 13937
+      md5: 688d84150ab3fe0c6e926881d6901915
+      size: 14197
   generate-pipeline-graph:
     cmd:
     - printf "# Pipeline\n" > models/pipeline.md
@@ -1057,5 +1059,612 @@ stages:
     - rm dot.dag
     outs:
     - path: models/pipeline.md
-      md5: e30681c9679587fe682caef13a57376d
-      size: 1194
+      md5: d05db369d9b4082bdfbd40d7545c15fe
+      size: 2108
+  prepare-data@cls-month:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_month.yaml -v
+    - touch data/sdo-dataset-cls-211-24h-month.placeholder
+    deps:
+    - path: config/dataset_cls_month.yaml
+      md5: 392ca33c3ba8001b75511d531ea62668
+      size: 2382
+    outs:
+    - path: data/sdo-dataset-cls-211-24h-month.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@ssl-2h:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_ssl_2h.yaml -v
+    - touch data/sdo-dataset-ssl-bz-2h.placeholder
+    deps:
+    - path: config/dataset_ssl_2h.yaml
+      md5: bddabaae067b1afa710fb9a11fa457d6
+      size: 2349
+    outs:
+    - path: data/sdo-dataset-ssl-bz-2h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls-bz:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_bz.yaml -v
+    - touch data/sdo-dataset-cls-bz-24h.placeholder
+    deps:
+    - path: config/dataset_cls_bz.yaml
+      md5: b343d712f741e6f6fce2ee00d6a69a59
+      size: 2352
+    outs:
+    - path: data/sdo-dataset-cls-bz-24h.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls-mix:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_mix.yaml -v
+    - touch data/sdo-dataset-cls-211-24h-mix.placeholder
+    deps:
+    - path: config/dataset_cls_mix.yaml
+      md5: ed6b4e3b9770602be7c92893313c9975
+      size: 2392
+    outs:
+    - path: data/sdo-dataset-cls-211-24h-mix.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  finetune@ssl_sdodataset:
+    cmd: python -m solarnet.main train +experiment=ssl_ft_sdodataset -v
+    deps:
+    - path: config/experiment/ssl_ft_sdodataset.yaml
+      md5: e4dfdc03526651578bfcaf8c65a69a59
+      size: 589
+    - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: models/ssl_bz/model.pt
+      md5: e0ee5606237b554c7443a1a3020fa1b6
+      size: 120927500
+    - path: models/ssl_bz/model_config.yaml
+      md5: b61c0770e46e6c6e67b4f5c629941150
+      size: 452
+    - path: solarnet/models/image_classification.py
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
+    - path: solarnet/tasks/train.py
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_bz_ft_sdodataset/config.yaml
+      md5: 0cc9a107f301ab120dacab04d7a7777e
+      size: 604
+    - path: models/ssl_bz_ft_sdodataset/metadata.yaml
+      md5: 672d46a538e2a8c164241e1618f58364
+      size: 622
+    - path: models/ssl_bz_ft_sdodataset/model.ckpt
+      md5: d8d0ef32d0d71b65dc093222062cef5b
+      size: 107458784
+    - path: models/ssl_bz_ft_sdodataset/model.pt
+      md5: d906607d9738bf31c4f990fc9c099962
+      size: 98542958
+    - path: models/ssl_bz_ft_sdodataset/model_config.yaml
+      md5: d52a8d9cc6b34fcedfff7153608cc45b
+      size: 634
+    - path: models/ssl_bz_ft_sdodataset/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdodataset/train_plots/
+      md5: 4c8de195cd37db717d3566e54c0730cb.dir
+      size: 1862357
+      nfiles: 5
+  test@ssl_ft_sdodataset:
+    cmd: python -m solarnet.main test +experiment=ssl_ft_sdodataset
+    deps:
+    - path: config/experiment/ssl_ft_sdodataset.yaml
+      md5: e4dfdc03526651578bfcaf8c65a69a59
+      size: 589
+    - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: models/ssl_bz_ft_sdodataset/model.ckpt
+      md5: d8d0ef32d0d71b65dc093222062cef5b
+      size: 107458784
+    - path: solarnet/models/image_classification.py
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
+    - path: solarnet/tasks/test.py
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+    outs:
+    - path: models/ssl_bz_ft_sdodataset/metrics.yaml
+      md5: 2ccbc3947bbea805943a2c8793c816e6
+      size: 211
+    - path: models/ssl_bz_ft_sdodataset/test_plots/
+      md5: 24d18e6893e074e18543805173892019.dir
+      size: 512530
+      nfiles: 3
+  prepare-data@cls-bz-month:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_bz_month.yaml -v
+    - touch data/sdo-dataset-cls-bz-24h-month.placeholder
+    deps:
+    - path: config/dataset_cls_bz_month.yaml
+      md5: bea6926fac4190b9d49540a18d0a3b6f
+      size: 2380
+    outs:
+    - path: data/sdo-dataset-cls-bz-24h-month.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@ssl-month:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_ssl_month.yaml -v
+    - touch data/sdo-dataset-ssl-bz-1h-month.placeholder
+    deps:
+    - path: config/dataset_ssl_month.yaml
+      md5: 9ac44e5b840cc41a73d97ea7239fced2
+      size: 2368
+    outs:
+    - path: data/sdo-dataset-ssl-bz-1h-month.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls-bz-half:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_bz_half.yaml -v
+    - touch data/sdo-dataset-cls-bz-24h-half.placeholder
+    deps:
+    - path: config/dataset_cls_bz_half.yaml
+      md5: 0441db24c617b456ff6bfed888b8fa5d
+      size: 2445
+    outs:
+    - path: data/sdo-dataset-cls-bz-24h-half.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@ssl-truncated:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_ssl_truncated.yaml -v
+    - touch data/sdo-dataset-ssl-bz-1h-truncated.placeholder
+    deps:
+    - path: config/dataset_ssl_truncated.yaml
+      md5: bc22913ebbf3e733759f428365fe66cc
+      size: 2437
+    outs:
+    - path: data/sdo-dataset-ssl-bz-1h-truncated.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls-bz-2015-2017:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_bz_2015_2017.yaml -v
+    - touch data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
+    deps:
+    - path: config/dataset_cls_bz_2015_2017.yaml
+      md5: a5dad99cfff51df0ebea50487370b3cf
+      size: 2450
+    outs:
+    - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls-bz-2014-2016:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_bz_2014_2016.yaml -v
+    - touch data/sdo-dataset-cls-bz-24h-2014-2016.placeholder
+    deps:
+    - path: config/dataset_cls_bz_2014_2016.yaml
+      md5: 1ef273a133fc6cad32c1bb6c4183529c
+      size: 2448
+    outs:
+    - path: data/sdo-dataset-cls-bz-24h-2014-2016.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@cls-bz-2015-2016:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_cls_bz_2015_2016.yaml -v
+    - touch data/sdo-dataset-cls-bz-24h-2015-2016.placeholder
+    deps:
+    - path: config/dataset_cls_bz_2015_2016.yaml
+      md5: 9925a585ffc9a191cc6a476ebb15770e
+      size: 2450
+    outs:
+    - path: data/sdo-dataset-cls-bz-24h-2015-2016.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  prepare-data@ssl-2010-2014:
+    cmd:
+    - python -m solarnet.main dataset config/dataset_ssl_2010_2014.yaml -v
+    - touch data/sdo-dataset-ssl-bz-1h-2010-2014.placeholder
+    deps:
+    - path: config/dataset_ssl_2010_2014.yaml
+      md5: 21422a81ffe0482c8f929303008fa151
+      size: 2426
+    outs:
+    - path: data/sdo-dataset-ssl-bz-1h-2010-2014.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+  train@ssl-month:
+    cmd: python -m solarnet.main train +experiment=ssl -v
+    deps:
+    - path: config/experiment/ssl.yaml
+      md5: 7a4c5c3ccee366e89bbf35fcd3c4f5a2
+      size: 601
+    - path: data/sdo-dataset-ssl-bz-1h-month.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: solarnet/models/simclr.py
+      md5: 722f53b8ce2e6e5ef995af34e21bbf8b
+      size: 2678
+    - path: solarnet/tasks/train.py
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_bz_month/config.yaml
+      md5: e443f222ecd2a3d86af5577f659aeae7
+      size: 598
+    - path: models/ssl_bz_month/metadata.yaml
+      md5: 331b81466f1ddafb6ce6057e89b66544
+      size: 561
+    - path: models/ssl_bz_month/model.ckpt
+      md5: 264eb7d52b330b033c67c3d9d6dda670
+      size: 360098943
+    - path: models/ssl_bz_month/model.pt
+      md5: ef04908b12949bedbfda4de6d00be406
+      size: 120927500
+    - path: models/ssl_bz_month/model_config.yaml
+      md5: 901cdeaa9a5ab2ca8e5fce469fcb09b2
+      size: 452
+    - path: models/ssl_bz_month/model_summary.txt
+      md5: c1e5fe62d49c128e6ad38a28289cf576
+      size: 12157
+    - path: models/ssl_bz_month/train_plots/
+      md5: a135ba9da85cd2733de079d7aab228df.dir
+      size: 2350308
+      nfiles: 3
+  finetune@ssl_sdobenchmark:
+    cmd: python -m solarnet.main train +experiment=ssl_ft_sdobenchmark -v
+    deps:
+    - path: config/experiment/ssl_ft_sdobenchmark.yaml
+      md5: 535f6321756ae2ab56d99423dee5a35f
+      size: 498
+    - path: data/sdo-benchmark.placeholder
+      md5: 03bc278e4376c8585af17fe4557b0337
+      size: 162
+    - path: models/ssl_bz_month/model.pt
+      md5: ef04908b12949bedbfda4de6d00be406
+      size: 120927500
+    - path: models/ssl_bz_month/model_config.yaml
+      md5: 901cdeaa9a5ab2ca8e5fce469fcb09b2
+      size: 452
+    - path: solarnet/models/image_classification.py
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
+    - path: solarnet/tasks/train.py
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_bz_ft_sdobenchmark/config.yaml
+      md5: 639208cc9029540bff45d87fb3abfe7a
+      size: 629
+    - path: models/ssl_bz_ft_sdobenchmark/metadata.yaml
+      md5: 57f802ceed06d48b1e05a19e82e22915
+      size: 606
+    - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
+      md5: c39c4c02a632f8d46bc0e4824ef80422
+      size: 107458784
+    - path: models/ssl_bz_ft_sdobenchmark/model.pt
+      md5: 8e3fb2dc4f28d9a71150fab42264eeed
+      size: 98542958
+    - path: models/ssl_bz_ft_sdobenchmark/model_config.yaml
+      md5: f53b1530606a6a5a94585b1e24a6454a
+      size: 635
+    - path: models/ssl_bz_ft_sdobenchmark/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdobenchmark/train_plots/
+      md5: 1c1826c47e416329b2e64baf9c2d17a3.dir
+      size: 4249585
+      nfiles: 5
+  test@ssl_ft_sdobenchmark:
+    cmd: python -m solarnet.main test +experiment=ssl_ft_sdobenchmark
+    deps:
+    - path: config/experiment/ssl_ft_sdobenchmark.yaml
+      md5: 535f6321756ae2ab56d99423dee5a35f
+      size: 498
+    - path: data/sdo-benchmark.placeholder
+      md5: 03bc278e4376c8585af17fe4557b0337
+      size: 162
+    - path: models/ssl_bz_ft_sdobenchmark/model.ckpt
+      md5: c39c4c02a632f8d46bc0e4824ef80422
+      size: 107458784
+    - path: solarnet/models/image_classification.py
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
+    - path: solarnet/tasks/test.py
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+    outs:
+    - path: models/ssl_bz_ft_sdobenchmark/metrics.yaml
+      md5: c23d31fe4531083d83184520eada458e
+      size: 209
+    - path: models/ssl_bz_ft_sdobenchmark/test_plots/
+      md5: 229870f4a4f1a63ab0121ce489857b8d.dir
+      size: 878124
+      nfiles: 3
+  finetune@ssl_sdodataset_month:
+    cmd: python -m solarnet.main train +experiment=ssl_ft_sdodataset_month -v
+    deps:
+    - path: config/experiment/ssl_ft_sdodataset_month.yaml
+      md5: 938ac4539ce3580d0caf504adf0060cc
+      size: 234
+    - path: data/sdo-dataset-cls-bz-24h-month.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: models/ssl_bz_month/model.pt
+      md5: ef04908b12949bedbfda4de6d00be406
+      size: 120927500
+    - path: models/ssl_bz_month/model_config.yaml
+      md5: 901cdeaa9a5ab2ca8e5fce469fcb09b2
+      size: 452
+    - path: solarnet/models/image_classification.py
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
+    - path: solarnet/tasks/train.py
+      md5: e574a043828372af93c95d23a8198a24
+      size: 4289
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        name: Baseline binary classification model
+        path: models/baseline_binary_sdobenchmark
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+        training_type: train
+    outs:
+    - path: models/ssl_bz_ft_sdodataset_month/config.yaml
+      md5: 7485e467db36c965d03563001fa1dcd6
+      size: 628
+    - path: models/ssl_bz_ft_sdodataset_month/metadata.yaml
+      md5: de8de62a6049269a4e81dd917a2e5271
+      size: 624
+    - path: models/ssl_bz_ft_sdodataset_month/model.ckpt
+      md5: eb9a41bd64eb976a62fd20c270505f3c
+      size: 107458784
+    - path: models/ssl_bz_ft_sdodataset_month/model.pt
+      md5: af38bc1acd7010b547620c249e11f790
+      size: 98542958
+    - path: models/ssl_bz_ft_sdodataset_month/model_config.yaml
+      md5: 4a42fcfe6a590232aef494992faed8d9
+      size: 635
+    - path: models/ssl_bz_ft_sdodataset_month/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdodataset_month/train_plots/
+      md5: e5f948aa2c883433fb4f2105aa12ea5e.dir
+      size: 1886834
+      nfiles: 5
+  test@ssl_ft_month:
+    cmd: python -m solarnet.main test +experiment=ssl_ft_sdodataset_month
+    deps:
+    - path: config/experiment/ssl_ft_sdodataset_month.yaml
+      md5: 938ac4539ce3580d0caf504adf0060cc
+      size: 234
+    - path: data/sdo-dataset-cls-bz-24h-month.placeholder
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: models/ssl_bz_ft_sdodataset_month/model.ckpt
+      md5: eb9a41bd64eb976a62fd20c270505f3c
+      size: 107458784
+    - path: solarnet/models/image_classification.py
+      md5: 17073e00d8b7a2ea9cc904debc89de86
+      size: 4994
+    - path: solarnet/tasks/test.py
+      md5: 2455c6f3b3a858c022643bac054d015d
+      size: 7371
+    params:
+      config/config.yaml:
+        model:
+          backbone: simple-cnn
+          learning_rate: 0.005
+        seed: 42
+        trainer:
+          epochs: 20
+          patience: 12
+          batch_size: 128
+    outs:
+    - path: models/ssl_bz_ft_sdodataset_month/metrics.yaml
+      md5: 1c85487089ed1e046dbe074c803b105c
+      size: 211
+    - path: models/ssl_bz_ft_sdodataset_month/test_plots/
+      md5: 0dad7b1ccf7077d42c50066a4f6afbd7.dir
+      size: 531940
+      nfiles: 3
+  generate-report@ssl_bz_ft_sdodataset_month:
+    cmd: printf "# Model report\n" > models/ssl_bz_ft_sdodataset_month/report.md &&
+      printf "## Training\n" >> models/ssl_bz_ft_sdodataset_month/report.md && printf
+      "### Parameters\n" >> models/ssl_bz_ft_sdodataset_month/report.md && printf
+      '```yaml\n' >> models/ssl_bz_ft_sdodataset_month/report.md && cat models/ssl_bz_ft_sdodataset_month/config.yaml
+      >> models/ssl_bz_ft_sdodataset_month/report.md && printf '```\n' >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "### Model architecture\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf '```\n' >> models/ssl_bz_ft_sdodataset_month/report.md && cat models/ssl_bz_ft_sdodataset_month/model_summary.txt
+      >> models/ssl_bz_ft_sdodataset_month/report.md && printf '```\n' >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "### Loss curve\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "### Accuracy curve\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n"
+      >> models/ssl_bz_ft_sdodataset_month/report.md && printf "### Metadata\n" >>
+      models/ssl_bz_ft_sdodataset_month/report.md && printf '```yaml\n' >> models/ssl_bz_ft_sdodataset_month/report.md
+      && cat models/ssl_bz_ft_sdodataset_month/metadata.yaml >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf '```\n' >> models/ssl_bz_ft_sdodataset_month/report.md && printf "##
+      Test\n" >> models/ssl_bz_ft_sdodataset_month/report.md && printf "### Metrics\n"
+      >> models/ssl_bz_ft_sdodataset_month/report.md && dvc metrics show --show-md
+      models/ssl_bz_ft_sdodataset_month/metrics.yaml --precision 4 >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "### Confusion matrix\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+      && printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/ssl_bz_ft_sdodataset_month/report.md && printf "### ROC Curve\n" >>
+      models/ssl_bz_ft_sdodataset_month/report.md && printf "![ROC Curve](test_plots/roc_curve.png
+      'ROC Curve')\n\n" >> models/ssl_bz_ft_sdodataset_month/report.md && printf "###
+      Test samples\n" >> models/ssl_bz_ft_sdodataset_month/report.md && printf "![Test
+      samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+    deps:
+    - path: models/ssl_bz_ft_sdodataset_month/config.yaml
+      md5: 7485e467db36c965d03563001fa1dcd6
+      size: 628
+    - path: models/ssl_bz_ft_sdodataset_month/metadata.yaml
+      md5: de8de62a6049269a4e81dd917a2e5271
+      size: 624
+    - path: models/ssl_bz_ft_sdodataset_month/metrics.yaml
+      md5: 1c85487089ed1e046dbe074c803b105c
+      size: 211
+    - path: models/ssl_bz_ft_sdodataset_month/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdodataset_month/test_plots/
+      md5: 0dad7b1ccf7077d42c50066a4f6afbd7.dir
+      size: 531940
+      nfiles: 3
+    - path: models/ssl_bz_ft_sdodataset_month/train_plots/
+      md5: e5f948aa2c883433fb4f2105aa12ea5e.dir
+      size: 1886834
+      nfiles: 5
+    outs:
+    - path: models/ssl_bz_ft_sdodataset_month/report.md
+      md5: 371e1fd567703b1d39ebae0a8be1764d
+      size: 14226
+  generate-report@ssl_bz_ft_sdodataset:
+    cmd: printf "# Model report\n" > models/ssl_bz_ft_sdodataset/report.md && printf
+      "## Training\n" >> models/ssl_bz_ft_sdodataset/report.md && printf "### Parameters\n"
+      >> models/ssl_bz_ft_sdodataset/report.md && printf '```yaml\n' >> models/ssl_bz_ft_sdodataset/report.md
+      && cat models/ssl_bz_ft_sdodataset/config.yaml >> models/ssl_bz_ft_sdodataset/report.md
+      && printf '```\n' >> models/ssl_bz_ft_sdodataset/report.md && printf "### Model
+      architecture\n" >> models/ssl_bz_ft_sdodataset/report.md && printf '```\n' >>
+      models/ssl_bz_ft_sdodataset/report.md && cat models/ssl_bz_ft_sdodataset/model_summary.txt
+      >> models/ssl_bz_ft_sdodataset/report.md && printf '```\n' >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "### Loss curve\n" >> models/ssl_bz_ft_sdodataset/report.md && printf
+      "![Loss curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "### Accuracy curve\n" >> models/ssl_bz_ft_sdodataset/report.md &&
+      printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n"
+      >> models/ssl_bz_ft_sdodataset/report.md && printf "### Metadata\n" >> models/ssl_bz_ft_sdodataset/report.md
+      && printf '```yaml\n' >> models/ssl_bz_ft_sdodataset/report.md && cat models/ssl_bz_ft_sdodataset/metadata.yaml
+      >> models/ssl_bz_ft_sdodataset/report.md && printf '```\n' >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "## Test\n" >> models/ssl_bz_ft_sdodataset/report.md && printf "###
+      Metrics\n" >> models/ssl_bz_ft_sdodataset/report.md && dvc metrics show --show-md
+      models/ssl_bz_ft_sdodataset/metrics.yaml --precision 4 >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "### Confusion matrix\n" >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n"
+      >> models/ssl_bz_ft_sdodataset/report.md && printf "### ROC Curve\n" >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/ssl_bz_ft_sdodataset/report.md
+      && printf "### Test samples\n" >> models/ssl_bz_ft_sdodataset/report.md && printf
+      "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/ssl_bz_ft_sdodataset/report.md
+    deps:
+    - path: models/ssl_bz_ft_sdodataset/config.yaml
+      md5: 0cc9a107f301ab120dacab04d7a7777e
+      size: 604
+    - path: models/ssl_bz_ft_sdodataset/metadata.yaml
+      md5: 672d46a538e2a8c164241e1618f58364
+      size: 622
+    - path: models/ssl_bz_ft_sdodataset/metrics.yaml
+      md5: 2ccbc3947bbea805943a2c8793c816e6
+      size: 211
+    - path: models/ssl_bz_ft_sdodataset/model_summary.txt
+      md5: f9b44bd8cc02bd18e7a33a69714bbb2a
+      size: 12027
+    - path: models/ssl_bz_ft_sdodataset/test_plots/
+      md5: 24d18e6893e074e18543805173892019.dir
+      size: 512530
+      nfiles: 3
+    - path: models/ssl_bz_ft_sdodataset/train_plots/
+      md5: 4c8de195cd37db717d3566e54c0730cb.dir
+      size: 1862357
+      nfiles: 5
+    outs:
+    - path: models/ssl_bz_ft_sdodataset/report.md
+      md5: 2b7e29383712828b790833de4e605c20
+      size: 14179
+  generate-report-ssl@ssl_bz_month:
+    cmd: printf "# Model report\n" > models/ssl_bz_month/report.md && printf "## Training\n"
+      >> models/ssl_bz_month/report.md && printf "### Parameters\n" >> models/ssl_bz_month/report.md
+      && printf '```yaml\n' >> models/ssl_bz_month/report.md && cat models/ssl_bz_month/config.yaml
+      >> models/ssl_bz_month/report.md && printf '```\n' >> models/ssl_bz_month/report.md
+      && printf "### Model architecture\n" >> models/ssl_bz_month/report.md && printf
+      '```\n' >> models/ssl_bz_month/report.md && cat models/ssl_bz_month/model_summary.txt
+      >> models/ssl_bz_month/report.md && printf '```\n' >> models/ssl_bz_month/report.md
+      && printf "### Loss curve\n" >> models/ssl_bz_month/report.md && printf "![Loss
+      curve](train_plots/loss_curve.png 'Loss curve')\n\n" >> models/ssl_bz_month/report.md
+      && printf "### Metadata\n" >> models/ssl_bz_month/report.md && printf '```yaml\n'
+      >> models/ssl_bz_month/report.md && cat models/ssl_bz_month/metadata.yaml >>
+      models/ssl_bz_month/report.md && printf '```\n' >> models/ssl_bz_month/report.md
+    deps:
+    - path: models/ssl_bz_month/config.yaml
+      md5: e443f222ecd2a3d86af5577f659aeae7
+      size: 598
+    - path: models/ssl_bz_month/metadata.yaml
+      md5: 331b81466f1ddafb6ce6057e89b66544
+      size: 561
+    - path: models/ssl_bz_month/model_summary.txt
+      md5: c1e5fe62d49c128e6ad38a28289cf576
+      size: 12157
+    - path: models/ssl_bz_month/train_plots/
+      md5: a135ba9da85cd2733de079d7aab228df.dir
+      size: 2350308
+      nfiles: 3
+    outs:
+    - path: models/ssl_bz_month/report.md
+      md5: 443df7a18d94597590a9f851dad0e670
+      size: 13497

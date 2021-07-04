@@ -1,0 +1,34 @@
+data:
+  name: sdo-dataset
+  channel: bz
+  size: 128
+  targets:
+    classes:
+    - Quiet: < 1e-6
+    - '>=C': '>= 1e-6'
+  path: data/sdo-dataset-cls-bz-24h-2015-2017
+model:
+  backbone: resnet50
+  learning_rate: 2e-05
+  n_hidden: 512
+  dropout: 0.5
+  lr_scheduler: false
+  lr_scheduler_warmup_steps: 50
+trainer:
+  epochs: 50
+  patience: 10
+  batch_size: 128
+name: Finetune SimCLR on SDO-Dataset
+training_type: finetune
+tune_lr: false
+path: models/ssl_bz_ft_sdodataset
+seed: 42
+tracking: true
+system:
+  gpus: 1
+  workers: 20
+finetune:
+  base: models/ssl_bz
+  backbone_unfreeze_epoch: 50
+tags:
+- sdo-dataset

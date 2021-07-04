@@ -3,9 +3,13 @@ defaults:
   - override /data: sdo-dataset
 
 data:
-  channel: 211
+  channel: bz
   size: 256
-  path: data/sdo-dataset-cls-211-24h
+  path: data/sdo-dataset-cls-bz-24h-2015-2017
+  targets:
+    classes:
+      - Quiet: "< 1e-6"
+      - ">=C": ">= 1e-6"
 
 model:
   backbone: simple-cnn
@@ -21,5 +25,6 @@ trainer:
   patience: 12
   batch_size: 128
 
-name: Binary classification model on SDO-Dataset
+name: Binary classification model on SDO-Dataset, Bz, split val on month, test on 2015-2017
+tags: ["sdo-dataset"]
 path: models/baseline_binary_sdodataset

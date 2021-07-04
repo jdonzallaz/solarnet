@@ -1,0 +1,9 @@
+# @package _global_
+defaults:
+  - ssl
+
+data:
+  path: data/sdo-dataset-ssl-bz-1h-month
+
+name: Self-supervised learning (SimCLR) on SDO-Dataset, split per month
+path: models/ssl_bz_month

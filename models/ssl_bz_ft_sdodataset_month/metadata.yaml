@@ -1,0 +1,28 @@
+machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
+training_time: 452.04s
+model_size: 107458kB
+early_stopping_epoch: 0
+model_checkpoint_step: 1050
+model_checkpoint_epoch: 50
+tracking_id: SOLN-389
+data:
+  class-balance:
+    train:
+      Quiet: 1248
+      '>=C': 1320
+    val:
+      Quiet: 127
+      '>=C': 134
+    test:
+      Quiet: 127
+      '>=C': 138
+  shape: (1, 128, 224)
+  tensor-data:
+    min: -1.0
+    max: 0.795974612236023
+    mean: -0.0002628046495374292
+    std: 0.028836458921432495
+  set-sizes:
+    train: 2568
+    val: 261
+    test: 265

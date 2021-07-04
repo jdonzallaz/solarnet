@@ -1,5 +1,5 @@
 # Choose destination for the dataset file(s). Default to current dir.
-destination: data/sdo-dataset-ssl-bz-1h
+destination: data/sdo-dataset-cls-bz-24h-month
 # Base filename for the metadata files. If splits-separate-files is true, the split's name will be appended to the
 # filename. E.g.: sdo-dataset-train.csv
 filename: sdo-dataset.csv
@@ -15,11 +15,11 @@ copy: true
 channel: Bz
 
 # In which time span the target (peak flux) will be selected. Format supported by pandas.Timedelta.
-flare-period: 1h
+flare-period: 24h
 
 # A sample will be created every "sample-interval". This will often be the same as "flare-period",
 # but can be customized for special cases. Format supported by pandas.Timedelta.
-sample-interval: 1h
+sample-interval: 24h
 
 # The different times before the flare to choose images. Format supported by pandas.Timedelta.
 time-steps:
@@ -30,26 +30,30 @@ time-steps:
 # A range of 15 minutes will search 15m before and after the original time.
 search-image-period: 20m
 
-# Set of splits with years to include in each
+# Set of splits. Accepts either years (4 digits) or months (3 first letters) to include in each split.
+# If there is both month and years in splits, years take priority.
 splits:
   train:
-    - 2010
-    - 2011
-    - 2013
-    - 2014
-    - 2015
-    - 2016
-    - 2018
+    - jan
+    - feb
+    - mar
+    - apr
+    - may
+    - jun
+    - jul
+    - aug
+    - sep
+    - oct
   val:
-    - 2012
+    - nov
   test:
-    - 2017
+    - dec
+
+# Add a margin between the split to avoid having too similar images. Format supported by pandas.Timedelta.
+margin-between-splits: 2d
 
 # Whether to put splits in separate files. Otherwise, a column in the csv will specify the split
 splits-separate-files: true
-
-# In which time span the target (peak flux) will be selected. Format supported by pandas.Timedelta.
-flare-time-range: 1h
 
 # Choose type of targets between regression and classification
 # With classification, the classes must be defined as a list of key (name of the class) - value (comparison) which are

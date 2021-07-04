@@ -54,6 +54,10 @@ def stats_dataset(
     # Histogram
     if hist_path is not None:
         logger.info("Computing histogram")
+
+        import matplotlib
+        matplotlib.rcParams['font.size'] = 18
+
         global_hist = torch.zeros(n_bins)
         for sample in tqdm(dataset):
             hist = torch.histc(sample[0].flatten(), bins=n_bins, min=min, max=max)

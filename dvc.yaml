@@ -1,6 +1,8 @@
 stages:
   download-dataset:
-    cmd: python -m solarnet.main download sdo-benchmark-zip
+    cmd:
+      - python -m solarnet.main download sdo-benchmark data
+      - touch data/sdo-benchmark.placeholder
     deps:
       - config/minio.yaml
     outs:
@@ -10,12 +12,18 @@ stages:
 
   prepare-data:
     foreach:
-      cls:
-        config: dataset_cls.yaml
-        output: sdo-dataset-cls-211-24h
-      ssl:
-        config: dataset_ssl.yaml
-        output: sdo-dataset-ssl-bz-1h
+      cls-bz-month:
+        config: dataset_cls_bz_month.yaml
+        output: sdo-dataset-cls-bz-24h-month
+      cls-bz-2015-2017:
+        config: dataset_cls_bz_2015_2017.yaml
+        output: sdo-dataset-cls-bz-24h-2015-2017
+      ssl-month:
+        config: dataset_ssl_month.yaml
+        output: sdo-dataset-ssl-bz-1h-month
+      ssl-2010-2014:
+        config: dataset_ssl_2010_2014.yaml
+        output: sdo-dataset-ssl-bz-1h-2010-2014
     do:
       cmd:
         - python -m solarnet.main dataset config/${item.config} -v
@@ -48,12 +56,17 @@ stages:
         experiment: baseline_binary_sdodataset
         path: baseline_binary_sdodataset
         model: image_classification
-        dataset: sdo-dataset-cls-211-24h
+        dataset: sdo-dataset-cls-bz-24h-2015-2017
       ssl:
         experiment: ssl
         path: ssl_bz
         model: simclr
-        dataset: sdo-dataset-ssl-bz-1h
+        dataset: sdo-dataset-ssl-bz-1h-2010-2014
+      ssl-month:
+        experiment: ssl
+        path: ssl_bz_month
+        model: simclr
+        dataset: sdo-dataset-ssl-bz-1h-month
     do:
       cmd: python -m solarnet.main train +experiment=${item.experiment} -v
       params:
@@ -85,12 +98,24 @@ stages:
 
   finetune:
     foreach:
-      ssl:
-        base: ssl_bz
+      ssl_sdobenchmark:
+        base: ssl_bz_month
         experiment: ssl_ft_sdobenchmark
         path: ssl_bz_ft_sdobenchmark
         model: image_classification
         dataset: sdo-benchmark
+      ssl_sdodataset:
+        base: ssl_bz
+        experiment: ssl_ft_sdodataset
+        path: ssl_bz_ft_sdodataset
+        model: image_classification
+        dataset: sdo-dataset-cls-bz-24h-2015-2017
+      ssl_sdodataset_month:
+        base: ssl_bz_month
+        experiment: ssl_ft_sdodataset_month
+        path: ssl_bz_ft_sdodataset_month
+        model: image_classification
+        dataset: sdo-dataset-cls-bz-24h-month
     do:
       cmd: python -m solarnet.main train +experiment=${item.experiment} -v
       params:
@@ -146,13 +171,25 @@ stages:
         experiment: baseline_binary_sdodataset
         path: baseline_binary_sdodataset
         model: image_classification
-        dataset: sdo-dataset-cls-211-24h
+        dataset: sdo-dataset-cls-bz-24h-2015-2017
         plot: confusion_matrix
-      ssl_ft:
+      ssl_ft_sdobenchmark:
         experiment: ssl_ft_sdobenchmark
         path: ssl_bz_ft_sdobenchmark
         model: image_classification
         dataset: sdo-benchmark
+        plot: confusion_matrix
+      ssl_ft_sdodataset:
+        experiment: ssl_ft_sdodataset
+        path: ssl_bz_ft_sdodataset
+        model: image_classification
+        dataset: sdo-dataset-cls-bz-24h-2015-2017
+        plot: confusion_matrix
+      ssl_ft_month:
+        experiment: ssl_ft_sdodataset_month
+        path: ssl_bz_ft_sdodataset_month
+        model: image_classification
+        dataset: sdo-dataset-cls-bz-24h-month
         plot: confusion_matrix
     do:
       cmd: python -m solarnet.main test +experiment=${item.experiment}
@@ -230,6 +267,30 @@ stages:
           printf "### ROC Curve\n" >> models/ssl_bz_ft_sdobenchmark/report.md &&
           printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/ssl_bz_ft_sdobenchmark/report.md
         precision: 4
+      ssl_bz_ft_sdodataset:
+        report: "models/ssl_bz_ft_sdodataset/report.md"
+        path: ssl_bz_ft_sdodataset
+        train_plots_cmd: >-
+          printf "### Accuracy curve\n" >> models/ssl_bz_ft_sdodataset/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/ssl_bz_ft_sdodataset/report.md
+        test_plots_cmd: >-
+          printf "### Confusion matrix\n" >> models/ssl_bz_ft_sdodataset/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/ssl_bz_ft_sdodataset/report.md &&
+          printf "### ROC Curve\n" >> models/ssl_bz_ft_sdodataset/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/ssl_bz_ft_sdodataset/report.md
+        precision: 4
+      ssl_bz_ft_sdodataset_month:
+        report: "models/ssl_bz_ft_sdodataset_month/report.md"
+        path: ssl_bz_ft_sdodataset_month
+        train_plots_cmd: >-
+          printf "### Accuracy curve\n" >> models/ssl_bz_ft_sdodataset_month/report.md &&
+          printf "![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')\n\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+        test_plots_cmd: >-
+          printf "### Confusion matrix\n" >> models/ssl_bz_ft_sdodataset_month/report.md &&
+          printf "![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')\n\n" >> models/ssl_bz_ft_sdodataset_month/report.md &&
+          printf "### ROC Curve\n" >> models/ssl_bz_ft_sdodataset_month/report.md &&
+          printf "![ROC Curve](test_plots/roc_curve.png 'ROC Curve')\n\n" >> models/ssl_bz_ft_sdodataset_month/report.md
+        precision: 4
     do:
       cmd: >-
         printf "# Model report\n" > ${item.report} &&
@@ -271,6 +332,9 @@ stages:
       ssl_bz:
         report: "models/ssl_bz/report.md"
         path: ssl_bz
+      ssl_bz_month:
+        report: "models/ssl_bz_month/report.md"
+        path: ssl_bz_month
     do:
       cmd: >-
         printf "# Model report\n" > ${item.report} &&

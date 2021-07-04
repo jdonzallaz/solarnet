@@ -1,17 +1,14 @@
 data:
   name: sdo-dataset
-  channel: Bz
+  channel: bz
   size: 128
   targets:
     classes:
     - Quiet: < 1e-6
     - '>=C': '>= 1e-6'
-  path: data/sdo-dataset-ssl-bz-1h-1
+  path: data/sdo-dataset-ssl-bz-1h-2010-2014
 model:
   backbone: resnet50
-  activation: relu6
-  pooling: 0
-  dropout: 0.5
   learning_rate: 0.001
   hidden_mlp: 2048
   feat_dim: 64
@@ -34,3 +31,5 @@ ssl:
   online:
     learning_rate: 1e-05
     n_hidden: 128
+tags:
+- ssl

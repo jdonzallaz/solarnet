@@ -22,10 +22,7 @@ def model_from_config(parameters: dict, datamodule: LightningDataModule) -> Ligh
     steps_per_epoch = len(datamodule.train_dataloader())
     total_steps = parameters["trainer"]["epochs"] * steps_per_epoch
 
-    if parameters["data"]["name"] == "sdo-dataset":
-        class_weight = [0.5, 7]
-    else:
-        class_weight = compute_class_weight(datamodule.dataset_train)
+    class_weight = compute_class_weight(datamodule.dataset_train)
 
     regression = parameters["data"]["targets"] == "regression"
     if regression:
@@ -106,10 +103,12 @@ def finetune(parameters: dict):
 
     total_steps = parameters["trainer"]["epochs"] * len(datamodule.train_dataloader())
 
+    class_weight = None  # compute_class_weight(datamodule.dataset_train)
+
     model = ImageClassification.from_pretrained(
         Path(parameters["finetune"]["base"]),
         n_class=len(parameters["data"]["targets"]["classes"]),
-        class_weight=compute_class_weight(datamodule.dataset_train),
+        class_weight=class_weight,
         lr_scheduler_total_steps=total_steps,
         **parameters["model"],
         print_incompatible_keys=True,

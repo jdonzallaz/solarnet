@@ -1,6 +1,7 @@
 import re
 import shutil
 from pathlib import Path
+import zipfile
 
 
 def rename_file(path: Path, new_name: str, keep_old: bool = False):
@@ -41,3 +42,17 @@ def rm_rf(path: Path):
         shutil.rmtree(path)
     elif path.exists():
         path.unlink()
+
+
+def unzip(zip_file: Path, destination: Path, delete_file: bool = False):
+    """
+    Unzip a zip file to the destination folder. Optionnaly delete the zip file after the decompression.
+
+    :param zip_file: file to decompress
+    :param destination: destination folder
+    :param delete_file: whether to delete the zip file after the decompression
+    """
+
+    with zipfile.ZipFile(zip_file, "r") as zip_ref:
+        zip_ref.extractall(destination)
+    zip_file.unlink()  # Delete archive

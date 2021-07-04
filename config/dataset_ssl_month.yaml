@@ -1,5 +1,5 @@
 # Choose destination for the dataset file(s). Default to current dir.
-destination: data/sdo-dataset-cls-211-24h
+destination: data/sdo-dataset-ssl-bz-1h-month
 # Base filename for the metadata files. If splits-separate-files is true, the split's name will be appended to the
 # filename. E.g.: sdo-dataset-train.csv
 filename: sdo-dataset.csv
@@ -12,14 +12,14 @@ relative_paths: true
 copy: true
 
 # Choose channel among: 94, 131, 171, 193, 211, 304, 335, 1600, 1700, 4500.
-channel: 211
+channel: Bz
 
 # In which time span the target (peak flux) will be selected. Format supported by pandas.Timedelta.
-flare-period: 24h
+flare-period: 1h
 
 # A sample will be created every "sample-interval". This will often be the same as "flare-period",
 # but can be customized for special cases. Format supported by pandas.Timedelta.
-sample-interval: 24h
+sample-interval: 1h
 
 # The different times before the flare to choose images. Format supported by pandas.Timedelta.
 time-steps:
@@ -30,20 +30,26 @@ time-steps:
 # A range of 15 minutes will search 15m before and after the original time.
 search-image-period: 20m
 
-# Set of splits with years to include in each
+# Set of splits. Accepts either years (4 digits) or months (3 first letters) to include in each split.
+# If there is both month and years in splits, years take priority.
 splits:
   train:
-    - 2010
-    - 2011
-    - 2013
-    - 2014
-    - 2015
-    - 2016
-    - 2018
+    - jan
+    - feb
+    - mar
+    - apr
+    - may
+    - jun
+    - jul
+    - aug
+    - sep
+    - oct
+    - nov
   val:
-    - 2012
-  test:
-    - 2017
+    - dec
+
+# Add a margin between the split to avoid having too similar images. Format supported by pandas.Timedelta.
+margin-between-splits: 0
 
 # Whether to put splits in separate files. Otherwise, a column in the csv will specify the split
 splits-separate-files: true

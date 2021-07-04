@@ -9,6 +9,7 @@ from torch import nn
 from torch.nn.modules.module import _IncompatibleKeys
 
 from solarnet.callbacks import TimerCallback
+from solarnet.utils.data import data_info
 from solarnet.utils.hardware import machine_summary
 
 logger = logging.getLogger(__name__)
@@ -26,12 +27,14 @@ def pytorch_model_summary(model: nn.Module, path: Path, filename: str = "model_s
 
 def get_training_summary(
     model_file: Path,
+    parameters: dict,
     tracking_id: Union[str, int],
     timer_callback: TimerCallback,
     datamodule: pl.LightningDataModule,
     early_stop_callback: Optional[pl.callbacks.EarlyStopping],
     checkpoint_callback: pl.callbacks.ModelCheckpoint,
     steps_per_epoch: int,
+    save_path: Path = None,
 ):
     model_size_kB = int(model_file.stat().st_size / 1000)
 
@@ -47,11 +50,7 @@ def get_training_summary(
         "model_checkpoint_step": model_checkpoint_step,
         "model_checkpoint_epoch": model_checkpoint_step // steps_per_epoch,
         "tracking_id": tracking_id,
-        "dataset": {
-            "training_set_size": len(datamodule.train_dataloader().dataset),
-            "validation_set_size": len(datamodule.val_dataloader().dataset),
-            "test_set_size": len(datamodule.test_dataloader().dataset),
-        },
+        "data": data_info(datamodule, parameters, save_path),
     }
 
 

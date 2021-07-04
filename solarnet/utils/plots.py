@@ -86,7 +86,7 @@ def plot_image_grid(
     labels: List[str] = None,
     columns: int = 5,
     width: int = 22,
-    height: int = 6,
+    height: Optional[int] = None,
     max_images: int = 10,
     label_font_size: int = 14,
     save_path: Optional[Path] = None,
@@ -102,7 +102,7 @@ def plot_image_grid(
     :param labels: list of string labels
     :param columns: number of images to show in a row
     :param width: width of the figure
-    :param height: height of the figure
+    :param height: height of the figure, optional. Computed if None.
     :param max_images: Number max of image to show from the given list
     :param label_font_size: Size of the labels
     :param save_path: optional path where the figure will be saved
@@ -114,11 +114,11 @@ def plot_image_grid(
     if len(images) > max_images:
         images = images[0:max_images]
 
-    is_regression = not isinstance(y[0], int)
+    is_regression = y is not None and not isinstance(y[0], int)
     if is_regression:
         pretty_label = lambda x: f'{x:.1e}'
 
-    height = max(height, int(len(images) / columns) * height)
+    height = width * math.ceil(len(images) / columns) / columns * 1.33
 
     plt.figure(figsize=(width, height))
     # plt.subplots_adjust(wspace=0.05)
@@ -384,4 +384,5 @@ def plot_histogram(
     if save_path is None:
         plt.show()
     else:
+        plt.tight_layout()
         plt.savefig(save_path)

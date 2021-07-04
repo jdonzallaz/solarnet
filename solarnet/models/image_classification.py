@@ -66,7 +66,7 @@ class ImageClassification(BaseModel):
                 StatScores(
                     num_classes=self.hparams.n_class if self.hparams.n_class > 2 else 1,
                     reduce="micro",
-                    is_multiclass=self.hparams.n_class > 2,
+                    multiclass=self.hparams.n_class > 2,
                 ),
             ]
         )
@@ -85,6 +85,10 @@ class ImageClassification(BaseModel):
     @auto_move_data
     def forward(self, image):
         return self.classifier(self.backbone(image))
+
+    def predict_step(self, batch, batch_idx: int , dataloader_idx: int = None):
+        image, _ = batch
+        return self(image)
 
     def training_step(self, batch, batch_id):
         return self.step(batch, step_type="train")
