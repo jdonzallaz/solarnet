@@ -22,7 +22,7 @@ trainer:
   epochs: 50
   patience: 10
   batch_size: 128
-name: Finetune SimCLR on SDO-Dataset
+name: Finetune SimCLR on SDO-Dataset, unfreeze 40
 training_type: finetune
 tune_lr: false
 path: models/ssl_bz_ft_sdodataset
@@ -33,7 +33,7 @@ system:
   workers: 20
 finetune:
   base: models/ssl_bz
-  backbone_unfreeze_epoch: 50
+  backbone_unfreeze_epoch: 40
 tags:
 - sdo-dataset
 - ft
@@ -250,12 +250,12 @@ Total parameters: 24552898
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 336.47s
-model_size: 107458kB
+training_time: 352.49s
+model_size: 295085kB
 early_stopping_epoch: 0
 model_checkpoint_step: 576
 model_checkpoint_epoch: 48
-tracking_id: SOLN-420
+tracking_id: SOLN-421
 data:
   class-balance:
     train:
@@ -280,9 +280,9 @@ data:
 ```
 ## Test
 ### Metrics
-| Path                                     | accuracy   | balanced_accuracy   | csi    | f1     | far   | hss    | pod    | tss    |
-|------------------------------------------|------------|---------------------|--------|--------|-------|--------|--------|--------|
-| models/ssl_bz_ft_sdodataset/metrics.yaml | 0.7325     | 0.7217              | 0.5017 | 0.7221 | 0.328 | 0.4442 | 0.6644 | 0.4434 |
+| Path                                     | accuracy   | balanced_accuracy   | csi    | f1     | far    | hss    | pod    | tss    |
+|------------------------------------------|------------|---------------------|--------|--------|--------|--------|--------|--------|
+| models/ssl_bz_ft_sdodataset/metrics.yaml | 0.739      | 0.7231              | 0.4982 | 0.7256 | 0.3071 | 0.4518 | 0.6395 | 0.4463 |
 
 ### Confusion matrix
 ![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')

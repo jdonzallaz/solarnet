@@ -4,10 +4,6 @@ stages:
     cmd:
     - python -m solarnet.main download sdo-benchmark data
     - touch data/sdo-benchmark.placeholder
-    deps:
-    - path: config/minio.yaml
-      md5: 2cf2c6bc04bcddb76df1d97aae80ba0a
-      size: 117
     outs:
     - path: data/sdo-benchmark.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
@@ -1113,7 +1109,7 @@ stages:
     cmd: python -m solarnet.main train +experiment=ssl_ft_sdodataset -v
     deps:
     - path: config/experiment/ssl_ft_sdodataset.yaml
-      md5: ef6a6f7ce695393139684d857a07ec65
+      md5: ee7bacac1a39aff968fdee7702bb6089
       size: 595
     - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
@@ -1145,17 +1141,17 @@ stages:
         training_type: train
     outs:
     - path: models/ssl_bz_ft_sdodataset/config.yaml
-      md5: b6167de0331acf9aff2383bcc335855a
-      size: 609
+      md5: 8a7cf55efe1984304d86f55514414e5d
+      size: 622
     - path: models/ssl_bz_ft_sdodataset/metadata.yaml
-      md5: f26a75c278ab592f3938ef496d4684d9
+      md5: 2d1f0779819d19d3280ce8ddb9f52d68
       size: 622
     - path: models/ssl_bz_ft_sdodataset/model.ckpt
-      md5: 7be0641c17280917ded9dd1525e076a7
-      size: 107458784
+      md5: f5a811ce6d165fd4c2d554c1c4087025
+      size: 295085274
     - path: models/ssl_bz_ft_sdodataset/model.pt
-      md5: 70d8af06d7abf675e7105e7b70b09517
-      size: 98542958
+      md5: 25b54adf300a39b210071b977e12e693
+      size: 98542961
     - path: models/ssl_bz_ft_sdodataset/model_config.yaml
       md5: d52a8d9cc6b34fcedfff7153608cc45b
       size: 634
@@ -1163,21 +1159,21 @@ stages:
       md5: f9b44bd8cc02bd18e7a33a69714bbb2a
       size: 12027
     - path: models/ssl_bz_ft_sdodataset/train_plots/
-      md5: 4c8de195cd37db717d3566e54c0730cb.dir
-      size: 1862357
+      md5: bbb01ea1b92334c96c91fff631348abc.dir
+      size: 1862897
       nfiles: 5
   test@ssl_ft_sdodataset:
     cmd: python -m solarnet.main test +experiment=ssl_ft_sdodataset
     deps:
     - path: config/experiment/ssl_ft_sdodataset.yaml
-      md5: ef6a6f7ce695393139684d857a07ec65
+      md5: ee7bacac1a39aff968fdee7702bb6089
       size: 595
     - path: data/sdo-dataset-cls-bz-24h-2015-2017.placeholder
       md5: d41d8cd98f00b204e9800998ecf8427e
       size: 0
     - path: models/ssl_bz_ft_sdodataset/model.ckpt
-      md5: 7be0641c17280917ded9dd1525e076a7
-      size: 107458784
+      md5: f5a811ce6d165fd4c2d554c1c4087025
+      size: 295085274
     - path: solarnet/models/image_classification.py
       md5: 17073e00d8b7a2ea9cc904debc89de86
       size: 4994
@@ -1196,11 +1192,11 @@ stages:
           batch_size: 128
     outs:
     - path: models/ssl_bz_ft_sdodataset/metrics.yaml
-      md5: 2ccbc3947bbea805943a2c8793c816e6
-      size: 211
+      md5: 1b87948de48f7193aaca9c26f2268649
+      size: 212
     - path: models/ssl_bz_ft_sdodataset/test_plots/
-      md5: 24d18e6893e074e18543805173892019.dir
-      size: 512530
+      md5: 79c3b3e7f3ce34812f3705e17bb7742f.dir
+      size: 514309
       nfiles: 3
   prepare-data@cls-bz-month:
     cmd:
@@ -1614,29 +1610,29 @@ stages:
       "![Test samples](test_plots/test_samples.png 'Test samples')\n\n" >> models/ssl_bz_ft_sdodataset/report.md
     deps:
     - path: models/ssl_bz_ft_sdodataset/config.yaml
-      md5: b6167de0331acf9aff2383bcc335855a
-      size: 609
+      md5: 8a7cf55efe1984304d86f55514414e5d
+      size: 622
     - path: models/ssl_bz_ft_sdodataset/metadata.yaml
-      md5: f26a75c278ab592f3938ef496d4684d9
+      md5: 2d1f0779819d19d3280ce8ddb9f52d68
       size: 622
     - path: models/ssl_bz_ft_sdodataset/metrics.yaml
-      md5: 2ccbc3947bbea805943a2c8793c816e6
-      size: 211
+      md5: 1b87948de48f7193aaca9c26f2268649
+      size: 212
     - path: models/ssl_bz_ft_sdodataset/model_summary.txt
       md5: f9b44bd8cc02bd18e7a33a69714bbb2a
       size: 12027
     - path: models/ssl_bz_ft_sdodataset/test_plots/
-      md5: 24d18e6893e074e18543805173892019.dir
-      size: 512530
+      md5: 79c3b3e7f3ce34812f3705e17bb7742f.dir
+      size: 514309
       nfiles: 3
     - path: models/ssl_bz_ft_sdodataset/train_plots/
-      md5: 4c8de195cd37db717d3566e54c0730cb.dir
-      size: 1862357
+      md5: bbb01ea1b92334c96c91fff631348abc.dir
+      size: 1862897
       nfiles: 5
     outs:
     - path: models/ssl_bz_ft_sdodataset/report.md
-      md5: 466b66b926636523a4e5174f251b7a00
-      size: 14184
+      md5: 613617bf552da03bfec908942baf5ef9
+      size: 14200
   generate-report-ssl@ssl_bz_month:
     cmd: printf "# Model report\n" > models/ssl_bz_month/report.md && printf "## Training\n"
       >> models/ssl_bz_month/report.md && printf "### Parameters\n" >> models/ssl_bz_month/report.md

@@ -18,7 +18,7 @@ trainer:
   epochs: 50
   patience: 10
   batch_size: 128
-name: Finetune SimCLR on SDO-Dataset
+name: Finetune SimCLR on SDO-Dataset, unfreeze 40
 training_type: finetune
 tune_lr: false
 path: models/ssl_bz_ft_sdodataset
@@ -29,7 +29,7 @@ system:
   workers: 20
 finetune:
   base: models/ssl_bz
-  backbone_unfreeze_epoch: 50
+  backbone_unfreeze_epoch: 40
 tags:
 - sdo-dataset
 - ft
