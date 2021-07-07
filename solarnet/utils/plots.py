@@ -114,7 +114,7 @@ def plot_image_grid(
     if len(images) > max_images:
         images = images[0:max_images]
 
-    is_regression = y is not None and not isinstance(y[0], int)
+    is_regression = y is not None and not isinstance(y[0], int) and not isinstance(y[0], str)
     if is_regression:
         pretty_label = lambda x: f'{x:.1e}'
 

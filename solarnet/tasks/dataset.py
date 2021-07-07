@@ -132,7 +132,9 @@ def make_dataset(parameters: dict):
         df.to_csv(csv_path, index=False)
 
     if copy:
-        paths = (path for sample in samples for path in sample["images_paths"])  # Generator of paths
+        paths = (
+            path for sample in samples for path in sample["images_paths"] if sample["split"] != "ignore"
+        )  # Generator of paths
         n_files = len(samples) * len(time_steps)
         copy_data(paths, dataset_path, destination, n_files)
 

@@ -3,3 +3,5 @@
 ['remote "minio"']
     url = s3://solarnet-dvc
     endpointurl = https://k8s-minio.isc.heia-fr.ch:9003
+    access_key_id = tm_jdonzallaz
+    secret_access_key = 5aP3Rl1p0p3tte

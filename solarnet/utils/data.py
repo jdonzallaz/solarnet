@@ -96,9 +96,10 @@ def data_info(datamodule: pl.LightningDataModule, parameters: dict, save_path: P
     # Examples of each batch
     def plot_batch(ds_name: str, ds: Dataset, n_images: int = 32):
         if isinstance(ds[0][0], tuple):
-            images = [ds[i][0][0].squeeze() for i in random.sample(range(len(ds)), n_images)]
+            images = [ds[i][0][0][0] for i in random.sample(range(len(ds)), n_images)]
         else:
-            images = [ds[i][0].squeeze() for i in random.sample(range(len(ds)), n_images)]
+            images = [ds[i][0][0] for i in random.sample(range(len(ds)), n_images)]
+
         plot_image_grid(images, max_images=n_images, columns=8, save_path=save_path / f"data-examples-{ds_name}.png")
 
     if save_path is not None:
