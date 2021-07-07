@@ -36,6 +36,7 @@ finetune:
   backbone_unfreeze_epoch: 50
 tags:
 - sdo-dataset
+- ft
 ```
 ### Model architecture
 ```
@@ -249,12 +250,12 @@ Total parameters: 24552898
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 346.73s
+training_time: 336.47s
 model_size: 107458kB
 early_stopping_epoch: 0
 model_checkpoint_step: 576
 model_checkpoint_epoch: 48
-tracking_id: SOLN-384
+tracking_id: SOLN-420
 data:
   class-balance:
     train:

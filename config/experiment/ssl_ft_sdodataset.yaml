@@ -31,6 +31,6 @@ finetune:
   backbone_unfreeze_epoch: 50
 
 name: Finetune SimCLR on SDO-Dataset
-tags: ["sdo-dataset"]
+tags: ["sdo-dataset", "ft"]
 training_type: finetune
 path: models/ssl_bz_ft_sdodataset

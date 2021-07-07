@@ -1,46 +1,12 @@
-# Model report
-## Training
-### Parameters
-```yaml
-data:
-  name: sdo-benchmark
-  validation_size: 0.1
-  channel: magnetogram
-  size: 128
-  targets:
-    classes:
-    - Quiet: < 1e-6
-    - '>=C': '>= 1e-6'
-  time_steps:
-  - 3
-  path: data/sdo-benchmark
-model:
-  backbone: resnet50
-  learning_rate: 2e-05
-  n_hidden: 512
-  dropout: 0.5
-  lr_scheduler: false
-  lr_scheduler_warmup_steps: 50
-trainer:
-  epochs: 50
-  patience: 10
-  batch_size: 128
-name: Finetune SimCLR on SDO-Benchmark, pretraining on 2010-2011, unfreeze epoch 40
-training_type: finetune
-tune_lr: false
-path: models/ssl_bz_ft_sdobenchmark
-seed: 42
-tracking: true
-system:
-  gpus: 1
-  workers: 20
-finetune:
-  base: models/ssl_bz_2011
-  backbone_unfreeze_epoch: 40
-```
-### Model architecture
-```
-ImageClassification(
+SimCLR(
+  (projection): Projection(
+    (model): Sequential(
+      (0): Linear(in_features=2048, out_features=2048, bias=True)
+      (1): BatchNorm1d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (2): ReLU()
+      (3): Linear(in_features=2048, out_features=64, bias=False)
+    )
+  )
   (backbone): ResNet(
     (conv1): Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
@@ -215,81 +181,20 @@ ImageClassification(
       )
     )
     (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
-    (fc): Identity()
+    (fc): Linear(in_features=2048, out_features=1000, bias=True)
   )
-  (classifier): Classifier(
-    (classifier): Sequential(
-      (0): Flatten(start_dim=1, end_dim=-1)
-      (1): Dropout(p=0.5, inplace=False)
-      (2): Linear(in_features=2048, out_features=512, bias=True)
-      (3): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (non_linear_evaluator): SSLEvaluator(
+    (block_forward): Sequential(
+      (0): Flatten()
+      (1): Dropout(p=0.2, inplace=False)
+      (2): Linear(in_features=2048, out_features=128, bias=False)
+      (3): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
       (4): ReLU(inplace=True)
-      (5): Dropout(p=0.5, inplace=False)
-      (6): Linear(in_features=512, out_features=2, bias=True)
+      (5): Dropout(p=0.2, inplace=False)
+      (6): Linear(in_features=128, out_features=2, bias=True)
+      (7): Softmax(dim=None)
     )
-  )
-  (loss_fn): CrossEntropyLoss()
-  (train_accuracy): Accuracy()
-  (val_accuracy): Accuracy()
-  (test_metrics): MetricCollection(
-    (Accuracy): Accuracy()
-    (F1): F1()
-    (Recall): Recall()
-    (StatScores): StatScores()
   )
 )
 ================================================================================
-Total parameters: 24552898
-```
-### Loss curve
-![Loss curve](train_plots/loss_curve.png 'Loss curve')
-
-### Accuracy curve
-![Accuracy curve](train_plots/accuracy_curve.png 'Accuracy curve')
-
-### Metadata
-```yaml
-machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 589.57s
-model_size: 295085kB
-early_stopping_epoch: 0
-model_checkpoint_step: 2784
-model_checkpoint_epoch: 48
-tracking_id: SOLN-412
-data:
-  class-balance:
-    train:
-      Quiet: 4362
-      '>=C': 2993
-    val:
-      Quiet: 474
-      '>=C': 343
-    test:
-      Quiet: 350
-      '>=C': 515
-  shape: (1, 128, 128)
-  tensor-data:
-    min: -1.0
-    max: 1.0
-    mean: 0.009875836782157421
-    std: 0.1774301379919052
-  set-sizes:
-    train: 7355
-    val: 817
-    test: 865
-```
-## Test
-### Metrics
-| Path                                       | accuracy   | balanced_accuracy   | csi    | f1     | far    | hss    | pod    | tss    |
-|--------------------------------------------|------------|---------------------|--------|--------|--------|--------|--------|--------|
-| models/ssl_bz_ft_sdobenchmark/metrics.yaml | 0.8231     | 0.8231              | 0.7348 | 0.8186 | 0.1276 | 0.6377 | 0.8233 | 0.6462 |
-
-### Confusion matrix
-![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')
-
-### ROC Curve
-![ROC Curve](test_plots/roc_curve.png 'ROC Curve')
-
-### Test samples
-![Test samples](test_plots/test_samples.png 'Test samples')
-
+Total parameters: 30144938

@@ -22,6 +22,9 @@ stages:
       ssl-2010-2014:
         config: dataset_ssl_2010_2014.yaml
         output: sdo-dataset-ssl-bz-1h-2010-2014
+      ssl-2010-2011:
+        config: dataset_ssl_2010_2011.yaml
+        output: sdo-dataset-ssl-bz-1h-2010-2011
     do:
       cmd:
         - python -m solarnet.main dataset config/${item.config} -v
@@ -60,6 +63,11 @@ stages:
         path: ssl_bz
         model: simclr
         dataset: sdo-dataset-ssl-bz-1h-2010-2014
+      ssl-2011:
+        experiment: ssl_2011
+        path: ssl_bz_2011
+        model: simclr
+        dataset: sdo-dataset-ssl-bz-1h-2010-2011
       ssl-month:
         experiment: ssl
         path: ssl_bz_month
@@ -97,7 +105,7 @@ stages:
   finetune:
     foreach:
       ssl_sdobenchmark:
-        base: ssl_bz_month
+        base: ssl_bz_2011
         experiment: ssl_ft_sdobenchmark
         path: ssl_bz_ft_sdobenchmark
         model: image_classification

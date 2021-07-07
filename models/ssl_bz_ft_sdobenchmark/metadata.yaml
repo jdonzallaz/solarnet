@@ -1,10 +1,10 @@
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 549.99s
-model_size: 107458kB
+training_time: 589.57s
+model_size: 295085kB
 early_stopping_epoch: 0
-model_checkpoint_step: 2842
-model_checkpoint_epoch: 49
-tracking_id: SOLN-385
+model_checkpoint_step: 2784
+model_checkpoint_epoch: 48
+tracking_id: SOLN-412
 data:
   class-balance:
     train:

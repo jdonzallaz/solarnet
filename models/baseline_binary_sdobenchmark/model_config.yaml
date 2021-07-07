@@ -7,14 +7,14 @@ hparams:
   n_class: 2
   learning_rate: 0.005
   class_weight:
-  - 0.8423076923076923
-  - 1.2303370786516854
+  - 0.8430765703805594
+  - 1.228700300701637
   backbone: simple-cnn
   backbone_output_size: 0
   n_hidden: 16
   dropout: 0.2
   lr_scheduler: true
   lr_scheduler_warmup_steps: 100
-  lr_scheduler_total_steps: 1180
+  lr_scheduler_total_steps: 1160
   activation: relu6
   pooling: 2

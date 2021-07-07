@@ -1,0 +1,35 @@
+data:
+  name: sdo-dataset
+  channel: bz
+  size: 128
+  targets:
+    classes:
+    - Quiet: < 1e-6
+    - '>=C': '>= 1e-6'
+  path: data/sdo-dataset-ssl-bz-1h-2010-2011
+model:
+  backbone: resnet50
+  learning_rate: 0.001
+  hidden_mlp: 2048
+  feat_dim: 64
+  optimizer: adam
+  warmup_epochs: 10
+trainer:
+  epochs: 1000
+  patience: 200
+  batch_size: 768
+name: Self-supervised learning (SimCLR) on SDO-Dataset, data 2010-2011
+training_type: ssl
+tune_lr: false
+path: models/ssl_bz_2011
+seed: 42
+tracking: true
+system:
+  gpus: 2
+  workers: 20
+ssl:
+  online:
+    learning_rate: 1e-05
+    n_hidden: 128
+tags:
+- ssl

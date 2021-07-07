@@ -21,7 +21,7 @@ trainer:
   epochs: 50
   patience: 10
   batch_size: 128
-name: Finetune SimCLR on SDO-Benchmark
+name: Finetune SimCLR on SDO-Benchmark, pretraining on 2010-2011, unfreeze epoch 40
 training_type: finetune
 tune_lr: false
 path: models/ssl_bz_ft_sdobenchmark
@@ -31,5 +31,5 @@ system:
   gpus: 1
   workers: 20
 finetune:
-  base: models/ssl_bz_month
-  backbone_unfreeze_epoch: 50
+  base: models/ssl_bz_2011
+  backbone_unfreeze_epoch: 40

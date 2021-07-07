@@ -5,14 +5,13 @@
 data:
   name: sdo-benchmark
   validation_size: 0.1
-  channel: 211
+  channel: magnetogram
   size: 256
   targets:
     classes:
     - Quiet: < 1e-6
     - '>=C': '>= 1e-6'
-  time_steps:
-  - 3
+  time_steps: 3
   path: data/sdo-benchmark
 model:
   backbone: simple-cnn
@@ -26,7 +25,7 @@ trainer:
   epochs: 20
   patience: 12
   batch_size: 128
-name: Baseline binary classification model
+name: Baseline binary classification model, magnetogram, >=C
 training_type: train
 tune_lr: false
 path: models/baseline_binary_sdobenchmark
@@ -35,6 +34,9 @@ tracking: true
 system:
   gpus: 1
   workers: 20
+tags:
+- sdo-benchmark
+- Class-C
 ```
 ### Model architecture
 ```
@@ -101,39 +103,39 @@ Total parameters: 24626
 ### Metadata
 ```yaml
 machine: 'lambda02 | Linux #113-Ubuntu SMP Thu Jul 9 23:41:39 UTC 2020 | 10 cores @ 4120.00Mhz | RAM 126 GB | 2x TITAN RTX'
-training_time: 85.12s
+training_time: 84.05s
 model_size: 323kB
 early_stopping_epoch: 0
-model_checkpoint_step: 590
-model_checkpoint_epoch: 10
-tracking_id: SOLN-388
+model_checkpoint_step: 522
+model_checkpoint_epoch: 9
+tracking_id: SOLN-419
 data:
   class-balance:
     train:
-      Quiet: 4420
-      '>=C': 3026
+      Quiet: 4362
+      '>=C': 2993
     val:
       Quiet: 474
-      '>=C': 353
+      '>=C': 343
     test:
-      Quiet: 352
-      '>=C': 522
+      Quiet: 350
+      '>=C': 515
   shape: (1, 256, 256)
   tensor-data:
-    min: -0.7960784435272217
-    max: 0.8901960849761963
-    mean: -0.10380689054727554
-    std: 0.28518185019493103
+    min: -1.0
+    max: 1.0
+    mean: 0.00987583864480257
+    std: 0.18608516454696655
   set-sizes:
-    train: 7446
-    val: 827
-    test: 874
+    train: 7355
+    val: 817
+    test: 865
 ```
 ## Test
 ### Metrics
-| Path                                             | accuracy   | balanced_accuracy   | csi   | f1     | far    | hss    | pod    | tss    |
-|--------------------------------------------------|------------|---------------------|-------|--------|--------|--------|--------|--------|
-| models/baseline_binary_sdobenchmark/metrics.yaml | 0.786      | 0.7691              | 0.705 | 0.7733 | 0.2004 | 0.5475 | 0.8563 | 0.5381 |
+| Path                                             | accuracy   | balanced_accuracy   | csi    | f1     | far    | hss    | pod    | tss    |
+|--------------------------------------------------|------------|---------------------|--------|--------|--------|--------|--------|--------|
+| models/baseline_binary_sdobenchmark/metrics.yaml | 0.8104     | 0.8037              | 0.7248 | 0.8034 | 0.1579 | 0.6069 | 0.8388 | 0.6074 |
 
 ### Confusion matrix
 ![Confusion matrix](test_plots/confusion_matrix.png 'Confusion matrix')

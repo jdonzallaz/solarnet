@@ -32,3 +32,4 @@ finetune:
   backbone_unfreeze_epoch: 50
 tags:
 - sdo-dataset
+- ft

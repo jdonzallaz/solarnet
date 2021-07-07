@@ -6,8 +6,9 @@ download-dataset --> train:multiclass
 download-dataset --> train:regression
 prepare-data:cls-bz-2015-2017 --> train:binary_sdodataset
 prepare-data:ssl-2010-2014 --> train:ssl
+prepare-data:ssl-2010-2011 --> train:ssl-2011
 prepare-data:ssl-month --> train:ssl-month
-train:ssl-month --> finetune:ssl_sdobenchmark
+train:ssl-2011 --> finetune:ssl_sdobenchmark
 download-dataset --> finetune:ssl_sdobenchmark
 train:ssl --> finetune:ssl_sdodataset
 prepare-data:cls-bz-2015-2017 --> finetune:ssl_sdodataset
